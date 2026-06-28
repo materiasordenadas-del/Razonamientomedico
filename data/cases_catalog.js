@@ -1,5 +1,5 @@
 window.HCR_CASES_CATALOG = {
-  version: "1.1.1",
+  version: "1.1.2",
   settings: { defaultPageSize: 24, pageSizeOptions: [12, 24, 48], defaultSort: "recommended", diagnosisPolicy: "hidden_until_module_7_evaluation" },
   filters: {
     symptoms: ["Disnea", "Dolor toracico", "Fiebre", "Fatiga", "Cefalea", "Dolor abdominal", "Mareo / Sincope", "Edema"],
@@ -39,6 +39,19 @@ window.HCR_CASES_CATALOG = {
   ]
 };
 
+function openCaseLibrary() {
+  document.querySelectorAll('.filter-opt input:checked').forEach((input) => {
+    input.checked = false;
+    input.parentElement.classList.remove('active-filter');
+  });
+  const search = document.getElementById('searchInput');
+  if (search) search.value = '';
+  if (typeof applyFilters === 'function') applyFilters();
+  const breadcrumb = document.querySelector('.breadcrumb');
+  if (breadcrumb) breadcrumb.innerHTML = 'Biblioteca <b>› Todos los casos</b>';
+  document.querySelector('.table-wrap')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 document.querySelectorAll('.filter-opt input:checked').forEach((input) => {
   input.checked = false;
   input.parentElement.classList.remove('active-filter');
@@ -49,4 +62,18 @@ if (difficultyGroup) {
   difficultyGroup.innerHTML = window.HCR_CASES_CATALOG.filters.difficulties.map((level) =>
     `<label class="filter-opt"><input type="checkbox" onchange="applyFilters()"> ${level}</label>`
   ).join('');
+}
+
+const libraryTab = document.querySelector('.sidebar-link.active');
+if (libraryTab) {
+  libraryTab.setAttribute('role', 'button');
+  libraryTab.setAttribute('tabindex', '0');
+  libraryTab.setAttribute('aria-label', 'Abrir biblioteca de casos');
+  libraryTab.onclick = openCaseLibrary;
+  libraryTab.onkeydown = (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      openCaseLibrary();
+    }
+  };
 }
