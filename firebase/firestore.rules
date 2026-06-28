@@ -1,0 +1,106 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function validUsername(value) {
+      return value is string
+        && value.matches('^[a-z0-9_]{3,24}$')
+        && !(value in ['admin', 'administrator', 'root', 'system', 'support', 'firebase']);
+    }
+
+    function validUserCreate(uid) {
+      return request.resource.data.keys().hasOnly([
+          'uid',
+          'username',
+          'usernameNormalized',
+          'role',
+          'contactEmail',
+          'createdAt',
+          'lastLoginAt'
+        ])
+        && request.resource.data.keys().hasAll([
+          'uid',
+          'username',
+          'usernameNormalized',
+          'role',
+          'contactEmail',
+          'createdAt',
+          'lastLoginAt'
+        ])
+        && request.resource.data.uid == uid
+        && request.resource.data.role == 'student'
+        && request.resource.data.contactEmail == null
+        && validUsername(request.resource.data.username)
+        && request.resource.data.username == request.resource.data.usernameNormalized
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.lastLoginAt == request.time;
+    }
+
+    function validUserUpdate() {
+      return request.resource.data.diff(resource.data).changedKeys().hasOnly(['lastLoginAt'])
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.username == resource.data.username
+        && request.resource.data.usernameNormalized == resource.data.usernameNormalized
+        && request.resource.data.role == 'student'
+        && request.resource.data.contactEmail == resource.data.contactEmail
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.lastLoginAt == request.time;
+    }
+
+    function validProgressWrite(caseId) {
+      return request.resource.data.keys().hasOnly([
+          'schemaVersion',
+          'caseId',
+          'status',
+          'currentModule',
+          'stateSnapshot',
+          'startedAt',
+          'updatedAt',
+          'completedAt'
+        ])
+        && request.resource.data.keys().hasAll([
+          'schemaVersion',
+          'caseId',
+          'status',
+          'currentModule',
+          'stateSnapshot',
+          'startedAt',
+          'updatedAt',
+          'completedAt'
+        ])
+        && request.resource.data.schemaVersion == 1
+        && request.resource.data.caseId == caseId
+        && request.resource.data.status in ['in_progress', 'completed']
+        && request.resource.data.currentModule is string
+        && request.resource.data.stateSnapshot is map
+        && request.resource.data.updatedAt == request.time
+        && (
+          request.resource.data.completedAt == null
+          || request.resource.data.completedAt == request.time
+          || request.resource.data.completedAt == resource.data.completedAt
+        );
+    }
+
+    match /users/{uid} {
+      allow get: if isOwner(uid);
+      allow list: if false;
+      allow create: if isOwner(uid) && validUserCreate(uid);
+      allow update: if isOwner(uid) && validUserUpdate();
+      allow delete: if false;
+
+      match /caseProgress/{caseId} {
+        allow get, list: if isOwner(uid);
+        allow create, update: if isOwner(uid) && validProgressWrite(caseId);
+        allow delete: if false;
+      }
+    }
+  }
+}

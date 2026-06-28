@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Firebase Test</title>
+</head>
+<body>
+  <main>
+    <label>
+      Usuario
+      <input id="username" type="text" autocomplete="username" inputmode="text">
+    </label>
+
+    <label>
+      Contraseña
+      <input id="password" type="password" autocomplete="current-password">
+    </label>
+
+    <button id="createAccount" type="button">Crear cuenta</button>
+    <button id="login" type="button">Iniciar sesión</button>
+    <button id="logout" type="button">Cerrar sesión</button>
+
+    <h1>Estado</h1>
+    <div id="status">No autenticado</div>
+  </main>
+
+  <script type="module">
+    import {
+      registerUser,
+      loginUser,
+      logoutUser,
+      onAuthStateChangedHCR
+    } from "./firebase/auth.js";
+
+    const username = document.getElementById("username");
+    const password = document.getElementById("password");
+    const status = document.getElementById("status");
+    const createAccount = document.getElementById("createAccount");
+    const login = document.getElementById("login");
+    const logout = document.getElementById("logout");
+
+    function credentials() {
+      return {
+        username: username.value,
+        password: password.value
+      };
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (character) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        "\"": "&quot;",
+        "'": "&#039;"
+      }[character]));
+    }
+
+    function showError(error) {
+      alert(error?.message || "No se pudo completar la accion.");
+    }
+
+    createAccount.addEventListener("click", async () => {
+      try {
+        const data = credentials();
+        await registerUser(data.username, data.password);
+      } catch (error) {
+        showError(error);
+      }
+    });
+
+    login.addEventListener("click", async () => {
+      try {
+        const data = credentials();
+        await loginUser(data.username, data.password);
+      } catch (error) {
+        showError(error);
+      }
+    });
+
+    logout.addEventListener("click", async () => {
+      try {
+        await logoutUser();
+      } catch (error) {
+        showError(error);
+      }
+    });
+
+    onAuthStateChangedHCR(({ user, profile }) => {
+      if (!user) {
+        status.textContent = "No autenticado";
+        return;
+      }
+
+      status.innerHTML = `
+        <div>Usuario: ${escapeHtml(profile?.usernameNormalized || "")}</div>
+        <div>UID parcial: ${escapeHtml(user.uid.slice(0, 8))}</div>
+      `;
+    });
+  </script>
+</body>
+</html>
