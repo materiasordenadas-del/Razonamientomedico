@@ -1,0 +1,26 @@
+{
+  "id": "RC1",
+  "caseId": "cap_001",
+  "route": "caso-RC1.html",
+  "status": "Disponible",
+  "format": "Caso completo",
+  "modules": 8,
+  "difficulty": "Intermedio",
+  "level": "Nivel III",
+  "collections": ["respiratorio", "infectologia", "urgencias"],
+  "public": {
+    "patient": {
+      "displayName": "José Ramírez",
+      "initials": "JR",
+      "age": 68,
+      "sex": "Masculino",
+      "setting": "Urgencias"
+    },
+    "chiefConcern": "Fiebre, tos y dificultad para respirar",
+    "presentation": "Paciente adulto mayor con fiebre, tos y disnea de evolución aguda. Acude al servicio de urgencias acompañado por un familiar."
+  },
+  "assets": {
+    "directory": "assets/",
+    "status": "pending"
+  }
+}
