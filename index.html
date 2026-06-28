@@ -141,7 +141,7 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-t
       <div class="sidebar-section-title">Filtros</div>
     </div>
 
-    <div class="filter-group">
+    <div class="filter-group" data-filter-group="symptoms">
       <div class="filter-group-title open" onclick="toggleFilter(this)">
         Síntoma principal <span>▾</span>
       </div>
@@ -157,7 +157,7 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-t
       </div>
     </div>
 
-    <div class="filter-group">
+    <div class="filter-group" data-filter-group="systems">
       <div class="filter-group-title open" onclick="toggleFilter(this)">
         Sistema orgánico <span>▾</span>
       </div>
@@ -170,7 +170,7 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-t
       </div>
     </div>
 
-    <div class="filter-group">
+    <div class="filter-group" data-filter-group="difficulties">
       <div class="filter-group-title open" onclick="toggleFilter(this)">
         Dificultad <span>▾</span>
       </div>
@@ -189,7 +189,7 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-t
 
     <div class="main-header">
       <div class="breadcrumb">Biblioteca <b>› Todos los casos</b></div>
-      <span class="count-badge" id="countBadge">1 caso disponible · 8 próximamente</span>
+      <span class="count-badge" id="countBadge">0 casos disponibles · 8 próximamente</span>
       <div class="search-wrap">
         <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg>
         <input class="search-input" id="searchInput" type="text" placeholder="Buscar por síntoma…" oninput="applyFilters()">
@@ -213,34 +213,6 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-t
           </tr>
         </thead>
         <tbody id="caseBody">
-
-          <!-- CASO DISPONIBLE -->
-          <tr class="case-row" onclick="window.location='caso-1.html'">
-            <td>
-              <div class="patient-cell">
-                <div class="avatar">CM</div>
-                <div>
-                  <div class="patient-name">Carlos M.</div>
-                  <div class="patient-demo">67 años · Masculino · Urgencias</div>
-                </div>
-              </div>
-            </td>
-            <td class="concern-cell">
-              <span class="concern-tag">Dificultad para respirar</span>
-            </td>
-            <td class="repr-cell">
-              Paciente adulto mayor con disnea progresiva de días de evolución, ortopnea, edema bilateral de miembros inferiores y taquicardia al ingreso.
-            </td>
-            <td class="modules-cell">
-              <span class="mod-badge"><span class="mod-dot"></span>8 módulos</span>
-            </td>
-            <td class="action-cell">
-              <a class="go-btn" href="caso-1.html" onclick="event.stopPropagation()">
-                Iniciar
-                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 18l6-6-6-6"/></svg>
-              </a>
-            </td>
-          </tr>
 
           <!-- PRÓXIMAMENTE -->
           <tr class="coming-row">
@@ -311,6 +283,7 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-t
   Diseñado por <strong>Adriel Pereira</strong> — Estudiante de Medicina, Universidad del Zulia · H-CR v3
 </footer>
 
+<script src="data/cases_catalog.js"></script>
 <script>
 function toggleFilter(el){
   el.classList.toggle('open');
@@ -318,12 +291,115 @@ function toggleFilter(el){
   opts.style.display=opts.style.display==='none'?'flex':'none';
 }
 
+function escapeHtml(value){
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  }[ch]));
+}
+
+function normalize(value){
+  return String(value ?? '').toLowerCase();
+}
+
+function caseSearchText(item){
+  const patient=item.patient||{};
+  const tags=item.publicTags||{};
+  return [
+    item.id,
+    patient.displayName,
+    patient.age,
+    patient.sex,
+    patient.setting,
+    item.chiefConcern,
+    item.publicPresentation,
+    item.difficulty,
+    ...(tags.symptoms||[]),
+    ...(tags.systems||[]),
+    ...(tags.context||[]),
+    ...(tags.keywords||[])
+  ].join(' ').toLowerCase();
+}
+
+function buildCaseRow(item){
+  const patient=item.patient||{};
+  const route=item.route||'#';
+  const symptoms=(item.publicTags?.symptoms||[item.chiefConcern]).join('|');
+  const systems=(item.publicTags?.systems||[]).join('|');
+  const demo=[patient.age?`${patient.age} años`:'',patient.sex,patient.setting].filter(Boolean).join(' · ');
+  const tr=document.createElement('tr');
+  tr.className='case-row';
+  tr.dataset.search=caseSearchText(item);
+  tr.dataset.symptoms=normalize(symptoms);
+  tr.dataset.systems=normalize(systems);
+  tr.dataset.difficulty=normalize(item.difficulty);
+  tr.onclick=()=>{window.location=route};
+  tr.innerHTML=`
+    <td>
+      <div class="patient-cell">
+        <div class="avatar">${escapeHtml(patient.initials||'--')}</div>
+        <div>
+          <div class="patient-name">${escapeHtml(patient.displayName||'Caso')}</div>
+          <div class="patient-demo">${escapeHtml(demo)}</div>
+        </div>
+      </div>
+    </td>
+    <td class="concern-cell">
+      <span class="concern-tag">${escapeHtml(item.chiefConcern||'Caso clínico')}</span>
+    </td>
+    <td class="repr-cell">${escapeHtml(item.publicPresentation||'')}</td>
+    <td class="modules-cell">
+      <span class="mod-badge"><span class="mod-dot"></span>${escapeHtml(item.modules||0)} módulos</span>
+    </td>
+    <td class="action-cell">
+      <a class="go-btn" href="${escapeHtml(route)}" onclick="event.stopPropagation()">
+        Iniciar
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 18l6-6-6-6"/></svg>
+      </a>
+    </td>`;
+  return tr;
+}
+
+function renderCasesFromCatalog(){
+  const body=document.getElementById('caseBody');
+  const catalog=window.HCR_CASES_CATALOG;
+  const cases=Array.isArray(catalog?.cases)?catalog.cases:[];
+  body.querySelectorAll('.case-row').forEach(row=>row.remove());
+  const firstComing=body.querySelector('.coming-row');
+  cases.forEach(item=>body.insertBefore(buildCaseRow(item),firstComing));
+  const countBadge=document.getElementById('countBadge');
+  if(countBadge){
+    countBadge.textContent=`${cases.length} caso${cases.length===1?'':'s'} disponible${cases.length===1?'':'s'} · 8 próximamente`;
+  }
+}
+
+function checkedFilters(groupName){
+  const group=document.querySelector(`[data-filter-group="${groupName}"]`);
+  if(!group){return []}
+  return [...group.querySelectorAll('.filter-opt input:checked')].map(input=>input.parentElement.textContent.trim().toLowerCase());
+}
+
+function matchesAny(text,values){
+  return values.length===0 || values.some(value=>text.includes(value));
+}
+
 function applyFilters(){
   const q=document.getElementById('searchInput').value.toLowerCase();
-  const rows=document.querySelectorAll('.case-row');
-  rows.forEach(row=>{
-    const text=row.textContent.toLowerCase();
-    row.style.display=(!q||text.includes(q))?'':'none';
+  const symptoms=checkedFilters('symptoms');
+  const systems=checkedFilters('systems');
+  const difficulties=checkedFilters('difficulties');
+  document.querySelectorAll('.filter-opt').forEach(opt=>{
+    opt.classList.toggle('active-filter',opt.querySelector('input').checked);
+  });
+  document.querySelectorAll('.case-row').forEach(row=>{
+    const visible=(!q||row.dataset.search.includes(q)) &&
+      matchesAny(row.dataset.symptoms||'',symptoms) &&
+      matchesAny(row.dataset.systems||'',systems) &&
+      matchesAny(row.dataset.difficulty||'',difficulties);
+    row.style.display=visible?'':'none';
   });
 }
 
@@ -332,6 +408,9 @@ function clearFilters(){
   document.getElementById('searchInput').value='';
   applyFilters();
 }
+
+renderCasesFromCatalog();
+applyFilters();
 </script>
 </body>
 </html>
