@@ -44,7 +44,7 @@ function expertPhaseCard(phaseKey, phase) {
 }
 
 function renderExpertNarrative() {
-  const comparison = expertData().comparisonByModule || {};
+  const comparison = expertData().comparisonByModule || window.HCR_EXPERT_COMPARISON || {};
   const ordered = ['m1', 'm2', 'm3', 'm4'];
   const cards = ordered.map(key => expertPhaseCard(key, comparison[key])).join('');
   return cards || '<div class="placeholder">Este caso aún no tiene comparación experta estructurada por módulo.</div>';
@@ -84,6 +84,4 @@ function renderM7() {
   </section>`;
 }
 
-if (typeof renderers !== 'undefined') {
-  renderers.m7 = renderM7;
-}
+if (typeof renderers !== 'undefined') renderers.m7 = renderM7;
