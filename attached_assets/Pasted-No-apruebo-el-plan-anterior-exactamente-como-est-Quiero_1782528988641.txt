@@ -1,0 +1,100 @@
+No apruebo el plan anterior exactamente como está. Quiero corregir la arquitectura antes de construirla.
+
+La aplicación debe separarse así:
+
+```text
+app/     = funcionamiento y diseño compartidos de toda H-CR
+cases/   = solamente datos clínicos de cada paciente
+```
+
+El objetivo es que, en el futuro, pueda cambiar una sola vez la interfaz, el Pad diagnóstico, el Venn, la navegación o cualquier módulo, y ese cambio afecte a todos los casos.
+
+Por eso, `cases/demo_case.js` NO debe contener:
+
+* `renderM1()`, `renderM2()` o funciones similares;
+* HTML de pantallas;
+* lógica de botones;
+* lógica del Pad diagnóstico;
+* lógica del Venn;
+* código que decida cómo se ve un módulo.
+
+Debe contener solamente un objeto estructurado de datos de demostración, por ejemplo:
+
+* identidad del paciente;
+* título del caso;
+* datos de Triage;
+* datos de Interrogatorio;
+* datos de Historial;
+* hallazgos del examen físico;
+* datos de Paraclínicos;
+* textos de prueba para manejo y evaluación;
+* identificador del caso y clave de guardado local.
+
+No uses contenido clínico real todavía. Usa datos de prueba claramente marcados como “Dato de demostración”.
+
+`app/modules.js` debe contener toda la lógica que convierte esos datos en pantallas, acordeones, hallazgos seleccionables, campos y módulos.
+
+También quiero que la demostración tenga desde el inicio los 8 módulos completos como estructura, aunque cada módulo tenga pocos datos de prueba:
+
+1. Triage e interrogatorio.
+2. Historial y examen funcional subjetivo.
+3. Examen físico.
+4. Paraclínicos.
+5. Pausa diagnóstica.
+6. Manejo clínico.
+7. Evaluación.
+8. Exportar desempeño.
+
+El Pad diagnóstico debe tener desde el inicio estas seis categorías:
+
+```text
+Triage
+Interrogatorio
+Historial
+Examen funcional
+Examen físico
+Paraclínicos
+```
+
+No construyas todavía un caso clínico real. Esto será un laboratorio técnico para probar el motor de la aplicación.
+
+Mantén intactos:
+
+```text
+caso-1.html
+index.html
+legacy/prototipo_original.html
+```
+
+No modifiques todavía esos archivos.
+
+La nueva estructura debe ser:
+
+```text
+caso-demo.html
+
+app/
+  styles.css
+  core.js
+  modules.js
+  bootstrap.js
+
+cases/
+  demo_case.js
+
+legacy/
+  prototipo_original.html
+```
+
+Usa HTML, CSS y JavaScript puro. No uses React, Node, npm, backend ni bases de datos.
+
+Primero actualiza tu plan de trabajo con estas correcciones y explícame, en lenguaje simple, qué archivo controla:
+
+1. La apariencia.
+2. Los botones y comportamiento.
+3. Los datos del paciente.
+4. El Pad diagnóstico.
+5. El Venn.
+6. La exportación.
+
+No escribas código todavía. Espera mi aprobación.

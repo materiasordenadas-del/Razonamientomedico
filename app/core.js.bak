@@ -1,0 +1,250 @@
+const sourceOrder = [
+  'Triage',
+  'Interrogatorio',
+  'Historial',
+  'Examen funcional',
+  'Examen físico',
+  'Paraclínicos'
+];
+
+const state = JSON.parse(localStorage.getItem(STORAGE) || 'null') || {
+  started:  false,
+  current:  'm1',
+  selected: {},
+  fields:   {},
+  expanded: {},
+  venn:     { placed: {} },
+  expert:   null
+};
+
+function save() {
+  localStorage.setItem(STORAGE, JSON.stringify(state));
+}
+
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, m => (
+    { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' }[m]
+  ));
+}
+
+function selectedCount() {
+  return Object.keys(state.selected).length;
+}
+
+function isSelected(id) {
+  return !!state.selected[id];
+}
+
+function selectFinding(id, source, text, checked) {
+  if (checked) {
+    state.selected[id] = { id, source, text };
+  } else {
+    delete state.selected[id];
+  }
+  save();
+  renderPad();
+}
+
+function markExpanded(id, open) {
+  state.expanded[id] = open;
+  save();
+}
+
+function setField(key, val) {
+  state.fields[key] = val;
+  save();
+  renderPad();
+}
+
+function copyField(from, to) {
+  if (state.fields[from]) {
+    state.fields[to] = state.fields[from];
+    save();
+    renderModules();
+  }
+}
+
+function currentIllness() {
+  return state.fields.ill_m4 || state.fields.ill_m3 || state.fields.ill_m2 || state.fields.ill_m1 || '';
+}
+
+function currentSyndrome() {
+  return state.fields.syndrome_m4 || state.fields.syndrome_m3 || state.fields.syndrome_m2 || '';
+}
+
+function currentTier() {
+  const pref = state.fields.tier_m4_1 ? 'tier_m4'
+             : state.fields.tier_m3_1 ? 'tier_m3'
+             : state.fields.tier_m2_1 ? 'tier_m2'
+             : 'tier_m1';
+  return [1,2,3].map(i => state.fields[`${pref}_${i}`]).filter(Boolean).join('\n');
+}
+
+function renderPad() {
+  document.getElementById('timeBadge').textContent =
+    'Módulo ' + state.current.replace('m', '');
+  document.getElementById('selectedBadge').textContent =
+    selectedCount() + ' dato' + (selectedCount() === 1 ? '' : 's');
+
+  const groups = {};
+  Object.values(state.selected).forEach(f => {
+    (groups[f.source] = groups[f.source] || []).push(f.text);
+  });
+
+  document.getElementById('padGroups').innerHTML = sourceOrder.map(s => {
+    const a = groups[s] || [];
+    return `<details ${a.length ? 'open' : ''}>
+      <summary>${esc(s)} (${a.length})</summary>
+      ${a.length
+        ? '<ul>' + a.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>'
+        : '<div class="empty">Sin datos seleccionados.</div>'}
+    </details>`;
+  }).join('');
+
+  document.getElementById('padIllness').textContent = currentIllness() || 'Pendiente';
+  document.getElementById('padSyndrome').textContent = currentSyndrome() || 'Pendiente';
+  document.getElementById('padTier').textContent    = currentTier()    || 'Pendiente';
+}
+
+function phaseData(phase) {
+  const map = {
+    m1: ['ill_m1','tier_m1'], m2: ['ill_m2','tier_m2'],
+    m3: ['ill_m3','tier_m3'], m4: ['ill_m4','tier_m4']
+  };
+  const [ill, prefix] = map[phase] || ['',''];
+  return {
+    illness: state.fields[ill] || '',
+    tiers:   [1,2,3].map(i => state.fields[`${prefix}_${i}`] || '')
+  };
+}
+
+function studentEvalRows() {
+  return [
+    ['Triage e interrogatorio', phaseData('m1')],
+    ['Tras Historial',          phaseData('m2')],
+    ['Tras examen físico',      phaseData('m3')],
+    ['Tras Paraclínicos',       phaseData('m4')]
+  ].map(([title, d]) =>
+    `<div class="eval-row">
+      <div class="eval-label">${title}</div>
+      <div class="eval-value">
+        <b>Enfermedad actual:</b> ${esc(d.illness || 'Pendiente')}<br>
+        <b>Tier 3:</b> ${esc(d.tiers.filter(Boolean).join(' · ') || 'Pendiente')}
+      </div>
+    </div>`
+  ).join('');
+}
+
+function expertEvalRows() {
+  const e = state.expert?.phases;
+  if (!e) return '<div class="placeholder">Importa aquí un archivo de evaluación experta después del análisis en ChatGPT.</div>';
+  return Object.entries(e).map(([title, d]) =>
+    `<div class="eval-row">
+      <div class="eval-label">${esc(title)}</div>
+      <div class="eval-value">
+        <b>Enfermedad actual:</b> ${esc(d.illness || '—')}<br>
+        <b>Tier 3:</b> ${esc((d.tiers || []).join(' · ') || '—')}
+      </div>
+    </div>`
+  ).join('');
+}
+
+function findingsEval() {
+  const groups = {};
+  Object.values(state.selected).forEach(f => {
+    (groups[f.source] = groups[f.source] || []).push(f.text);
+  });
+  return Object.entries(groups).map(([s, a]) =>
+    `<div class="eval-row">
+      <div class="eval-label">${esc(s)}</div>
+      <div class="eval-value">${a.map(x => '• ' + esc(x)).join('<br>')}</div>
+    </div>`
+  ).join('') || '<div class="placeholder">Aún no hay hallazgos seleccionados.</div>';
+}
+
+function exportPayload() {
+  return {
+    format:           'H-CR v3 performance',
+    exportedAt:       new Date().toISOString(),
+    caseId:           CASE_DATA.caseId,
+    selectedFindings: Object.values(state.selected),
+    fields:           state.fields,
+    expanded:         state.expanded,
+    venn:             state.venn,
+    currentModule:    state.current
+  };
+}
+
+function download(name, text, type) {
+  const b = new Blob([text], { type });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(b);
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function exportPerformance() {
+  download(
+    `HCR_v3_desempeno_${CASE_DATA.caseId}.json`,
+    JSON.stringify(exportPayload(), null, 2),
+    'application/json'
+  );
+}
+
+function exportSummary() {
+  const d = exportPayload();
+  let out = 'H-CR v3 — DESEMPEÑO\n\nHALLAZGOS SELECCIONADOS\n';
+  sourceOrder.forEach(s => {
+    const a = d.selectedFindings.filter(f => f.source === s);
+    out += `\n${s.toUpperCase()} (${a.length})\n` + a.map(f => '• ' + f.text).join('\n') + '\n';
+  });
+  out += '\nENFERMEDAD ACTUAL Y DIAGNÓSTICOS\n';
+  Object.entries(d.fields).forEach(([k, v]) => { if (v) out += `${k}: ${v}\n`; });
+  out += '\nPAUSA DIAGNÓSTICA\n';
+  Object.entries(d.venn.placed).forEach(([id, p]) => {
+    const f = d.selectedFindings.find(x => x.id === id);
+    if (f) out += `• ${f.text} → ${p.zone} [${p.direction}]\n`;
+  });
+  download(`HCR_v3_desempeno_${CASE_DATA.caseId}.txt`, out, 'text/plain;charset=utf-8');
+}
+
+function importExpertEvaluation() {
+  const input = document.getElementById('expertFile');
+  const file  = input?.files?.[0];
+  if (!file) return alert('Selecciona primero un archivo JSON de evaluación experta.');
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      state.expert = JSON.parse(r.result);
+      save();
+      renderModules();
+    } catch (e) {
+      alert('El archivo no tiene un formato JSON válido.');
+    }
+  };
+  r.readAsText(file);
+}
+
+function resetVenn() {
+  state.venn.placed = {};
+  save();
+  renderVenn();
+}
+
+function resetCase() {
+  if (confirm('¿Borrar todos los datos de este caso?')) {
+    localStorage.removeItem(STORAGE);
+    location.reload();
+  }
+}
+
+function togglePad() {
+  document.getElementById('app').classList.toggle('pad-collapsed');
+  const btn = document.getElementById('togglePad');
+  if (btn) {
+    btn.textContent = document.getElementById('app').classList.contains('pad-collapsed')
+      ? 'Mostrar Pad diagnóstico'
+      : 'Minimizar Pad diagnóstico';
+  }
+}

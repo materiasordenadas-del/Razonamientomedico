@@ -1,0 +1,131 @@
+No apruebo todavía el plan original. Quiero una migración más segura en dos etapas.
+
+El problema es que actualmente los datos clínicos están mezclados dentro de las funciones que crean los módulos. No quiero separar y rediseñar ambas cosas al mismo tiempo.
+
+## ETAPA A — Separación segura, sin cambiar el comportamiento
+
+Haz solamente esto:
+
+1. Crea primero:
+
+   * `legacy/caso-1_original.html`
+   * Debe ser una copia exacta e intacta de `caso-1.html`.
+
+2. Extrae el CSS a:
+
+   * `app/styles.css`
+
+3. Separa el JavaScript en archivos, pero conserva por ahora las funciones que generan el contenido clínico del caso tal como están.
+
+La estructura inicial debe ser:
+
+```text
+index.html
+caso-1.html
+server.py
+
+legacy/
+  caso-1_original.html
+
+app/
+  styles.css
+  core.js
+  modules.js
+  bootstrap.js
+
+cases/
+  caso-1.renderers.js
+  caso-1.config.js
+```
+
+## Reglas críticas
+
+* No intentes todavía transformar todos los hallazgos clínicos en datos puros.
+
+* `caso-1.renderers.js` debe conservar inicialmente las funciones actuales `renderM1()` hasta `renderM8()` y el contenido clínico actual, sin reescribirlo.
+
+* La conversión posterior a datos clínicos puros será una etapa distinta, después de comprobar que esta migración funciona.
+
+* `app/core.js` debe contener el funcionamiento general:
+
+  * localStorage;
+  * selección y deselección de hallazgos;
+  * Pad diagnóstico;
+  * campos de texto;
+  * exportación;
+  * reinicio;
+  * minimizar Pad.
+
+* `app/modules.js` debe contener la estructura compartida:
+
+  * navegación;
+  * pestañas;
+  * constructores visuales;
+  * Venn;
+  * funciones comunes de módulos.
+
+* `cases/caso-1.config.js` debe contener solamente:
+
+  * identificador del caso;
+  * clave actual de localStorage;
+  * título o configuración general del caso.
+
+* `sourceOrder` debe quedar en `app/core.js` o `app/modules.js`, porque es una regla general de la aplicación, no un dato clínico de este paciente.
+
+* La clave actual de localStorage debe conservarse exactamente:
+  `hcr_v3_cardiac_hidden_v2`
+
+* `app/bootstrap.js` debe ser el único archivo que inicia la aplicación al final.
+
+* `core.js` y `modules.js` no deben intentar abrir la app por sí mismos antes de que todos los demás archivos hayan cargado.
+
+## Orden obligatorio dentro de caso-1.html
+
+Usa scripts clásicos con `defer`, en este orden:
+
+```html
+<link rel="stylesheet" href="app/styles.css">
+
+<script defer src="cases/caso-1.config.js"></script>
+<script defer src="app/core.js"></script>
+<script defer src="app/modules.js"></script>
+<script defer src="cases/caso-1.renderers.js"></script>
+<script defer src="app/bootstrap.js"></script>
+```
+
+## Compatibilidad obligatoria
+
+Las funciones usadas dentro de HTML, por ejemplo:
+
+```text
+setField(...)
+selectFinding(...)
+goModule(...)
+```
+
+deben seguir funcionando exactamente igual.
+
+No las ocultes dentro de una estructura que impida que el HTML las encuentre.
+
+## Antes de continuar a una segunda etapa, prueba en Preview:
+
+1. La pantalla de inicio.
+2. Botón Continuar.
+3. Seleccionar un hallazgo.
+4. Ver el hallazgo inmediatamente en Pad diagnóstico.
+5. Deseleccionar un hallazgo.
+6. Abrir diálogos y acordeones.
+7. Navegar entre módulos.
+8. Escribir en campos clínicos y volver al módulo anterior.
+9. Minimizar y restaurar Pad diagnóstico.
+10. Arrastrar y devolver hallazgos en el Venn.
+11. Exportar JSON.
+12. Reiniciar caso.
+
+Si una prueba falla:
+
+* no continúes;
+* no hagas cambios adicionales;
+* indícame exactamente qué prueba falló y qué archivo la causó.
+
+Antes de modificar archivos, responde con el nuevo plan corregido y espera mi aprobación.

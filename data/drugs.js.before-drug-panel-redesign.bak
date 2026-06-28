@@ -1,0 +1,136 @@
+window.HCR_DRUGS = [
+  {
+    group: "Antibioticos",
+    children: [
+      {
+        group: "Inhibidores de sintesis de pared celular",
+        children: [
+          {
+            group: "Beta-lactamicos",
+            children: [
+              {
+                group: "Cefalosporinas",
+                children: [
+                  {
+                    group: "3a generacion",
+                    drugs: [
+                      {
+                        id: "ceftriaxone",
+                        name: "Ceftriaxona",
+                        presentations: ["1 g", "2 g", "Otra dosis"],
+                        routes: ["IV", "IM"],
+                        frequencies: ["Cada 12 horas", "Cada 24 horas", "Otra"],
+                        duration: true
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            group: "Glucopeptidos",
+            drugs: [
+              {
+                id: "vancomycin",
+                name: "Vancomicina",
+                presentations: ["500 mg", "1 g", "Otra dosis"],
+                routes: ["IV"],
+                frequencies: ["Cada 8 horas", "Cada 12 horas", "Segun niveles", "Otra"],
+                duration: true
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    group: "Cardiovascular",
+    children: [
+      {
+        group: "Diureticos",
+        drugs: [
+          {
+            id: "furosemide",
+            name: "Furosemida",
+            presentations: ["20 mg", "40 mg", "Otra dosis"],
+            routes: ["IV", "VO"],
+            frequencies: ["Dosis unica", "Cada 12 horas", "Cada 24 horas", "Infusion continua", "Otra"],
+            duration: true
+          }
+        ]
+      },
+      {
+        group: "Vasodilatadores",
+        drugs: [
+          {
+            id: "nitroglycerin",
+            name: "Nitroglicerina",
+            presentations: ["Infusion IV", "Sublingual", "Otra dosis"],
+            routes: ["IV", "SL"],
+            frequencies: ["Infusion titulada", "Cada 5 minutos segun respuesta", "Otra"],
+            duration: true
+          }
+        ]
+      },
+      {
+        group: "Antihipertensivos",
+        drugs: [
+          {
+            id: "labetalol",
+            name: "Labetalol",
+            presentations: ["20 mg", "40 mg", "Otra dosis"],
+            routes: ["IV", "VO"],
+            frequencies: ["Dosis unica", "Cada 10 minutos segun respuesta", "Cada 12 horas", "Otra"],
+            duration: true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    group: "Antitromboticos",
+    children: [
+      {
+        group: "Anticoagulantes",
+        drugs: [
+          {
+            id: "enoxaparin",
+            name: "Enoxaparina",
+            presentations: ["40 mg", "60 mg", "80 mg", "1 mg/kg", "Otra dosis"],
+            routes: ["SC"],
+            frequencies: ["Cada 12 horas", "Cada 24 horas", "Otra"],
+            duration: true
+          }
+        ]
+      },
+      {
+        group: "Antiagregantes",
+        drugs: [
+          {
+            id: "aspirin",
+            name: "Aspirina",
+            presentations: ["81 mg", "100 mg", "300 mg", "Otra dosis"],
+            routes: ["VO"],
+            frequencies: ["Dosis de carga", "Cada 24 horas", "Otra"],
+            duration: true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    group: "Hipolipemiantes",
+    drugs: [
+      {
+        id: "atorvastatin",
+        name: "Atorvastatina",
+        presentations: ["40 mg", "80 mg", "Otra dosis"],
+        routes: ["VO"],
+        frequencies: ["Cada 24 horas", "Otra"],
+        duration: true
+      }
+    ]
+  }
+];

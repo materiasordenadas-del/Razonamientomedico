@@ -1,0 +1,141 @@
+Quiero hacer una ronda pequeña de correcciones. No agregues funciones nuevas fuera de las indicadas y no cambies el diseño general.
+
+## CAMBIO 1 — Acordeones de Módulo 2 y Módulo 3
+
+Problema actual:
+
+En Módulo 2 y Módulo 3, cuando abro un acordeón, por ejemplo “Medicamentos”, y selecciono un hallazgo, el acordeón se cierra automáticamente.
+
+Quiero que esto deje de ocurrir.
+
+Comportamiento esperado:
+
+1. Abro “Medicamentos”.
+2. Selecciono un hallazgo.
+3. El hallazgo aparece en el Pad diagnóstico.
+4. El acordeón “Medicamentos” permanece abierto.
+5. Puedo seleccionar más hallazgos sin tener que abrirlo otra vez.
+
+Aplica esto a todos los acordeones de:
+
+* Módulo 2 — Historial y examen funcional subjetivo.
+* Módulo 3 — Examen físico.
+
+No cambies qué hallazgos existen. Solo conserva abiertos los acordeones que el estudiante ya abrió.
+
+---
+
+## CAMBIO 2 — Corregir devolución de hallazgos desde el Venn
+
+Problema actual:
+
+Cuando un hallazgo se devuelve desde el diagrama de Venn a la lista “Findings”:
+
+* vuelve correctamente a Findings;
+* pero también permanece visible dentro del Venn.
+
+Quiero que un hallazgo exista en un solo lugar a la vez.
+
+Comportamiento esperado:
+
+* Si el hallazgo está en Findings, no debe verse dentro del Venn.
+* Si el hallazgo está dentro del Venn, debe desaparecer de Findings.
+* Si se quita o devuelve desde el Venn:
+
+  * debe desaparecer completamente del Venn;
+  * debe regresar una sola vez a Findings;
+  * no debe quedar ninguna copia visual residual.
+
+Después de quitar un hallazgo, vuelve a renderizar o limpiar correctamente el Venn para evitar duplicados visuales.
+
+---
+
+## CAMBIO 3 — Botón “Reiniciar diagrama”
+
+Añade un botón visible en Módulo 5:
+
+```text
+Reiniciar diagrama
+```
+
+Su función debe ser únicamente:
+
+* quitar todos los hallazgos colocados dentro del Venn;
+* devolverlos a Findings;
+* dejar el Venn vacío.
+
+No debe borrar:
+
+* hallazgos seleccionados en los módulos anteriores;
+* contenido del Pad diagnóstico;
+* Dx1, Dx2 o Dx3;
+* textos escritos en otros módulos;
+* progreso general del caso.
+
+Debe reiniciar solamente la colocación de hallazgos dentro del Venn.
+
+---
+
+## CAMBIO 4 — Eliminar campos innecesarios de Módulo 5
+
+Quiero eliminar completamente esta sección del Módulo 5:
+
+* Hallazgo pivote.
+* Hallazgo más compartido.
+* Hallazgo más discriminador.
+* Hallazgo que reduce al diagnóstico líder.
+* Diagnóstico fatal aún abierto.
+* Prueba, maniobra o pregunta omitida.
+
+Elimina:
+
+1. Los títulos.
+2. Las instrucciones.
+3. Los campos de texto.
+4. Los placeholders.
+5. Su guardado en localStorage.
+6. Su inclusión en el JSON de exportación.
+
+No elimines:
+
+* Dx1, Dx2 y Dx3.
+* El diagrama de Venn.
+* Las instrucciones principales del Venn.
+* El Pad diagnóstico.
+* El botón de cargar Tier 3 final.
+
+---
+
+## REGLAS DE SEGURIDAD
+
+No tocar:
+
+* `caso-1.html`
+* `index.html`
+* `legacy/caso-1_original.html`
+* datos del paciente demo
+* estructura general de los 8 módulos
+* exportación JSON fuera de eliminar los seis campos indicados
+
+Después de implementar, prueba manualmente en Preview:
+
+```text
+[ ] Abrir un acordeón en Módulo 2 y seleccionar varios hallazgos sin que se cierre.
+[ ] Abrir un acordeón en Módulo 3 y seleccionar varios hallazgos sin que se cierre.
+[ ] Seleccionar hallazgo y verificar actualización inmediata del Pad.
+[ ] Arrastrar un hallazgo al Venn y comprobar que desaparece de Findings.
+[ ] Devolver un hallazgo desde el Venn y comprobar que desaparece totalmente del Venn.
+[ ] Reiniciar diagrama y comprobar que todos los hallazgos regresan a Findings.
+[ ] Verificar que Dx1, Dx2 y Dx3 no se borran al reiniciar diagrama.
+[ ] Verificar que los seis campos eliminados no aparecen en Módulo 5.
+[ ] Exportar JSON y comprobar que esos seis campos ya no están incluidos.
+```
+
+Al terminar, dame un reporte breve con:
+
+* archivos modificados;
+* pruebas aprobadas;
+* pruebas fallidas;
+* errores encontrados.
+
+No agregues otras mejoras todavía.

@@ -1,0 +1,149 @@
+const CASE_DATA = {
+  storage: 'hcr_demo_v1',
+  caseId:  'demo',
+  title:   'Laboratorio técnico H-CR',
+  patient: {
+    name:   'Dato de demostración',
+    age:    '00 años',
+    sex:    'Masculino (ficticio)',
+    reason: 'Dato de demostración: motivo de consulta ficticio para verificar la interfaz'
+  },
+
+  m1: {
+    triage: [
+      { id:'t01', source:'Triage', text:'Dato de demostración: FC 110 lpm' },
+      { id:'t02', source:'Triage', text:'Dato de demostración: PA 130/85 mmHg' },
+      { id:'t03', source:'Triage', text:'Dato de demostración: SatO₂ 93% al aire ambiente' },
+      { id:'t04', source:'Triage', text:'Dato de demostración: FR 22 rpm' },
+      { id:'t05', source:'Triage', text:'Dato de demostración: Temperatura 37,2 °C' }
+    ],
+    interrogatorio: [
+      {
+        id:'i01', source:'Interrogatorio',
+        text:'Dato de demostración: síntoma principal ficticio desde hace 3 días.',
+        question:'¿Qué lo trae por aquí hoy?',
+        depth:'Dato de demostración: información adicional al profundizar en el síntoma principal.'
+      },
+      {
+        id:'i02', source:'Interrogatorio',
+        text:'Dato de demostración: síntoma asociado ficticio de aparición progresiva.',
+        question:'¿Tiene algún otro síntoma?',
+        depth:'Dato de demostración: profundización del síntoma asociado con detalles adicionales.'
+      },
+      {
+        id:'i03', source:'Interrogatorio',
+        text:'Dato de demostración: niega síntoma negativo relevante.',
+        question:'¿Tiene dolor en el pecho?',
+        depth: null
+      }
+    ]
+  },
+
+  m2: {
+    historial: [
+      {
+        title: 'Antecedentes médicos (demostración)',
+        items: [
+          { id:'h01', source:'Historial', text:'Dato de demostración: antecedente crónico ficticio 1.' },
+          { id:'h02', source:'Historial', text:'Dato de demostración: antecedente crónico ficticio 2.' },
+          { id:'h03', source:'Historial', text:'Dato de demostración: antecedente quirúrgico ficticio.' }
+        ]
+      },
+      {
+        title: 'Medicación actual (demostración)',
+        items: [
+          { id:'h04', source:'Historial', text:'Dato de demostración: fármaco ficticio A — dosis ficticia.' },
+          { id:'h05', source:'Historial', text:'Dato de demostración: fármaco ficticio B — dosis ficticia.' }
+        ]
+      },
+      {
+        title: 'Antecedentes familiares (demostración)',
+        items: [
+          { id:'h06', source:'Historial', text:'Dato de demostración: antecedente familiar ficticio relevante.' }
+        ]
+      }
+    ],
+    examenFuncional: [
+      {
+        id:'ef01', source:'Examen funcional',
+        text:'Dato de demostración: respuesta cardiovascular ficticia positiva.',
+        question:'Sistema cardiovascular (demostración)',
+        depth:'Dato de demostración: profundización cardiovascular con detalles adicionales ficticios.'
+      },
+      {
+        id:'ef02', source:'Examen funcional',
+        text:'Dato de demostración: respuesta respiratoria ficticia positiva.',
+        question:'Sistema respiratorio (demostración)',
+        depth:'Dato de demostración: profundización respiratoria con detalles adicionales ficticios.'
+      },
+      {
+        id:'ef03', source:'Examen funcional',
+        text:'Dato de demostración: niega síntoma digestivo relevante.',
+        question:'Sistema digestivo (demostración)',
+        depth: null
+      }
+    ]
+  },
+
+  m3: {
+    systems: [
+      {
+        name: 'Sistema de demostración A',
+        findings: [
+          { id:'f01', source:'Examen físico', text:'Dato de demostración: hallazgo ficticio 1A.' },
+          { id:'f02', source:'Examen físico', text:'Dato de demostración: hallazgo ficticio 2A.' },
+          { id:'f03', source:'Examen físico', text:'Dato de demostración: hallazgo ficticio 3A.' }
+        ]
+      },
+      {
+        name: 'Sistema de demostración B',
+        findings: [
+          { id:'f04', source:'Examen físico', text:'Dato de demostración: hallazgo ficticio 1B.' },
+          { id:'f05', source:'Examen físico', text:'Dato de demostración: hallazgo ficticio 2B.' }
+        ]
+      },
+      {
+        name: 'Sistema de demostración C',
+        findings: [
+          { id:'f06', source:'Examen físico', text:'Dato de demostración: hallazgo ficticio 1C.' },
+          { id:'f07', source:'Examen físico', text:'Dato de demostración: hallazgo ficticio 2C.' },
+          { id:'f08', source:'Examen físico', text:'Dato de demostración: hallazgo ficticio 3C.' }
+        ]
+      }
+    ]
+  },
+
+  m4: {
+    tables: [
+      {
+        title: 'Hematología y química (demostración)',
+        rows: [
+          { id:'p01', source:'Paraclínicos', label:'Prueba A', value:'0,0', unit:'unidad', ref:'0–10' },
+          { id:'p02', source:'Paraclínicos', label:'Prueba B', value:'0,0', unit:'unidad', ref:'0–10' },
+          { id:'p03', source:'Paraclínicos', label:'Prueba C', value:'0,0', unit:'unidad', ref:'0–10' }
+        ]
+      },
+      {
+        title: 'Imágenes — informe textual (demostración)',
+        rows: [
+          { id:'p04', source:'Paraclínicos', label:'Imagen ficticia', value:'Dato de demostración: informe de imagen ficticio.', unit:'', ref:'' }
+        ]
+      }
+    ]
+  },
+
+  m6: {
+    fields: [
+      { key:'managementLeader',    title:'Diagnóstico principal actual',              placeholder:'Escribe el diagnóstico que lidera tu manejo…',        hint:'Justifica en una frase por qué es el más probable ahora.' },
+      { key:'managementFatal',     title:'Diagnóstico grave que aún no puedes descartar', placeholder:'Diagnóstico peligroso aún abierto…',               hint:'' },
+      { key:'initialActions',      title:'Intervención inicial',                      placeholder:'Primeras acciones para estabilizar al paciente…',    hint:'' },
+      { key:'additionalTests',     title:'Paraclínicos adicionales',                  placeholder:'Prueba — pregunta clínica — conducta — prioridad…',  hint:'' },
+      { key:'etiologicTreatment',  title:'Tratamiento etiológico',                    placeholder:'Fármaco, dosis, vía, frecuencia…',                   hint:'' },
+      { key:'complications',       title:'Prevención y manejo de complicaciones',     placeholder:'Complicación — medida…',                             hint:'' },
+      { key:'avoid',               title:'Precauciones y conductas a evitar',         placeholder:'Evitar / precauciones…',                             hint:'' },
+      { key:'consults',            title:'Interconsultas y destino',                  placeholder:'Servicio — motivo — destino…',                       hint:'' }
+    ]
+  }
+};
+
+const STORAGE = CASE_DATA.storage;

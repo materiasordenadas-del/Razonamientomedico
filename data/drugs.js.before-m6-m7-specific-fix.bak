@@ -1,0 +1,210 @@
+window.HCR_DRUGS = [
+  {
+    group: "Cardiovasculares",
+    children: [
+      {
+        group: "Antihipertensivos",
+        children: [
+          {
+            group: "Betabloqueantes",
+            children: [
+              {
+                group: "β1 selectivos",
+                drugs: [
+                  { id: "atenolol", name: "Atenolol" },
+                  { id: "bisoprolol", name: "Bisoprolol" },
+                  { id: "metoprolol", name: "Metoprolol" },
+                  { id: "esmolol", name: "Esmolol" },
+                  { id: "nebivolol", name: "Nebivolol" }
+                ]
+              },
+              {
+                group: "No selectivos",
+                drugs: [
+                  { id: "propranolol", name: "Propranolol" },
+                  { id: "nadolol", name: "Nadolol" },
+                  { id: "timolol", name: "Timolol" }
+                ]
+              },
+              {
+                group: "Mixtos α1 + β",
+                drugs: [
+                  { id: "carvedilol", name: "Carvedilol" },
+                  {
+                    id: "labetalol",
+                    name: "Labetalol",
+                    presentations: ["20 mg", "40 mg", "Otra dosis"],
+                    routes: ["IV", "VO"],
+                    frequencies: ["Dosis unica", "Cada 10 minutos segun respuesta", "Cada 12 horas", "Otra"],
+                    duration: true
+                  }
+                ]
+              },
+              {
+                group: "Con actividad simpaticomimética intrínseca",
+                drugs: [
+                  { id: "pindolol", name: "Pindolol" },
+                  { id: "acebutolol", name: "Acebutolol" },
+                  { id: "celiprolol", name: "Celiprolol" }
+                ]
+              }
+            ]
+          },
+          {
+            group: "Bloqueadores de canales de calcio",
+            children: [
+              {
+                group: "Dihidropiridínicos",
+                drugs: [
+                  { id: "amlodipine", name: "Amlodipino" },
+                  { id: "nifedipine", name: "Nifedipino" },
+                  { id: "felodipine", name: "Felodipino" },
+                  { id: "nicardipine", name: "Nicardipino" },
+                  { id: "clevidipine", name: "Clevidipino" },
+                  { id: "lercanidipine", name: "Lercanidipino" }
+                ]
+              },
+              {
+                group: "No dihidropiridínicos",
+                drugs: [
+                  { id: "verapamil", name: "Verapamilo" },
+                  { id: "diltiazem", name: "Diltiazem" }
+                ]
+              }
+            ]
+          },
+          { group: "Vasodilatadores directos", drugs: [] },
+          {
+            group: "Vasodilatadores dependientes de óxido nítrico",
+            drugs: [
+              {
+                id: "nitroglycerin",
+                name: "Nitroglicerina",
+                presentations: ["Infusion IV", "Sublingual", "Otra dosis"],
+                routes: ["IV", "SL"],
+                frequencies: ["Infusion titulada", "Cada 5 minutos segun respuesta", "Otra"],
+                duration: true
+              }
+            ]
+          },
+          { group: "Bloqueadores α1", drugs: [] },
+          { group: "Simpaticolíticos centrales", drugs: [] },
+          { group: "IECA", drugs: [] },
+          { group: "BRA", drugs: [] },
+          { group: "Inhibidor directo de renina", drugs: [] },
+          { group: "Diuréticos", drugs: [] },
+          { group: "Antagonistas mineralocorticoides", drugs: [] },
+          { group: "Otros antihipertensivos IV", drugs: [] }
+        ]
+      },
+      { group: "Antiarritmicos", drugs: [] },
+      { group: "Antianginosos", drugs: [] },
+      { group: "Inotrópicos y vasopresores", drugs: [] },
+      {
+        group: "Diuréticos",
+        drugs: [
+          {
+            id: "furosemide",
+            name: "Furosemida",
+            presentations: ["20 mg", "40 mg", "Otra dosis"],
+            routes: ["IV", "VO"],
+            frequencies: ["Dosis unica", "Cada 12 horas", "Cada 24 horas", "Infusion continua", "Otra"],
+            duration: true
+          }
+        ]
+      },
+      { group: "Fármacos para insuficiencia cardiaca", drugs: [] },
+      {
+        group: "Hipolipemiantes",
+        drugs: [
+          {
+            id: "atorvastatin",
+            name: "Atorvastatina",
+            presentations: ["40 mg", "80 mg", "Otra dosis"],
+            routes: ["VO"],
+            frequencies: ["Cada 24 horas", "Otra"],
+            duration: true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    group: "Antimicrobianos",
+    children: [
+      {
+        group: "Beta-lactámicos",
+        children: [
+          {
+            group: "Cefalosporinas",
+            children: [
+              {
+                group: "3a generación",
+                drugs: [
+                  {
+                    id: "ceftriaxone",
+                    name: "Ceftriaxona",
+                    presentations: ["1 g", "2 g", "Otra dosis"],
+                    routes: ["IV", "IM"],
+                    frequencies: ["Cada 12 horas", "Cada 24 horas", "Otra"],
+                    duration: true
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        group: "Glucopéptidos",
+        drugs: [
+          {
+            id: "vancomycin",
+            name: "Vancomicina",
+            presentations: ["500 mg", "1 g", "Otra dosis"],
+            routes: ["IV"],
+            frequencies: ["Cada 8 horas", "Cada 12 horas", "Segun niveles", "Otra"],
+            duration: true
+          }
+        ]
+      }
+    ]
+  },
+  { group: "Respiratorio", drugs: [] },
+  { group: "Endocrino", drugs: [] },
+  { group: "Gastrointestinal", drugs: [] },
+  { group: "Neurología", drugs: [] },
+  { group: "Analgesia y antiinflamatorios", drugs: [] },
+  {
+    group: "Anticoagulantes y antiagregantes",
+    children: [
+      {
+        group: "Anticoagulantes",
+        drugs: [
+          {
+            id: "enoxaparin",
+            name: "Enoxaparina",
+            presentations: ["40 mg", "60 mg", "80 mg", "1 mg/kg", "Otra dosis"],
+            routes: ["SC"],
+            frequencies: ["Cada 12 horas", "Cada 24 horas", "Otra"],
+            duration: true
+          }
+        ]
+      },
+      {
+        group: "Antiagregantes",
+        drugs: [
+          {
+            id: "aspirin",
+            name: "Aspirina",
+            presentations: ["81 mg", "100 mg", "300 mg", "Otra dosis"],
+            routes: ["VO"],
+            frequencies: ["Dosis de carga", "Cada 24 horas", "Otra"],
+            duration: true
+          }
+        ]
+      }
+    ]
+  },
+  { group: "Otros", drugs: [] }
+];

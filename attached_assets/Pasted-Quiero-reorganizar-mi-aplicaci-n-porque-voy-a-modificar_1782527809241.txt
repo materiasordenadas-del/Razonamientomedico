@@ -1,0 +1,81 @@
+Quiero reorganizar mi aplicación porque voy a modificar muchas veces el funcionamiento interno y la interfaz general.
+
+No quiero crear casos aislados que tengan todo repetido. Quiero que todos los casos futuros compartan el mismo sistema de funcionamiento y el mismo diseño.
+
+Ejemplos de cosas que quiero poder cambiar una sola vez para todos los casos:
+
+* Pad diagnóstico.
+* Selección y eliminación de hallazgos.
+* Navegación entre módulos.
+* Pantalla de inicio.
+* Diseño visual.
+* Pausa diagnóstica y diagrama de Venn.
+* Exportación JSON.
+* Evaluación.
+* Nuevos módulos, imágenes clínicas reales y audios.
+
+El contenido clínico de cada caso debe quedar separado del funcionamiento general de la app.
+
+Antes de modificar nada:
+
+1. Crea una copia intacta del archivo actual:
+   legacy/caso-1_original.html
+
+2. No borres ni sustituyas el archivo original.
+
+3. Conserva la URL actual caso-1.html para que el botón “Iniciar” de index.html siga funcionando.
+
+Luego reorganiza el proyecto gradualmente usando HTML, CSS y JavaScript puro.
+
+No uses React, Node, npm, Vite, TypeScript, backend, base de datos ni APIs externas.
+
+La estructura final debe parecerse a esta:
+
+index.html
+caso-1.html
+caso-2.html
+
+app/
+styles.css
+core.js
+modules.js
+
+cases/
+caso-1.js
+caso-2.js
+
+legacy/
+caso-1_original.html
+
+Reglas:
+
+* caso-1.html debe seguir abriendo el caso actual.
+* cases/caso-1.js debe contener solo los datos clínicos, textos, hallazgos, resultados y configuración específica del paciente.
+* app/styles.css debe contener el diseño general.
+* app/core.js debe contener el funcionamiento compartido: guardado, navegación, Pad diagnóstico, selección de hallazgos, exportación y reinicio.
+* app/modules.js debe contener la lógica de los módulos clínicos, incluyendo triage, historial, examen físico, paraclínicos, Venn, manejo y evaluación.
+* No cambies los textos clínicos, hallazgos ni flujo del caso durante esta reorganización.
+* No cambies la clave actual de localStorage.
+* No cambies la interfaz visible todavía.
+* No añadas funciones nuevas todavía.
+* No elimines botones ni interacciones existentes.
+
+Primero haz solamente una migración interna: el caso debe verse y comportarse exactamente igual al final.
+
+Después de terminar, prueba en Replit Preview:
+
+1. La pantalla de inicio.
+2. El botón Continuar.
+3. Selección y deselección de hallazgos.
+4. Actualización inmediata del Pad diagnóstico.
+5. Profundizaciones del paciente.
+6. Navegación entre módulos.
+7. Textos escritos en los campos.
+8. Minimizar y restaurar el Pad.
+9. Pausa diagnóstica y Venn.
+10. Exportar JSON y TXT.
+11. Reiniciar caso.
+
+No me digas que terminaste hasta confirmar qué pruebas funcionaron y cuáles no.
+
+Antes de crear o mover archivos, explícame en palabras simples exactamente qué vas a hacer y espera mi aprobación.

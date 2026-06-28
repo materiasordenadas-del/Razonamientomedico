@@ -1,0 +1,1207 @@
+function choice(id, source, text) {
+  const sel = isSelected(id);
+  return `<label class="selectable${sel ? ' selected' : ''}">
+    <input class="finding-check" type="checkbox"
+      data-id="${esc(id)}" data-source="${esc(source)}" data-text="${esc(text)}"
+      ${sel ? 'checked' : ''}>
+    <span class="fact-label">${esc(text)}</span>
+  </label>`;
+}
+
+function conversationBlock(item) {
+  const sel = isSelected(item.id);
+  const dlgId = 'dlg_' + item.id;
+  return `<div class="dialogue">
+    <p class="doctor">${esc(item.question)}</p>
+    <details class="patient-details" id="${dlgId}"
+      ${state.expanded[dlgId] ? 'open' : ''}
+      ontoggle="markExpanded('${dlgId}',this.open)">
+      <summary>
+        <span class="patient-text">${esc(item.text)}</span>
+        <input class="patient-check finding-check" type="checkbox"
+          data-id="${esc(item.id)}" data-source="${esc(item.source)}" data-text="${esc(item.text)}"
+          ${sel ? 'checked' : ''}
+          onclick="event.stopPropagation()">
+      </summary>
+      ${item.depth
+        ? `<div class="deeper"><p>${esc(item.depth)}</p></div>`
+        : ''}
+    </details>
+  </div>`;
+}
+
+function accordion(title, items, id, defaultOpen) {
+  const expandedKey = id || 'accordion_' + title;
+  const hasStoredState = Object.prototype.hasOwnProperty.call(state.expanded, expandedKey);
+  const isOpen = hasStoredState ? state.expanded[expandedKey] : !!defaultOpen;
+  return `<details class="accordion" ${isOpen ? 'open' : ''}
+    ontoggle="markExpanded('${esc(expandedKey)}',this.open)">
+    <summary>${esc(title)}</summary>
+    <div class="accordion-body">
+      ${renderFindingList(items)}
+    </div>
+  </details>`;
+}
+
+function expandablePatientItem(item) {
+  const sel = isSelected(item.id);
+  const detail = item.expandable;
+  const detailId = 'exp_' + item.id;
+  const detailSel = detail ? isSelected(detail.id) : false;
+  return `<details class="expandable-finding" ${state.expanded[detailId] ? 'open' : ''}
+    ontoggle="markExpanded('${detailId}',this.open)">
+    <summary>
+      <span class="patient-text">${esc(item.text)}</span>
+      <input class="patient-check finding-check" type="checkbox"
+        data-id="${esc(item.id)}" data-source="${esc(item.source)}" data-text="${esc(item.text)}"
+        ${sel ? 'checked' : ''}
+        onclick="event.stopPropagation()">
+    </summary>
+    <div class="deeper">
+      <p class="doctor">Médico: ${esc(detail.doctor)}</p>
+      <label class="selectable nested-selectable${detailSel ? ' selected' : ''}">
+        <input class="finding-check" type="checkbox"
+          data-id="${esc(detail.id)}" data-source="${esc(item.source)}" data-text="${esc(detail.patient)}"
+          ${detailSel ? 'checked' : ''}>
+        <span class="fact-label">Paciente: ${esc(detail.patient)}</span>
+      </label>
+    </div>
+  </details>`;
+}
+
+function findingItem(item) {
+  return item.expandable ? expandablePatientItem(item) : choice(item.id, item.source, item.text);
+}
+
+function renderFindingList(items) {
+  return items.map(item => findingItem(item)).join('');
+}
+
+function renderAccordionGroup(sections, keyPrefix) {
+  return (sections || []).map((section, idx) =>
+    accordion(section.title || section.name, section.items || section.findings || [], `${keyPrefix}_${idx}`, false)
+  ).join('');
+}
+
+function renderPhysicalExamSections(sections) {
+  return renderAccordionGroup(sections, 'm3_physical');
+}
+
+function labRow(item) {
+  const txt = item.label + ': ' + item.value
+    + (item.unit ? ' ' + item.unit : '')
+    + (item.ref  ? ' (VR: ' + item.ref + ')' : '');
+  const sel = isSelected(item.id);
+  return `<tr class="${sel ? 'selected' : ''}">
+    <td><input class="lab-check finding-check" type="checkbox"
+      data-id="${esc(item.id)}" data-source="${esc(item.source)}" data-text="${esc(txt)}"
+      ${sel ? 'checked' : ''}></td>
+    <td>${esc(item.label)}</td>
+    <td>${esc(item.value)}</td>
+    <td>${esc(item.unit)}</td>
+    <td>${esc(item.ref)}</td>
+  </tr>`;
+}
+
+function field(key, title, placeholder, hint, short) {
+  hint  = hint  ?? '';
+  short = short ?? false;
+  const val     = esc(state.fields[key] || '');
+  const handler = `oninput="setField('${esc(key)}',this.value)"`;
+  const input   = short
+    ? `<input type="text" placeholder="${esc(placeholder)}" value="${val}" ${handler}>`
+    : `<textarea placeholder="${esc(placeholder)}" ${handler}>${val}</textarea>`;
+  return `<div class="field">
+    <div class="field-title">${esc(title)}</div>
+    ${hint ? `<div class="field-instruction">${esc(hint)}</div>` : ''}
+    ${input}
+  </div>`;
+}
+
+function diagnosisPicker(key, label) {
+  const selected = state.diagnoses[key];
+  const query = state.diagnosisSearch[key] || '';
+  const manual = selected?.manual;
+  const display = diagnosisDisplay(key);
+  return `<div class="diagnosis-picker">
+    ${display
+      ? `<div class="diagnosis-selected">
+          <span>
+            <b data-diagnosis-name="${esc(key)}">${esc(display)}</b>
+            <small>${esc(selected?.category || (manual ? 'Manual' : 'Texto libre'))}</small>
+          </span>
+          <button type="button" class="diagnosis-x" onclick="clearDiagnosis('${key}')" aria-label="Quitar diagnóstico">×</button>
+        </div>`
+      : ''}
+    ${manual
+      ? `<input type="text" placeholder="${esc(label)}"
+          value="${esc(display)}"
+          oninput="setManualDiagnosis('${key}',this.value)">`
+      : display
+        ? ''
+      : `<input type="text" placeholder="Buscar diagnóstico..."
+          value="${esc(query)}"
+          oninput="setDiagnosisSearch('${key}',this.value);refreshDiagnosisSuggestions('${key}')"
+          onfocus="refreshDiagnosisSuggestions('${key}')">
+        <div class="diagnosis-suggestions" id="suggestions_${key}">
+          ${diagnosisSuggestionsHTML(key)}
+        </div>`}
+  </div>`;
+}
+
+function tier(phase) {
+  inheritPreviousTier(phase);
+  const labels = {
+    1: 'Diagnóstico principal',
+    2: 'Diagnóstico secundario',
+    3: 'Diagnóstico fatal que no puedo perder'
+  };
+  return `<div class="tier-grid">
+    ${[1,2,3].map(i => {
+      const k = `tier_${phase}_${i}`;
+      return `<div class="tier-card">
+        <h4>${esc(labels[i])}</h4>
+        ${diagnosisPicker(k, labels[i])}
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function phaseClose(phase) {
+  const canLoadPrevious = ['m2', 'm3', 'm4'].includes(phase);
+  return `<div class="card">
+    <h2>Síntesis de fase</h2>
+    ${canLoadPrevious
+      ? `<div class="footer-actions" style="justify-content:flex-start;border:0;margin:0 0 8px">
+          <button class="action light" onclick="copyPreviousIllness('${phase}')">Cargar enfermedad actual</button>
+        </div>`
+      : ''}
+    ${field('ill_' + phase, 'ENFERMEDAD ACTUAL', 'Sintetiza la enfermedad actual en una frase…')}
+    <h3>Hipótesis diagnósticas (Tier 3)</h3>
+    ${tier(phase)}
+  </div>`;
+}
+
+function goModule(m) {
+  if (['m6','m7','m8'].includes(m) && !state.diagnosticPauseCompleted) {
+    state.current = 'm5';
+    save();
+    renderModules();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+  if (['m6','m7','m8'].includes(m) && !state.managementMode) {
+    state.current = 'managementSelect';
+    save();
+    renderModules();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+  state.current = m;
+  save();
+  renderModules();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderTabs() {
+  const labels = {
+    m1:'1 Triage', m2:'2 Historial', m3:'3 Examen físico',
+    m4:'4 Paraclínicos', m5:'5 Pausa diagnóstica',
+    m6:'6 Manejo', m7:'7 Evaluación', m8:'8 Exportar'
+  };
+  document.getElementById('tabs').innerHTML = Object.entries(labels).map(([k, v]) =>
+    `<button class="tab${state.current === k ? ' active' : ''}" onclick="goModule('${k}')">${v}</button>`
+  ).join('');
+}
+
+function renderModules() {
+  document.getElementById('modules').innerHTML = renderers[state.current]();
+  const app = document.getElementById('app');
+  app.classList.remove('pad-collapsed', 'pad-hidden');
+  if (state.current === 'm5') {
+    app.classList.add('pad-collapsed');
+    renderVenn();
+  } else if (state.current === 'managementSelect' || state.current === 'm6' || state.current === 'm7') {
+    app.classList.add('pad-hidden');
+  } else {
+    app.classList.remove('pad-collapsed', 'pad-hidden');
+  }
+  renderTabs();
+  renderPad();
+}
+
+function loadTierToVenn() {
+  ['1','2','3'].forEach(i => {
+    state.fields['venn_dx' + i] =
+      diagnosisDisplay('tier_m4_' + i) ||
+      diagnosisDisplay('tier_m3_' + i) ||
+      diagnosisDisplay('tier_m2_' + i) ||
+      diagnosisDisplay('tier_m1_' + i) || '';
+  });
+  save();
+  renderModules();
+}
+
+function syncTierToVenn() {
+  let changed = false;
+  ['1','2','3'].forEach(i => {
+    const next =
+      diagnosisDisplay('tier_m4_' + i) ||
+      diagnosisDisplay('tier_m3_' + i) ||
+      diagnosisDisplay('tier_m2_' + i) ||
+      diagnosisDisplay('tier_m1_' + i) || '';
+    const key = 'venn_dx' + i;
+    if (next && state.fields[key] !== next) {
+      state.fields[key] = next;
+      changed = true;
+    }
+  });
+  if (changed) save();
+}
+
+let dragId = null;
+
+function clearVennVisuals() {
+  document.querySelectorAll('.zone').forEach(z => {
+    z.classList.remove('drop-over');
+    z.querySelectorAll('.placed').forEach(el => el.remove());
+  });
+  document.querySelectorAll('[data-return-source]').forEach(g => {
+    g.classList.remove('drop-over');
+  });
+}
+
+function renderVennLogGroups(places) {
+  const zoneOrder = [
+    'Solo Dx1',
+    'Solo Dx2',
+    'Solo Dx3',
+    'Dx1 + Dx2',
+    'Dx1 + Dx3',
+    'Dx2 + Dx3',
+    'Los tres',
+    'Fuera / distractor'
+  ];
+  const zoneLabels = { 'Los tres': 'Dx1 + Dx2 + Dx3' };
+  return zoneOrder.map(zone => {
+    const rows = Object.entries(places)
+      .filter(([id, p]) => p.zone === zone && state.selected[id])
+      .map(([id, p]) => `<tr class="venn-log-finding"><td colspan="3">${esc(state.selected[id].text)} <small>[${esc(p.direction)}]</small></td></tr>`)
+      .join('');
+    return rows
+      ? `<tr class="venn-log-heading"><td colspan="3">${esc(zoneLabels[zone] || zone)}</td></tr>${rows}`
+      : '';
+  }).join('') || '<tr><td colspan="3" class="subtle">Aún no has colocado hallazgos.</td></tr>';
+}
+
+function renderVenn() {
+  const source = document.getElementById('findingSource');
+  if (!source) return;
+  clearVennVisuals();
+
+  state.venn = state.venn || { placed: {} };
+  state.venn.placed = state.venn.placed || {};
+  Object.keys(state.venn.placed).forEach(id => {
+    if (!state.selected[id]) delete state.venn.placed[id];
+  });
+
+  const by = {};
+  Object.values(state.selected).forEach(f => {
+    if (!state.venn.placed[f.id]) (by[f.source] = by[f.source] || []).push(f);
+  });
+
+  source.innerHTML = '<h3 style="margin:0 0 6px">Findings</h3>'
+    + '<p class="subtle">Agrupa por módulo. Al colocar en el Venn desaparecen de aquí.</p>'
+    + sourceOrder.map(s =>
+        `<div class="finding-group" data-return-source="${esc(s)}">
+          <div class="finding-group-title">${esc(s)}</div>
+          ${(by[s] || []).map(f =>
+            `<span class="finding-chip" draggable="true" data-id="${f.id}"
+              title="Arrastrar">${esc(f.text)}</span>`
+          ).join('') || '<span class="subtle">Sin hallazgos disponibles.</span>'}
+        </div>`
+      ).join('');
+
+  document.querySelectorAll('.finding-chip').forEach(el =>
+    el.addEventListener('dragstart', e => {
+      dragId = el.dataset.id;
+      e.dataTransfer.setData('text/plain', dragId);
+    })
+  );
+
+  document.querySelectorAll('.zone').forEach(z => {
+    z.addEventListener('dragover',  e => { e.preventDefault(); z.classList.add('drop-over'); });
+    z.addEventListener('dragleave', ()  => z.classList.remove('drop-over'));
+    z.addEventListener('drop', e => {
+      e.preventDefault();
+      z.classList.remove('drop-over');
+      if (!dragId) return;
+      const dir = document.getElementById('direction')?.value || '0';
+      state.venn.placed[dragId] = { zone: z.dataset.zone, direction: dir };
+      save(); dragId = null; renderVenn();
+    });
+  });
+
+  document.querySelectorAll('[data-return-source]').forEach(g => {
+    g.addEventListener('dragover',  e => { e.preventDefault(); g.classList.add('drop-over'); });
+    g.addEventListener('dragleave', ()  => g.classList.remove('drop-over'));
+    g.addEventListener('drop', e => {
+      e.preventDefault();
+      g.classList.remove('drop-over');
+      if (dragId && state.venn.placed[dragId]) {
+        delete state.venn.placed[dragId];
+        save();
+        clearVennVisuals();
+        dragId = null;
+        renderVenn();
+      }
+    });
+  });
+
+  const places  = state.venn.placed;
+  const zoneMap = {};
+  Object.entries(places).forEach(([id, p]) =>
+    (zoneMap[p.zone] = zoneMap[p.zone] || []).push([id, p])
+  );
+  document.querySelectorAll('.zone').forEach(z => {
+    (zoneMap[z.dataset.zone] || []).forEach(([id, p]) => {
+      const f = state.selected[id];
+      if (!f) return;
+      const el = document.createElement('div');
+      el.className  = 'placed';
+      el.draggable  = true;
+      el.dataset.id = id;
+      el.innerHTML  = `${esc(f.text)} <small>[${esc(p.direction)}]</small>`;
+      el.addEventListener('dragstart', e => {
+        dragId = id;
+        e.dataTransfer.setData('text/plain', id);
+      });
+      z.appendChild(el);
+    });
+  });
+
+  const log = document.getElementById('vennLog');
+  if (log) {
+    log.innerHTML = Object.entries(places).map(([id, p]) => {
+      const f = state.selected[id];
+      return f
+        ? `<tr><td>${esc(f.text)}</td><td>${esc(p.zone)}</td><td>${esc(p.direction)}</td></tr>`
+        : '';
+    }).join('') || '<tr><td colspan="3" class="subtle">Aún no has colocado hallazgos.</td></tr>';
+  }
+  if (log) log.innerHTML = renderVennLogGroups(places);
+}
+
+function renderEvaluationStudent() {
+  const el = document.getElementById('studentEval');
+  if (el) el.innerHTML = studentEvalRows();
+  const fs = document.getElementById('studentFindingsEval');
+  if (fs) fs.innerHTML = findingsEval();
+}
+
+function renderExpertFindings() {
+  const data = state.expert?.findings || {};
+  return Object.entries(data).map(([module, items]) =>
+    `<div class="eval-row">
+      <div class="eval-label">${esc(module)}</div>
+      <div class="eval-value">
+        ${(items || []).map(i =>
+          `<b>${esc(i.finding || '')}</b>${i.reason ? ': ' + esc(i.reason) : ''}`
+        ).join('<br>')}
+      </div>
+    </div>`
+  ).join('') || '<div class="placeholder">Sin hallazgos expertos importados.</div>';
+}
+
+function renderM1() {
+  const d = CASE_DATA.m1;
+  return `<section class="module active">
+    <div class="module-intro">
+      <h1>Módulo 1 — Triage e interrogatorio</h1>
+      <p>Selecciona los datos que cambian tu representación del problema.</p>
+    </div>
+    <div class="m1-grid">
+      <div class="triage-panel">
+        <div class="card">
+          <div class="section-title">Triage</div>
+          <div class="patient-identity">
+            <b>${esc(CASE_DATA.patient.name)}</b> · ${esc(CASE_DATA.patient.age)} · ${esc(CASE_DATA.patient.sex)}<br>
+            <span style="color:var(--muted)">Motivo: ${esc(CASE_DATA.patient.reason)}</span>
+          </div>
+          ${d.triage.map(f => choice(f.id, f.source, f.text)).join('')}
+        </div>
+      </div>
+      <div class="conversation-panel">
+        <div class="card">
+          <div class="section-title">Interrogatorio</div>
+          ${d.interrogatorio.map(item => conversationBlock(item)).join('')}
+        </div>
+        ${phaseClose('m1')}
+      </div>
+    </div>
+    <div class="footer-actions">
+      <button class="action" onclick="goModule('m2')">Continuar a historial →</button>
+    </div>
+  </section>`;
+}
+
+function renderM2() {
+  const d = CASE_DATA.m2;
+  return `<section class="module active">
+    <div class="module-intro">
+      <h1>Módulo 2 — Historial y examen funcional subjetivo</h1>
+      <p>Selecciona los antecedentes y síntomas funcionales relevantes.</p>
+    </div>
+    <div class="card">
+      <h2>Historial</h2>
+      ${renderAccordionGroup(d.historial, 'm2_historial')}
+    </div>
+    <div class="card">
+      <h2>Examen funcional subjetivo</h2>
+      ${renderAccordionGroup(d.examenFuncional, 'm2_examen_funcional')}
+    </div>
+    ${phaseClose('m2')}
+    <div class="footer-actions">
+      <button class="action secondary" onclick="goModule('m1')">← Volver</button>
+      <button class="action" onclick="goModule('m3')">Continuar a examen físico →</button>
+    </div>
+  </section>`;
+}
+
+function renderM3() {
+  const d = CASE_DATA.m3;
+  return `<section class="module active">
+    <div class="module-intro">
+      <h1>Módulo 3 — Examen físico</h1>
+      <p>Selecciona los hallazgos que cambian tu diagnóstico diferencial.</p>
+    </div>
+    <div class="card">
+      <h2>Examen físico por sistemas</h2>
+      ${renderPhysicalExamSections(d.physicalExam || d.systems || [])}
+    </div>
+    ${phaseClose('m3')}
+    <div class="footer-actions">
+      <button class="action secondary" onclick="goModule('m2')">← Volver</button>
+      <button class="action" onclick="goModule('m4')">Continuar a paraclínicos →</button>
+    </div>
+  </section>`;
+}
+
+function renderM4() {
+  const d = CASE_DATA.m4;
+  const tableHTML = (title, rows, idx) => {
+    const expandedKey = 'm4_paraclinicos_' + idx;
+    const hasStoredState = Object.prototype.hasOwnProperty.call(state.expanded, expandedKey);
+    const isOpen = hasStoredState ? state.expanded[expandedKey] : false;
+    return `<details class="accordion" ${isOpen ? 'open' : ''}
+      ontoggle="markExpanded('${expandedKey}',this.open)">
+      <summary>${esc(title)}</summary>
+      <div class="accordion-body">
+        <table class="lab-table">
+          <thead><tr><th></th><th>Prueba</th><th>Valor</th><th>Unidad</th><th>Referencia</th></tr></thead>
+          <tbody>${rows.map(r => labRow(r)).join('')}</tbody>
+        </table>
+      </div>
+    </details>`;
+  };
+  return `<section class="module active">
+    <div class="module-intro">
+      <h1>Módulo 4 — Paraclínicos</h1>
+      <p>Selecciona los resultados que cambian tu representación del problema o el diagnóstico diferencial.</p>
+    </div>
+    <div class="card">
+      <h2>Estudios disponibles</h2>
+      ${d.tables.map((t, idx) => tableHTML(t.title, t.rows, idx)).join('')}
+    </div>
+    ${phaseClose('m4')}
+    <div class="footer-actions">
+      <button class="action secondary" onclick="goModule('m3')">← Volver</button>
+      <button class="action" onclick="goModule('m5')">Continuar a pausa diagnóstica →</button>
+    </div>
+  </section>`;
+}
+
+function renderM5() {
+  syncTierToVenn();
+  return `<section class="module active">
+    <div class="module-intro">
+      <h1>Módulo 5 — Pausa diagnóstica</h1>
+      <p>Arrastra cada hallazgo hacia la zona que mejor represente a qué diagnóstico favorece. El Pad se minimiza automáticamente para darte espacio.</p>
+    </div>
+    <div class="card m5-card">
+      <div class="guidance"><b>Instrucción:</b> Arrastra hallazgos del panel izquierdo al diagrama. Para devolverlos, arrástralos de vuelta al panel izquierdo.</div>
+      <div class="venn-top">
+        ${field('venn_dx1','Dx1','Diagnóstico 1…','',true)}
+        ${field('venn_dx2','Dx2','Diagnóstico 2…','',true)}
+        ${field('venn_dx3','Dx3','Diagnóstico 3…','',true)}
+      </div>
+      <div class="footer-actions" style="justify-content:flex-start;border:0;margin:4px 0 10px">
+        <button class="action light" onclick="loadTierToVenn()">Cargar Tier 3 final</button>
+        <label class="subtle">Dirección diagnóstica
+          <select id="direction">
+            <option value="++">++ Apoya fuertemente</option>
+            <option value="+">+ Apoya</option>
+            <option value="0">0 Compartido / poco discriminador</option>
+            <option value="−">− Reduce</option>
+            <option value="−−">−− Reduce mucho</option>
+          </select>
+        </label>
+      </div>
+      <div class="venn-layout">
+        <div class="card finding-source" id="findingSource"></div>
+        <div class="card" style="overflow:auto">
+          <div class="venn-board" id="vennBoard">
+            <button class="action light venn-reset-button" onclick="resetVenn()">Reiniciar diagrama</button>
+            <div class="circle dx1"></div>
+            <div class="circle dx2"></div>
+            <div class="circle dx3"></div>
+            <div class="zone z1"   data-zone="Solo Dx1"><div class="zone-title">Solo Dx1</div></div>
+            <div class="zone z2"   data-zone="Solo Dx2"><div class="zone-title">Solo Dx2</div></div>
+            <div class="zone z3"   data-zone="Solo Dx3"><div class="zone-title">Solo Dx3</div></div>
+            <div class="zone z12"  data-zone="Dx1 + Dx2"><div class="zone-title">Dx1 + Dx2</div></div>
+            <div class="zone z13"  data-zone="Dx1 + Dx3"><div class="zone-title">Dx1 + Dx3</div></div>
+            <div class="zone z23"  data-zone="Dx2 + Dx3"><div class="zone-title">Dx2 + Dx3</div></div>
+            <div class="zone z123" data-zone="Los tres"><div class="zone-title">Los tres</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Registro de colocaciones</h2>
+        <table class="lab-table venn-log-table">
+          <thead><tr><th>Hallazgo</th><th>Zona</th><th>Dirección</th></tr></thead>
+          <tbody id="vennLog"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="footer-actions">
+      <button class="action secondary" onclick="goModule('m4')">← Volver</button>
+      <button class="action" onclick="completeDiagnosticPause()">Completar pausa diagnóstica</button>
+    </div>
+  </section>`;
+}
+
+const manualManagementFields = [
+  { key: 'initialIntervention', title: 'Intervención inicial', instruction: 'Describa las primeras acciones para estabilizar al paciente, incluyendo soporte, prioridades inmediatas y parámetros a vigilar.' },
+  { key: 'stabilization', title: 'Estabilización', instruction: 'Organice las medidas para mantener perfusión, ventilación, seguridad y vigilancia durante las primeras horas.' },
+  { key: 'etiologicTreatment', title: 'Tratamiento etiológico', instruction: 'Explique el tratamiento dirigido a la causa más probable, con dosis, vía, frecuencia y condiciones de ajuste si aplica.' },
+  { key: 'activeProblems', title: 'Tratamiento de problemas activos adicionales', instruction: 'Incluya problemas concomitantes que cambian conducta y cómo los trataría o vigilaría.' },
+  { key: 'conductChangingTests', title: 'Pruebas que aún cambian conducta', instruction: 'Indique qué pruebas faltan, qué pregunta responden y cómo cambiarían el manejo.' },
+  { key: 'monitoring', title: 'Monitorización', instruction: 'Defina parámetros, frecuencia de control y criterios de alarma o respuesta.' },
+  { key: 'consults', title: 'Interconsultas', instruction: 'Especifique servicio, motivo, prioridad y qué decisión espera de la interconsulta.' },
+  { key: 'precautions', title: 'Precauciones y conductas a evitar', instruction: 'Registre riesgos de iatrogenia, contraindicaciones, interacciones, dosis inseguras o procedimientos a diferir.' },
+  { key: 'timeDestination', title: 'Tiempo y destino', instruction: 'Defina momento de inicio de las medidas, lugar de manejo y criterios para cambiar de destino.' }
+];
+
+const guidedGeneralOptions = [
+  ['oxygen', 'Oxígeno', true],
+  ['nasal_cannula', 'Cánula nasal'],
+  ['simple_mask', 'Mascarilla simple'],
+  ['reservoir_mask', 'Mascarilla con reservorio'],
+  ['noninvasive_ventilation', 'Ventilación no invasiva'],
+  ['intubation', 'Intubación orotraqueal'],
+  ['cardiac_monitoring', 'Monitorización cardíaca'],
+  ['two_iv_lines', 'Dos accesos venosos'],
+  ['strict_diuresis', 'Control estricto de diuresis'],
+  ['fluid_balance', 'Balance hídrico'],
+  ['head_elevated', 'Cabecera elevada'],
+  ['fluid_restriction', 'Restricción hídrica'],
+  ['sodium_restriction', 'Restricción de sodio'],
+  ['glucose_checks', 'Control seriado de glucemia'],
+  ['rest', 'Reposo'],
+  ['pain_control', 'Control del dolor']
+];
+
+const guidedProcedureOptions = [
+  ['urinary_catheter', 'Catéter vesical'],
+  ['arterial_blood_gas', 'Gasometría arterial'],
+  ['arterial_line', 'Vía arterial'],
+  ['central_line', 'Vía central'],
+  ['cardioversion', 'Cardioversión eléctrica'],
+  ['transcutaneous_pacing', 'Marcapasos transcutáneo'],
+  ['cardiac_catheterization', 'Cateterismo cardíaco'],
+  ['thoracentesis', 'Toracocentesis'],
+  ['paracentesis', 'Paracentesis'],
+  ['blood_cultures', 'Hemocultivos'],
+  ['isolation', 'Aislamiento']
+];
+
+const guidedMonitoringOptions = [
+  ['serial_vitals', 'Signos vitales seriados'],
+  ['telemetry', 'Telemetría'],
+  ['continuous_oximetry', 'Oximetría continua'],
+  ['fluid_balance', 'Balance hídrico'],
+  ['hourly_diuresis', 'Diuresis horaria'],
+  ['serial_ecg', 'ECG seriado'],
+  ['serial_troponins', 'Troponinas seriadas'],
+  ['capillary_glucose', 'Glucemia capilar'],
+  ['renal_function', 'Función renal'],
+  ['electrolytes', 'Electrolitos'],
+  ['arterial_gases', 'Gases arteriales'],
+  ['neurologic_status', 'Estado neurológico']
+];
+
+const destinationOptions = [
+  'Observación',
+  'Sala general',
+  'Unidad de cuidados intermedios',
+  'Unidad de cuidados intensivos',
+  'Hemodinamia',
+  'Quirófano',
+  'Traslado a centro de mayor complejidad',
+  'Manejo ambulatorio'
+];
+
+const guidedConsultOptions = [
+  ['internal_medicine', 'Medicina interna'],
+  ['cardiology', 'Cardiología'],
+  ['critical_care', 'Cuidados intensivos'],
+  ['infectious_diseases', 'Infectología'],
+  ['nephrology', 'Nefrología'],
+  ['pulmonology', 'Neumología'],
+  ['general_surgery', 'Cirugía general']
+];
+
+const oxygenFlowOptions = ['1-2 L/min', '3-5 L/min', '6-10 L/min', '10-15 L/min', 'Configuración según dispositivo'];
+const oxygenTargetOptions = ['SatO₂ 88-92%', 'SatO₂ 92-96%', 'SatO₂ ≥ 94%', 'Objetivo individualizado'];
+const oxygenIndicationOptions = ['Hipoxemia', 'Disnea con trabajo respiratorio', 'Soporte durante estabilización', 'Previo a traslado o procedimiento'];
+
+function renderManagementSelection() {
+  if (!state.diagnosticPauseCompleted) return renderBlockedManagement();
+  if (state.managementMode) return renderM6();
+  return `<section class="module active management-select">
+    <div class="management-instructions">
+      <p>Seleccione únicamente una modalidad de manejo.</p>
+      <p>La modalidad elegida quedará bloqueada para este caso.</p>
+      <p>No podrá cambiar posteriormente entre manejo con asistencia y manejo sin asistencia.</p>
+      <p>Esta elección no afecta la calificación por sí misma.</p>
+      <p>Cada modalidad evalúa competencias diferentes.</p>
+    </div>
+    <div class="management-choice-grid">
+      <button class="management-choice manual" onclick="selectManagementMode('manual')">
+        <h2>SIN ASISTENCIA</h2>
+        <p>Esta modalidad evalúa su capacidad para construir el manejo clínico completamente desde cero.</p>
+        <p>Usted redactará libremente todas las órdenes, intervenciones, dosis, monitorización, interconsultas y destino.</p>
+        <p>No recibirá organización previa del tratamiento.</p>
+        <h3>Competencias evaluadas:</h3>
+        <ul><li>Organización clínica.</li><li>Recuperación libre.</li><li>Precisión terapéutica.</li><li>Seguridad.</li></ul>
+      </button>
+      <button class="management-choice guided" onclick="selectManagementMode('guided')">
+        <h2>CON ASISTENCIA</h2>
+        <p>Esta modalidad organiza el manejo mediante categorías clínicas.</p>
+        <p>No revela el tratamiento correcto.</p>
+        <p>Solo facilita la construcción técnica de las órdenes.</p>
+        <h3>Competencias evaluadas:</h3>
+        <ul><li>Selección adecuada.</li><li>Dosis.</li><li>Vía.</li><li>Frecuencia.</li><li>Secuencia.</li><li>Contraindicaciones.</li><li>Monitorización.</li><li>Prevención de iatrogenia.</li></ul>
+      </button>
+    </div>
+  </section>`;
+}
+
+function renderBlockedManagement() {
+  return `<section class="module active">
+    <div class="card">
+      <h2>Primero completa la pausa diagnóstica</h2>
+      <p class="subtle">Para continuar al manejo debes completar el Módulo 5.</p>
+      <button class="action" onclick="goModule('m5')">Ir a Módulo 5</button>
+    </div>
+  </section>`;
+}
+
+function renderM6DxCard() {
+  const items = currentTierItems();
+  return `<div class="m6-dx-card">
+    ${items.map((item, idx) => `<div class="m6-dx-item">
+      <span>Dx${idx + 1}</span>
+      <strong>${esc(item.diagnosis?.name || 'Pendiente')}</strong>
+    </div>`).join('')}
+  </div>`;
+}
+
+function renderManualManagement() {
+  return `<div class="m6-library">
+    <h2>Biblioteca de manejo</h2>
+    <p class="subtle">Redacta el manejo por secciones. La columna izquierda resume lo escrito.</p>
+    ${manualManagementFields.map(({ key, title, instruction }) => `<div class="manual-section-card">
+      <div class="field-title">${esc(title)}</div>
+      <p class="subtle">${esc(instruction)}</p>
+      <textarea placeholder="Escribe aquí..." oninput="setManualManagementField('${key}',this.value)">${esc(state.manualManagement[key] || '')}</textarea>
+    </div>`).join('')}
+  </div>`;
+}
+
+function renderGuidedOption(id, label, checked, onChange) {
+  return `<label class="guided-option ${checked ? 'selected' : ''}">
+    <input type="checkbox" ${checked ? 'checked' : ''} onchange="${onChange}">
+    <span>${esc(label)}</span>
+  </label>`;
+}
+
+function renderGuidedGeneral() {
+  const gm = state.guidedManagement.general;
+  return `<details class="guided-section" open>
+    <summary>Manejo general</summary>
+    <div class="guided-options">
+      ${guidedGeneralOptions.map(([id, label]) => renderGuidedOption(id, label, !!gm[id], `setGuidedGeneral('${id}',this.checked)`)).join('')}
+    </div>
+  </details>`;
+}
+
+function renderDrugTree(nodes = drugBank(), level = 0, path = []) {
+  return nodes.map(node => {
+    const hasChildren = (node.children || []).length > 0;
+    const hasDrugs = (node.drugs || []).length > 0;
+    const isLeafGroup = !hasChildren && hasDrugs;
+    const nextPath = path.concat(node.group);
+    const expandedKey = 'drug_' + nextPath.join('_').replace(/[^A-Za-z0-9]+/g, '_');
+    if (isLeafGroup && level >= 3) {
+      return `<div class="drug-leaf-group drug-level-${Math.min(level, 3)}">
+        <div class="drug-leaf-title">${esc(node.group)}</div>
+        <div class="drug-chip-list">
+          ${node.drugs.map(drug => `<button type="button" class="drug-chip ${state.guidedManagement.drugs[drug.id] ? 'selected' : ''}" onclick="selectGuidedDrug('${drug.id}')">${esc(drug.name)}</button>`).join('')}
+        </div>
+      </div>`;
+    }
+    return `<details class="drug-node drug-level-${Math.min(level, 3)}" ${state.expanded[expandedKey] ? 'open' : ''}
+      ontoggle="markExpanded('${expandedKey}',this.open)">
+      <summary>
+        <span>${esc(node.group)}</span>
+        <span class="drug-arrow">⌄</span>
+      </summary>
+      <div class="drug-node-body">
+        ${hasChildren ? renderDrugTree(node.children, level + 1, nextPath) : ''}
+        ${isLeafGroup ? `<div class="drug-chip-list">
+          ${node.drugs.map(drug => `<button type="button" class="drug-chip ${state.guidedManagement.drugs[drug.id] ? 'selected' : ''}" onclick="selectGuidedDrug('${drug.id}')">${esc(drug.name)}</button>`).join('')}
+        </div>` : ''}
+      </div>
+    </details>`;
+  }).join('');
+}
+
+function renderDrugForm(drug) {
+  const selected = state.guidedManagement.drugs[drug.id] || {};
+  const hasStructuredForm = (drug.presentations || []).length || (drug.routes || []).length || (drug.frequencies || []).length || drug.duration;
+  if (!hasStructuredForm) {
+    return `<div class="drug-form basic-drug-order">
+      <div class="drug-form-header">
+        <div>
+          <h4>${esc(drug.name)}</h4>
+          <p class="subtle">Orden seleccionada básica. El formulario estructurado aún no está definido para este fármaco.</p>
+        </div>
+        <button type="button" class="diagnosis-x" onclick="removeGuidedDrug('${drug.id}')" aria-label="Quitar fármaco">×</button>
+      </div>
+    </div>`;
+  }
+  return `<div class="drug-form clinical-form-card">
+    <div class="drug-form-header">
+      <h4>${esc(drug.name).toUpperCase()}</h4>
+      <button type="button" class="diagnosis-x" onclick="removeGuidedDrug('${drug.id}')" aria-label="Quitar fármaco">×</button>
+    </div>
+    <label>Presentación / dosis
+      <select onchange="updateGuidedDrug('${drug.id}','presentation',this.value)">
+        <option value="">Seleccionar</option>
+        ${(drug.presentations || []).map(v => `<option ${selected.presentation === v ? 'selected' : ''}>${esc(v)}</option>`).join('')}
+      </select>
+    </label>
+    <label>Vía
+      <select onchange="updateGuidedDrug('${drug.id}','route',this.value)">
+        <option value="">Seleccionar</option>
+        ${(drug.routes || []).map(v => `<option ${selected.route === v ? 'selected' : ''}>${esc(v)}</option>`).join('')}
+      </select>
+    </label>
+    <label>Frecuencia
+      <select onchange="updateGuidedDrug('${drug.id}','frequency',this.value)">
+        <option value="">Seleccionar</option>
+        ${(drug.frequencies || []).map(v => `<option ${selected.frequency === v ? 'selected' : ''}>${esc(v)}</option>`).join('')}
+      </select>
+    </label>
+    <input placeholder="Duración prevista" value="${esc(selected.duration || '')}" oninput="updateGuidedDrug('${drug.id}','duration',this.value)">
+    <textarea placeholder="Indicación clínica" oninput="updateGuidedDrug('${drug.id}','indication',this.value)">${esc(selected.indication || '')}</textarea>
+    <textarea placeholder="Condición para ajustar, suspender o evitar" oninput="updateGuidedDrug('${drug.id}','precautions',this.value)">${esc(selected.precautions || '')}</textarea>
+  </div>`;
+}
+
+function renderGuidedDrugs() {
+  return `<details class="guided-section" open>
+    <summary>Manejo farmacológico</summary>
+    <div class="drug-panel">
+      <div class="drug-panel-header">
+        <h3>FÁRMACOS</h3>
+        <p>Clasificación farmacológica</p>
+      </div>
+      <div class="drug-tree">${renderDrugTree()}</div>
+    </div>
+  </details>`;
+}
+
+function renderGuidedProcedures() {
+  const selected = state.guidedManagement.procedures;
+  const open = Object.prototype.hasOwnProperty.call(state.expanded, 'guided_procedures')
+    ? state.expanded.guided_procedures
+    : false;
+  return `<details class="guided-section" ${open ? 'open' : ''} ontoggle="markExpanded('guided_procedures',this.open)">
+    <summary>Procedimientos y soporte</summary>
+    <div class="guided-options">
+      ${guidedProcedureOptions.map(([id, label]) => renderGuidedOption(id, label, !!selected[id], `setGuidedProcedure('${id}',this.checked)`)).join('')}
+    </div>
+  </details>`;
+}
+
+function renderGuidedMonitoring() {
+  const open = Object.prototype.hasOwnProperty.call(state.expanded, 'guided_monitoring')
+    ? state.expanded.guided_monitoring
+    : false;
+  return `<details class="guided-section" ${open ? 'open' : ''} ontoggle="markExpanded('guided_monitoring',this.open)">
+    <summary>Monitorización</summary>
+    <div class="guided-options">
+      ${guidedMonitoringOptions.map(([id, label]) => renderGuidedOption(id, label, !!state.guidedManagement.monitoring[id], `setGuidedMonitoring('${id}',this.checked)`)).join('')}
+    </div>
+  </details>`;
+}
+
+function renderGuidedConsults() {
+  const selected = new Set((state.guidedManagement.consults || []).map(c => c.id));
+  return `<details class="guided-section" open>
+    <summary>Interconsultas y destino</summary>
+    <div class="guided-options">
+      ${guidedConsultOptions.map(([id, label]) => renderGuidedOption(id, label, selected.has(id), `setGuidedConsultOption('${id}','${esc(label)}',this.checked)`)).join('')}
+    </div>
+    <label class="field-title">Destino global</label>
+    <div class="guided-options compact-options">
+      ${destinationOptions.map(v => `<label class="guided-option ${state.guidedManagement.destination === v ? 'selected' : ''}">
+        <input type="radio" name="guided_destination" ${state.guidedManagement.destination === v ? 'checked' : ''} onchange="setGuidedDestination('${esc(v)}')">
+        <span>${esc(v)}</span>
+      </label>`).join('')}
+    </div>
+  </details>`;
+}
+
+function renderGuidedPrecautions() {
+  return `<details class="guided-section" open>
+    <summary>Precauciones y conductas a evitar</summary>
+    <textarea class="required-precautions" placeholder="Fármacos contraindicados, dosis peligrosas, combinaciones de riesgo, procedimientos a diferir, correcciones rápidas, líquidos excesivos, anticoagulación insegura, destino inseguro o ausencia de monitorización." oninput="setGuidedPrecautions(this.value)">${esc(state.guidedManagement.precautions || '')}</textarea>
+  </details>`;
+}
+
+function renderGuidedManagement() {
+  return `<div class="m6-library guided-management">
+    <h2>Opciones de manejo</h2>
+    ${renderGuidedGeneral()}
+    ${renderGuidedDrugs()}
+    ${renderGuidedProcedures()}
+    ${renderGuidedMonitoring()}
+    ${renderGuidedConsults()}
+    ${renderGuidedPrecautions()}
+  </div>`;
+}
+
+function optionLabel(options, id) {
+  return options.find(([key]) => key === id)?.[1] || id;
+}
+
+function renderOxygenOrderForm() {
+  const oxygen = state.guidedManagement.general.oxygen;
+  if (!oxygen) return '';
+  const details = oxygen.details || {};
+  return `<div class="clinical-form-card">
+    <div class="drug-form-header">
+      <h4>OXÍGENO</h4>
+      <button type="button" class="diagnosis-x" onclick="setGuidedGeneral('oxygen',false)" aria-label="Quitar oxígeno">×</button>
+    </div>
+    <div class="field-title">Dispositivo</div>
+    <div class="oxygen-device-list">
+      ${['Cánula nasal','Mascarilla simple','Mascarilla con reservorio','Ventilación no invasiva'].map(device =>
+        `<label><input type="radio" name="oxygen_device" ${details.device === device ? 'checked' : ''} onchange="setGuidedGeneralDetail('oxygen','device','${esc(device)}')"> ${esc(device)}</label>`
+      ).join('')}
+    </div>
+    <div class="field-title">Flujo / configuración</div>
+    <div class="oxygen-device-list">
+      ${oxygenFlowOptions.map(value => `<label><input type="radio" name="oxygen_flow" ${details.flow === value ? 'checked' : ''} onchange="setGuidedGeneralDetail('oxygen','flow','${esc(value)}')"> ${esc(value)}</label>`).join('')}
+    </div>
+    <div class="field-title">Objetivo de saturación</div>
+    <div class="oxygen-device-list">
+      ${oxygenTargetOptions.map(value => `<label><input type="radio" name="oxygen_target" ${details.target === value ? 'checked' : ''} onchange="setGuidedGeneralDetail('oxygen','target','${esc(value)}')"> ${esc(value)}</label>`).join('')}
+    </div>
+    <div class="field-title">Indicación</div>
+    <div class="oxygen-device-list">
+      ${oxygenIndicationOptions.map(value => `<label><input type="radio" name="oxygen_indication" ${details.indication === value ? 'checked' : ''} onchange="setGuidedGeneralDetail('oxygen','indication','${esc(value)}')"> ${esc(value)}</label>`).join('')}
+    </div>
+  </div>`;
+}
+
+function renderGuidedOrdersSummary() {
+  const gm = state.guidedManagement;
+  const general = Object.entries(gm.general).filter(([, value]) => !!value).map(([id]) => optionLabel(guidedGeneralOptions, id));
+  const drugs = Object.keys(gm.drugs).map(id => findDrugById(id)).filter(Boolean);
+  const procedures = Object.keys(gm.procedures).map(id => optionLabel(guidedProcedureOptions, id));
+  const monitoring = Object.entries(gm.monitoring).filter(([, value]) => !!value).map(([id]) => optionLabel(guidedMonitoringOptions, id));
+  const hasOrders = general.length || drugs.length || procedures.length || monitoring.length || gm.consults.length || gm.destination || gm.precautions;
+  return `<div class="orders-panel-inner">
+    <h2>Órdenes seleccionadas</h2>
+    ${hasOrders ? `<div class="order-summary-list">
+      ${general.map(label => `<div class="order-item"><span>Manejo general</span><strong>${esc(label)}</strong></div>`).join('')}
+      ${drugs.map(drug => `<div class="order-item"><span>Fármaco</span><strong>${esc(drug.name)}</strong></div>`).join('')}
+      ${procedures.map(label => `<div class="order-item"><span>Procedimiento o soporte</span><strong>${esc(label)}</strong></div>`).join('')}
+      ${monitoring.map(label => `<div class="order-item"><span>Monitorización</span><strong>${esc(label)}</strong></div>`).join('')}
+      ${gm.consults.map(c => `<div class="order-item"><span>Interconsulta</span><strong>${esc(c.service || 'Pendiente')}</strong></div>`).join('')}
+      ${gm.destination ? `<div class="order-item"><span>Destino global</span><strong>${esc(gm.destination)}</strong></div>` : ''}
+      ${gm.precautions ? `<div class="order-item"><span>Precauciones</span><strong>${esc(gm.precautions)}</strong></div>` : ''}
+    </div>` : '<div class="order-empty">Aún no hay órdenes seleccionadas.</div>'}
+    ${renderOxygenOrderForm()}
+    ${drugs.map(drug => renderDrugForm(drug)).join('')}
+  </div>`;
+}
+
+function renderManualOrdersSummary() {
+  const written = manualManagementFields.filter(({ key }) => (state.manualManagement[key] || '').trim());
+  return `<div class="orders-panel-inner">
+    <h2>Órdenes seleccionadas</h2>
+    ${written.length ? `<div class="order-summary-list">
+      ${written.map(({ key, title }) => `<div class="order-item">
+        <span>${esc(title)}</span>
+        <strong>${esc(state.manualManagement[key])}</strong>
+      </div>`).join('')}
+    </div>` : '<div class="order-empty">Aún no hay manejo escrito.</div>'}
+  </div>`;
+}
+
+function renderM6() {
+  if (!state.diagnosticPauseCompleted) return renderBlockedManagement();
+  if (!state.managementMode) return renderManagementSelection();
+  return `<section class="module active m6-module">
+    <div class="module-intro">
+      <h1>Módulo 6 — Manejo clínico ${state.managementMode === 'guided' ? 'con asistencia' : 'sin asistencia'}</h1>
+      <p>Modo elegido: ${esc(managementModeLabel())}</p>
+    </div>
+    ${renderM6DxCard()}
+    <div class="m6-workspace">
+      <aside class="orders-panel">
+        ${state.managementMode === 'manual' ? renderManualOrdersSummary() : renderGuidedOrdersSummary()}
+      </aside>
+      <div class="library-panel">
+        ${state.managementMode === 'manual' ? renderManualManagement() : renderGuidedManagement()}
+      </div>
+    </div>
+    <div class="footer-actions">
+      <button class="action secondary" onclick="goModule('m5')">← Volver</button>
+      <button class="action" onclick="goModule('m7')">Continuar a evaluación →</button>
+    </div>
+  </section>`;
+}
+
+function expertData() {
+  return CASE_DATA.expertEvaluation || { findings: {}, management: {} };
+}
+
+function allCaseFindings() {
+  const out = [];
+  (CASE_DATA.m1?.triage || []).forEach(item => out.push(item));
+  (CASE_DATA.m1?.dialogue || []).forEach(item => {
+    out.push(item);
+    if (item.expandable) out.push({ ...item.expandable, source: item.source, text: item.expandable.patient });
+  });
+  (CASE_DATA.m2?.history || []).forEach(section => (section.items || []).forEach(item => {
+    out.push(item);
+    if (item.expandable) out.push({ ...item.expandable, source: item.source, text: item.expandable.patient });
+  }));
+  (CASE_DATA.m2?.functional || []).forEach(section => (section.items || []).forEach(item => {
+    out.push(item);
+    if (item.expandable) out.push({ ...item.expandable, source: item.source, text: item.expandable.patient });
+  }));
+  (CASE_DATA.m3?.physicalExam || []).forEach(section => (section.items || []).forEach(item => out.push(item)));
+  (CASE_DATA.m4?.tables || []).forEach(table => (table.rows || []).forEach(row => out.push({
+    id: row.id,
+    source: row.source,
+    text: `${row.label}: ${row.value}${row.unit ? ' ' + row.unit : ''}${row.ref ? ' (VR: ' + row.ref + ')' : ''}`
+  })));
+  return out;
+}
+
+function findingTextById(id) {
+  return allCaseFindings().find(item => item.id === id)?.text || id;
+}
+
+function sourceForFinding(id) {
+  return allCaseFindings().find(item => item.id === id)?.source || 'Otros';
+}
+
+function renderExpertFindingComparison() {
+  const expert = expertData().findings || {};
+  const expected = new Set([...(expert.selectedExpected || []), ...(expert.missedImportant || [])]);
+  const lowValue = new Set(expert.lowValueSelected || []);
+  const selectedIds = new Set(Object.keys(state.selected));
+  const rows = [];
+  sourceOrder.forEach(source => {
+    const sourceRows = [];
+    Object.values(state.selected)
+      .filter(f => f.source === source)
+      .forEach(f => {
+        if (expected.has(f.id)) {
+          sourceRows.push(`<div class="finding-score good">✅ ${esc(f.text)}</div>`);
+        } else if (lowValue.has(f.id)) {
+          sourceRows.push(`<div class="finding-score low">⚠️ ${esc(f.text)} — bajo valor / distractor</div>`);
+        }
+      });
+    Array.from(expected)
+      .filter(id => sourceForFinding(id) === source && !selectedIds.has(id))
+      .forEach(id => sourceRows.push(`<div class="finding-score missed">❌ ${esc(findingTextById(id))} — MISSED</div>`));
+    if (sourceRows.length) {
+      rows.push(`<div class="eval-row">
+        <div class="eval-label">${esc(source)}</div>
+        <div class="eval-value">${sourceRows.join('')}</div>
+      </div>`);
+    }
+  });
+  return rows.join('') || '<div class="placeholder">Aún no hay datos expertos para comparar hallazgos.</div>';
+}
+
+function listBlock(title, items) {
+  if (!items.length) return '';
+  return `<div class="clinical-summary-block">
+    <h3>${esc(title)}</h3>
+    <ul>${items.map(item => `<li>${esc(item)}</li>`).join('')}</ul>
+  </div>`;
+}
+
+function renderStudentManagementSummary() {
+  if (state.managementMode === 'manual') {
+    const items = manualManagementFields
+      .filter(({ key }) => (state.manualManagement[key] || '').trim())
+      .map(({ title, key }) => `${title}: ${state.manualManagement[key]}`);
+    return items.length
+      ? `<div class="clinical-summary">${listBlock('Manejo escrito', items)}</div>`
+      : '<div class="placeholder">Aún no hay manejo escrito.</div>';
+  }
+
+  const gm = state.guidedManagement || defaultGuidedManagement();
+  const general = Object.entries(gm.general || {}).filter(([, value]) => !!value).map(([id, value]) => {
+    const label = optionLabel(guidedGeneralOptions, id);
+    if (id !== 'oxygen') return label;
+    const d = value.details || {};
+    const details = [d.device, d.flow, d.target, d.indication].filter(Boolean).join(' · ');
+    return details ? `${label}: ${details}` : label;
+  });
+  const drugs = Object.keys(gm.drugs || {}).map(id => {
+    const drug = findDrugById(id);
+    const selected = gm.drugs[id] || {};
+    const details = [selected.presentation, selected.route, selected.frequency, selected.duration, selected.indication, selected.precautions].filter(Boolean).join(' · ');
+    return details ? `${drug?.name || selected.name || id}: ${details}` : (drug?.name || selected.name || id);
+  });
+  const procedures = Object.keys(gm.procedures || {}).map(id => optionLabel(guidedProcedureOptions, id));
+  const monitoring = Object.entries(gm.monitoring || {}).filter(([, value]) => !!value).map(([id]) => optionLabel(guidedMonitoringOptions, id));
+  const consults = (gm.consults || []).map(c => c.service || c.id).filter(Boolean);
+  const destination = gm.destination ? [gm.destination] : [];
+  const precautions = gm.precautions ? [gm.precautions] : [];
+  const html = [
+    listBlock('Manejo general', general),
+    listBlock('Fármacos', drugs),
+    listBlock('Procedimientos y soporte', procedures),
+    listBlock('Monitorización', monitoring),
+    listBlock('Interconsultas', consults),
+    listBlock('Destino', destination),
+    listBlock('Precauciones y conductas a evitar', precautions)
+  ].join('');
+  return html ? `<div class="clinical-summary">${html}</div>` : '<div class="placeholder">Aún no hay órdenes seleccionadas.</div>';
+}
+
+function renderManagementExpertEvaluation() {
+  const m = expertData().management || {};
+  const expected = m.expected || [];
+  const omissions = m.dangerousOmissions || [];
+  const monitoring = m.monitoringOmitted || [];
+  const destination = m.destination || null;
+  return `<div class="management-eval">
+    <div class="eval-row">
+      <div class="eval-label">Modo de manejo elegido</div>
+      <div class="eval-value">${esc(managementModeLabel())}</div>
+    </div>
+    <div class="eval-row">
+      <div class="eval-label">Lo que hizo el estudiante</div>
+      <div class="eval-value">${renderStudentManagementSummary()}</div>
+    </div>
+    <div class="eval-row">
+      <div class="eval-label">Esperado por experto</div>
+      <div class="eval-value">${expected.length ? expected.map(item => `<div class="finding-score good">${esc(item.label)}${item.reason ? ' — ' + esc(item.reason) : ''}</div>`).join('') : 'Sin datos demo.'}</div>
+    </div>
+    <div class="eval-row">
+      <div class="eval-label">Omisiones o decisiones peligrosas</div>
+      <div class="eval-value">${omissions.length ? omissions.map(item => `<div class="finding-score missed">${esc(item.label)}${item.reason ? ' — ' + esc(item.reason) : ''}</div>`).join('') : 'Sin datos demo.'}</div>
+    </div>
+    <div class="eval-row">
+      <div class="eval-label">Monitorización omitida</div>
+      <div class="eval-value">${monitoring.length ? monitoring.map(item => `<div class="finding-score low">${esc(item.label)}${item.reason ? ' — ' + esc(item.reason) : ''}</div>`).join('') : 'Sin datos demo.'}</div>
+    </div>
+    <div class="eval-row">
+      <div class="eval-label">Destino</div>
+      <div class="eval-value">${destination ? `${esc(destination.label)}${destination.reason ? ' — ' + esc(destination.reason) : ''}` : 'Sin datos demo.'}</div>
+    </div>
+  </div>`;
+}
+
+function renderM7() {
+  return `<section class="module active">
+    <div class="module-intro">
+      <h1>Módulo 7 — Evaluación</h1>
+      <p>Auditoría comparativa con datos expertos incluidos en el caso demo.</p>
+    </div>
+    <div class="card">
+      <h2>Enfermedad actual y diagnósticos: estudiante vs experto</h2>
+      <div class="eval-grid">
+        <div class="eval-col">
+          <h3>Estudiante</h3>
+          <div id="studentEval">${studentEvalRows()}</div>
+        </div>
+        <div class="eval-col">
+          <h3>Experto</h3>
+          <div id="expertEval"><div class="placeholder">La comparación experta textual se definirá por caso.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Hallazgos seleccionados: estudiante vs experto</h2>
+      <div id="expertFindingsEval">${renderExpertFindingComparison()}</div>
+    </div>
+    <div class="card">
+      <h2>Evaluación del manejo</h2>
+      <div id="managementEval">${renderManagementExpertEvaluation()}</div>
+    </div>
+    <div class="footer-actions">
+      <button class="action secondary" onclick="goModule('m6')">← Volver</button>
+      <button class="action" onclick="goModule('m8')">Continuar a exportar →</button>
+    </div>
+  </section>`;
+}
+
+function renderM8() {
+  return `<section class="module active">
+    <div class="module-intro">
+      <h1>Módulo 8 — Exportar desempeño</h1>
+      <p>Descarga tu desempeño completo y súbelo a ChatGPT para obtener una evaluación profunda módulo por módulo.</p>
+    </div>
+    <div class="card">
+      <h2>Archivo de desempeño</h2>
+      <p>El JSON contiene: hallazgos seleccionados, profundizaciones, enfermedad actual por fase, Tier 3, Venn, modalidad de manejo y manejo registrado.</p>
+      <div class="footer-actions" style="justify-content:flex-start;border:0">
+        <button class="action"           onclick="exportPerformance()">Descargar mi desempeño JSON</button>
+        <button class="action secondary" onclick="exportSummary()">Descargar resumen TXT</button>
+        <button class="action warn"      onclick="resetCase()">Reiniciar caso</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Cómo usar el archivo</h2>
+      <ol>
+        <li>Completa los módulos y descarga el JSON.</li>
+        <li>Súbelo en ChatGPT para recibir la evaluación completa módulo por módulo.</li>
+        <li>La evaluación experta básica del caso demo ya viene incluida en el caso.</li>
+      </ol>
+    </div>
+    <div class="footer-actions">
+      <button class="action secondary" onclick="goModule('m7')">← Volver a evaluación</button>
+    </div>
+  </section>`;
+}
+
+const renderers = {
+  m1: renderM1, m2: renderM2, m3: renderM3, m4: renderM4,
+  m5: renderM5, managementSelect: renderManagementSelection,
+  m6: renderM6, m7: renderM7, m8: renderM8
+};

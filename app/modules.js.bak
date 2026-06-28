@@ -1,0 +1,509 @@
+function choice(id, source, text) {
+  const sel = isSelected(id);
+  return `<label class="selectable${sel ? ' selected' : ''}">
+    <input class="finding-check" type="checkbox"
+      data-id="${esc(id)}" data-source="${esc(source)}" data-text="${esc(text)}"
+      ${sel ? 'checked' : ''}>
+    <span class="fact-label">${esc(text)}</span>
+  </label>`;
+}
+
+function conversationBlock(item) {
+  const sel = isSelected(item.id);
+  const dlgId = 'dlg_' + item.id;
+  return `<div class="dialogue">
+    <p class="doctor">${esc(item.question)}</p>
+    <details class="patient-details" id="${dlgId}"
+      ${state.expanded[dlgId] ? 'open' : ''}
+      ontoggle="markExpanded('${dlgId}',this.open)">
+      <summary>
+        <span class="patient-text">${esc(item.text)}</span>
+        <input class="patient-check finding-check" type="checkbox"
+          data-id="${esc(item.id)}" data-source="${esc(item.source)}" data-text="${esc(item.text)}"
+          ${sel ? 'checked' : ''}
+          onclick="event.stopPropagation()">
+      </summary>
+      ${item.depth
+        ? `<div class="deeper"><p>${esc(item.depth)}</p></div>`
+        : ''}
+    </details>
+  </div>`;
+}
+
+function accordion(title, items) {
+  return `<details class="accordion" open>
+    <summary>${esc(title)}</summary>
+    <div class="accordion-body">
+      ${items.map(f => choice(f.id, f.source, f.text)).join('')}
+    </div>
+  </details>`;
+}
+
+function labRow(item) {
+  const txt = item.label + ': ' + item.value
+    + (item.unit ? ' ' + item.unit : '')
+    + (item.ref  ? ' (VR: ' + item.ref + ')' : '');
+  const sel = isSelected(item.id);
+  return `<tr class="${sel ? 'selected' : ''}">
+    <td><input class="lab-check finding-check" type="checkbox"
+      data-id="${esc(item.id)}" data-source="${esc(item.source)}" data-text="${esc(txt)}"
+      ${sel ? 'checked' : ''}></td>
+    <td>${esc(item.label)}</td>
+    <td>${esc(item.value)}</td>
+    <td>${esc(item.unit)}</td>
+    <td>${esc(item.ref)}</td>
+  </tr>`;
+}
+
+function field(key, title, placeholder, hint, short) {
+  hint  = hint  ?? '';
+  short = short ?? false;
+  const val     = esc(state.fields[key] || '');
+  const handler = `oninput="setField('${esc(key)}',this.value)"`;
+  const input   = short
+    ? `<input type="text" placeholder="${esc(placeholder)}" value="${val}" ${handler}>`
+    : `<textarea placeholder="${esc(placeholder)}" ${handler}>${val}</textarea>`;
+  return `<div class="field">
+    <div class="field-title">${esc(title)}</div>
+    ${hint ? `<div class="field-instruction">${esc(hint)}</div>` : ''}
+    ${input}
+  </div>`;
+}
+
+function tier(phase) {
+  return `<div class="tier-grid">
+    ${[1,2,3].map(i => {
+      const k = `tier_${phase}_${i}`;
+      return `<div class="tier-card">
+        <h4>Dx${i}</h4>
+        <input type="text" placeholder="Diagnóstico ${i}…"
+          value="${esc(state.fields[k] || '')}"
+          oninput="setField('${k}',this.value)">
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function phaseClose(phase) {
+  return `<div class="card">
+    <h2>Síntesis de fase</h2>
+    ${field('ill_' + phase, 'ENFERMEDAD ACTUAL', 'Sintetiza la enfermedad actual en una frase…')}
+    <h3>Hipótesis diagnósticas (Tier 3)</h3>
+    ${tier(phase)}
+  </div>`;
+}
+
+function goModule(m) {
+  state.current = m;
+  save();
+  renderModules();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderTabs() {
+  const labels = {
+    m1:'1 Triage', m2:'2 Historial', m3:'3 Examen físico',
+    m4:'4 Paraclínicos', m5:'5 Pausa diagnóstica',
+    m6:'6 Manejo', m7:'7 Evaluación', m8:'8 Exportar'
+  };
+  document.getElementById('tabs').innerHTML = Object.entries(labels).map(([k, v]) =>
+    `<button class="tab${state.current === k ? ' active' : ''}" onclick="goModule('${k}')">${v}</button>`
+  ).join('');
+}
+
+function renderModules() {
+  document.getElementById('modules').innerHTML = renderers[state.current]();
+  if (state.current === 'm5') {
+    document.getElementById('app').classList.add('pad-collapsed');
+    renderVenn();
+  } else {
+    document.getElementById('app').classList.remove('pad-collapsed');
+  }
+  renderTabs();
+  renderPad();
+}
+
+function loadTierToVenn() {
+  ['1','2','3'].forEach(i => {
+    state.fields['venn_dx' + i] =
+      state.fields['tier_m4_' + i] ||
+      state.fields['tier_m3_' + i] ||
+      state.fields['tier_m2_' + i] ||
+      state.fields['tier_m1_' + i] || '';
+  });
+  save();
+  renderModules();
+}
+
+let dragId = null;
+
+function renderVenn() {
+  const source = document.getElementById('findingSource');
+  if (!source) return;
+
+  const by = {};
+  Object.values(state.selected).forEach(f => {
+    if (!state.venn.placed[f.id]) (by[f.source] = by[f.source] || []).push(f);
+  });
+
+  source.innerHTML = '<h3 style="margin:0 0 6px">Findings</h3>'
+    + '<p class="subtle">Agrupa por módulo. Al colocar en el Venn desaparecen de aquí.</p>'
+    + sourceOrder.map(s =>
+        `<div class="finding-group" data-return-source="${esc(s)}">
+          <div class="finding-group-title">${esc(s)}</div>
+          ${(by[s] || []).map(f =>
+            `<span class="finding-chip" draggable="true" data-id="${f.id}"
+              title="Arrastrar">${esc(f.text)}</span>`
+          ).join('') || '<span class="subtle">Sin hallazgos disponibles.</span>'}
+        </div>`
+      ).join('');
+
+  document.querySelectorAll('.finding-chip').forEach(el =>
+    el.addEventListener('dragstart', e => {
+      dragId = el.dataset.id;
+      e.dataTransfer.setData('text/plain', dragId);
+    })
+  );
+
+  document.querySelectorAll('.zone').forEach(z => {
+    z.addEventListener('dragover',  e => { e.preventDefault(); z.classList.add('drop-over'); });
+    z.addEventListener('dragleave', ()  => z.classList.remove('drop-over'));
+    z.addEventListener('drop', e => {
+      e.preventDefault();
+      z.classList.remove('drop-over');
+      if (!dragId) return;
+      const dir = document.getElementById('direction')?.value || '0';
+      state.venn.placed[dragId] = { zone: z.dataset.zone, direction: dir };
+      save(); dragId = null; renderVenn();
+    });
+  });
+
+  document.querySelectorAll('[data-return-source]').forEach(g => {
+    g.addEventListener('dragover',  e => { e.preventDefault(); g.classList.add('drop-over'); });
+    g.addEventListener('dragleave', ()  => g.classList.remove('drop-over'));
+    g.addEventListener('drop', e => {
+      e.preventDefault();
+      g.classList.remove('drop-over');
+      if (dragId && state.venn.placed[dragId]) {
+        delete state.venn.placed[dragId];
+        save(); dragId = null; renderVenn();
+      }
+    });
+  });
+
+  const places  = state.venn.placed;
+  const zoneMap = {};
+  Object.entries(places).forEach(([id, p]) =>
+    (zoneMap[p.zone] = zoneMap[p.zone] || []).push([id, p])
+  );
+  document.querySelectorAll('.zone').forEach(z =>
+    z.querySelectorAll('.placed').forEach(el => el.remove())
+  );
+  document.querySelectorAll('.zone').forEach(z => {
+    (zoneMap[z.dataset.zone] || []).forEach(([id, p]) => {
+      const f = state.selected[id];
+      if (!f) return;
+      const el = document.createElement('div');
+      el.className  = 'placed';
+      el.draggable  = true;
+      el.dataset.id = id;
+      el.innerHTML  = `${esc(f.text)} <small>[${esc(p.direction)}]</small>`;
+      el.addEventListener('dragstart', e => {
+        dragId = id;
+        e.dataTransfer.setData('text/plain', id);
+      });
+      z.appendChild(el);
+    });
+  });
+
+  const log = document.getElementById('vennLog');
+  if (log) {
+    log.innerHTML = Object.entries(places).map(([id, p]) => {
+      const f = state.selected[id];
+      return f
+        ? `<tr><td>${esc(f.text)}</td><td>${esc(p.zone)}</td><td>${esc(p.direction)}</td></tr>`
+        : '';
+    }).join('') || '<tr><td colspan="3" class="subtle">Aún no has colocado hallazgos.</td></tr>';
+  }
+}
+
+function renderEvaluationStudent() {
+  const el = document.getElementById('studentEval');
+  if (el) el.innerHTML = studentEvalRows();
+  const fs = document.getElementById('studentFindingsEval');
+  if (fs) fs.innerHTML = findingsEval();
+}
+
+function renderExpertFindings() {
+  const data = state.expert?.findings || {};
+  return Object.entries(data).map(([module, items]) =>
+    `<div class="eval-row">
+      <div class="eval-label">${esc(module)}</div>
+      <div class="eval-value">
+        ${(items || []).map(i =>
+          `<b>${esc(i.finding || '')}</b>${i.reason ? ': ' + esc(i.reason) : ''}`
+        ).join('<br>')}
+      </div>
+    </div>`
+  ).join('') || '<div class="placeholder">Sin hallazgos expertos importados.</div>';
+}
+
+function renderM1() {
+  const d = CASE_DATA.m1;
+  return `<section class="module active">
+    <div class="module-intro">
+      <h1>Módulo 1 — Triage e interrogatorio</h1>
+      <p>Selecciona los datos que cambian tu representación del problema.</p>
+    </div>
+    <div class="m1-grid">
+      <div class="triage-panel">
+        <div class="card">
+          <div class="section-title">Triage</div>
+          <div class="patient-identity">
+            <b>${esc(CASE_DATA.patient.name)}</b> · ${esc(CASE_DATA.patient.age)} · ${esc(CASE_DATA.patient.sex)}<br>
+            <span style="color:var(--muted)">Motivo: ${esc(CASE_DATA.patient.reason)}</span>
+          </div>
+          ${d.triage.map(f => choice(f.id, f.source, f.text)).join('')}
+        </div>
+      </div>
+      <div class="conversation-panel">
+        <div class="card">
+          <div class="section-title">Interrogatorio</div>
+          ${d.interrogatorio.map(item => conversationBlock(item)).join('')}
+        </div>
+        ${phaseClose('m1')}
+      </div>
+    </div>
+    <div class="footer-actions">
+      <button class="action" onclick="goModule('m2')">Continuar a historial →</button>
+    </div>
+  </section>`;
+}
+
+function renderM2() {
+  const d = CASE_DATA.m2;
+  return `<section class="module active">
+    <div class="module-intro">
+      <h1>Módulo 2 — Historial y examen funcional subjetivo</h1>
+      <p>Selecciona los antecedentes y síntomas funcionales relevantes.</p>
+    </div>
+    <div class="card">
+      <h2>Historial</h2>
+      ${d.historial.map(sec => accordion(sec.title, sec.items)).join('')}
+    </div>
+    <div class="card">
+      <h2>Examen funcional subjetivo</h2>
+      ${d.examenFuncional.map(item => conversationBlock(item)).join('')}
+    </div>
+    ${phaseClose('m2')}
+    <div class="footer-actions">
+      <button class="action secondary" onclick="goModule('m1')">← Volver</button>
+      <button class="action" onclick="goModule('m3')">Continuar a examen físico →</button>
+    </div>
+  </section>`;
+}
+
+function renderM3() {
+  const d = CASE_DATA.m3;
+  return `<section class="module active">
+    <div class="module-intro">
+      <h1>Módulo 3 — Examen físico</h1>
+      <p>Selecciona los hallazgos que cambian tu diagnóstico diferencial.</p>
+    </div>
+    <div class="card">
+      <h2>Hallazgos por sistema</h2>
+      ${d.systems.map(sys => accordion(sys.name, sys.findings)).join('')}
+    </div>
+    ${phaseClose('m3')}
+    <div class="footer-actions">
+      <button class="action secondary" onclick="goModule('m2')">← Volver</button>
+      <button class="action" onclick="goModule('m4')">Continuar a paraclínicos →</button>
+    </div>
+  </section>`;
+}
+
+function renderM4() {
+  const d = CASE_DATA.m4;
+  const tableHTML = (title, rows) =>
+    `<details class="accordion" open>
+      <summary>${esc(title)}</summary>
+      <div class="accordion-body">
+        <table class="lab-table">
+          <thead><tr><th></th><th>Prueba</th><th>Valor</th><th>Unidad</th><th>Referencia</th></tr></thead>
+          <tbody>${rows.map(r => labRow(r)).join('')}</tbody>
+        </table>
+      </div>
+    </details>`;
+  return `<section class="module active">
+    <div class="module-intro">
+      <h1>Módulo 4 — Paraclínicos</h1>
+      <p>Selecciona los resultados que cambian tu representación del problema o el diagnóstico diferencial.</p>
+    </div>
+    <div class="card">
+      <h2>Estudios disponibles</h2>
+      ${d.tables.map(t => tableHTML(t.title, t.rows)).join('')}
+    </div>
+    ${phaseClose('m4')}
+    <div class="footer-actions">
+      <button class="action secondary" onclick="goModule('m3')">← Volver</button>
+      <button class="action" onclick="goModule('m5')">Continuar a pausa diagnóstica →</button>
+    </div>
+  </section>`;
+}
+
+function renderM5() {
+  return `<section class="module active">
+    <div class="module-intro">
+      <h1>Módulo 5 — Pausa diagnóstica</h1>
+      <p>Arrastra cada hallazgo hacia la zona que mejor represente a qué diagnóstico favorece. El Pad se minimiza automáticamente para darte espacio.</p>
+    </div>
+    <div class="card">
+      <div class="guidance"><b>Instrucción:</b> Arrastra hallazgos del panel izquierdo al diagrama. Para devolverlos, arrástralos de vuelta al panel izquierdo.</div>
+      <div class="venn-top">
+        ${field('venn_dx1','Dx1','Diagnóstico 1…','',true)}
+        ${field('venn_dx2','Dx2','Diagnóstico 2…','',true)}
+        ${field('venn_dx3','Dx3','Diagnóstico 3…','',true)}
+      </div>
+      <div class="footer-actions" style="justify-content:flex-start;border:0;margin:4px 0 10px">
+        <button class="action light" onclick="loadTierToVenn()">Cargar Tier 3 final</button>
+        <button class="action light" onclick="resetVenn()">Reiniciar diagrama</button>
+        <label class="subtle">Dirección diagnóstica
+          <select id="direction">
+            <option value="++">++ Apoya fuertemente</option>
+            <option value="+">+ Apoya</option>
+            <option value="0">0 Compartido / poco discriminador</option>
+            <option value="−">− Reduce</option>
+            <option value="−−">−− Reduce mucho</option>
+          </select>
+        </label>
+      </div>
+      <div class="venn-layout">
+        <div class="card finding-source" id="findingSource"></div>
+        <div class="card" style="overflow:auto">
+          <div class="venn-board" id="vennBoard">
+            <div class="circle dx1"></div>
+            <div class="circle dx2"></div>
+            <div class="circle dx3"></div>
+            <div class="zone z1"   data-zone="Solo Dx1"><div class="zone-title">Solo Dx1</div></div>
+            <div class="zone z2"   data-zone="Solo Dx2"><div class="zone-title">Solo Dx2</div></div>
+            <div class="zone z3"   data-zone="Solo Dx3"><div class="zone-title">Solo Dx3</div></div>
+            <div class="zone z12"  data-zone="Dx1 + Dx2"><div class="zone-title">Dx1 + Dx2</div></div>
+            <div class="zone z13"  data-zone="Dx1 + Dx3"><div class="zone-title">Dx1 + Dx3</div></div>
+            <div class="zone z23"  data-zone="Dx2 + Dx3"><div class="zone-title">Dx2 + Dx3</div></div>
+            <div class="zone z123" data-zone="Los tres"><div class="zone-title">Los tres</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Registro de colocaciones</h2>
+        <table class="lab-table">
+          <thead><tr><th>Hallazgo</th><th>Zona</th><th>Dirección</th></tr></thead>
+          <tbody id="vennLog"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="footer-actions">
+      <button class="action secondary" onclick="goModule('m4')">← Volver</button>
+      <button class="action" onclick="goModule('m6')">Continuar a manejo →</button>
+    </div>
+  </section>`;
+}
+
+function renderM6() {
+  const d = CASE_DATA.m6;
+  return `<section class="module active">
+    <div class="module-intro">
+      <h1>Módulo 6 — Manejo clínico</h1>
+      <p>Convierte tu diagnóstico líder y el riesgo clínico en un plan seguro, priorizado y específico.</p>
+    </div>
+    <div class="card">
+      <h2>Manejo clínico</h2>
+      ${d.fields.map(f => field(f.key, f.title, f.placeholder, f.hint)).join('')}
+    </div>
+    <div class="footer-actions">
+      <button class="action secondary" onclick="goModule('m5')">← Volver</button>
+      <button class="action" onclick="goModule('m7')">Continuar a evaluación →</button>
+    </div>
+  </section>`;
+}
+
+function renderM7() {
+  return `<section class="module active">
+    <div class="module-intro">
+      <h1>Módulo 7 — Evaluación</h1>
+      <p>Auditoría comparativa. El lado del estudiante se actualiza en tiempo real; el lado experto se carga después de analizar tu JSON en ChatGPT.</p>
+    </div>
+    <div class="card">
+      <h2>Enfermedad actual y diagnósticos: estudiante vs experto</h2>
+      <div class="eval-grid">
+        <div class="eval-col">
+          <h3>Estudiante</h3>
+          <div id="studentEval">${studentEvalRows()}</div>
+        </div>
+        <div class="eval-col">
+          <h3>Experto</h3>
+          <div id="expertEval">${expertEvalRows()}</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Hallazgos seleccionados: estudiante vs experto</h2>
+      <div class="eval-grid">
+        <div class="eval-col">
+          <h3>Selección del estudiante</h3>
+          <div id="studentFindingsEval">${findingsEval()}</div>
+        </div>
+        <div class="eval-col">
+          <h3>Selección experta</h3>
+          <div id="expertFindingsEval">${state.expert?.findings ? renderExpertFindings() : '<div class="placeholder">Importa una evaluación experta para ver la comparación.</div>'}</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Importar evaluación experta</h2>
+      <p class="subtle">El archivo de evaluación se genera después del análisis en ChatGPT. No contiene la clave diagnóstica dentro del caso.</p>
+      <div class="import-box">
+        <input type="file" accept="application/json" id="expertFile">
+        <button class="action light" onclick="importExpertEvaluation()">Importar evaluación</button>
+      </div>
+    </div>
+    <div class="footer-actions">
+      <button class="action secondary" onclick="goModule('m6')">← Volver</button>
+      <button class="action" onclick="goModule('m8')">Continuar a exportar →</button>
+    </div>
+  </section>`;
+}
+
+function renderM8() {
+  return `<section class="module active">
+    <div class="module-intro">
+      <h1>Módulo 8 — Exportar desempeño</h1>
+      <p>Descarga tu desempeño completo y súbelo a ChatGPT para obtener una evaluación profunda módulo por módulo.</p>
+    </div>
+    <div class="card">
+      <h2>Archivo de desempeño</h2>
+      <p>El JSON contiene: hallazgos seleccionados, profundizaciones, enfermedad actual por fase, Tier 3, Venn y manejo.</p>
+      <div class="footer-actions" style="justify-content:flex-start;border:0">
+        <button class="action"           onclick="exportPerformance()">Descargar mi desempeño JSON</button>
+        <button class="action secondary" onclick="exportSummary()">Descargar resumen TXT</button>
+        <button class="action warn"      onclick="resetCase()">Reiniciar caso</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Cómo usar el archivo</h2>
+      <ol>
+        <li>Completa los módulos y descarga el JSON.</li>
+        <li>Súbelo en ChatGPT para recibir la evaluación completa módulo por módulo.</li>
+        <li>Importa el archivo de evaluación experta en el Módulo 7.</li>
+      </ol>
+    </div>
+    <div class="footer-actions">
+      <button class="action secondary" onclick="goModule('m7')">← Volver a evaluación</button>
+    </div>
+  </section>`;
+}
+
+const renderers = {
+  m1: renderM1, m2: renderM2, m3: renderM3, m4: renderM4,
+  m5: renderM5, m6: renderM6, m7: renderM7, m8: renderM8
+};

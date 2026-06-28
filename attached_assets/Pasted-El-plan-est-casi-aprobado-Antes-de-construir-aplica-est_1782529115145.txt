@@ -1,0 +1,79 @@
+El plan está casi aprobado. Antes de construir, aplica estas correcciones:
+
+1. No renombres ni modifiques la copia antigua.
+
+Déjala exactamente como:
+
+```text
+legacy/caso-1_original.html
+```
+
+No necesito que se llame `prototipo_original.html`. Quiero conservar la copia existente intacta como referencia.
+
+2. `sourceOrder` no debe estar dentro de `cases/demo_case.js`.
+
+Es una regla general del Pad diagnóstico y debe vivir en `app/core.js` o `app/modules.js`.
+
+El orden fijo será:
+
+```text
+Triage
+Interrogatorio
+Historial
+Examen funcional
+Examen físico
+Paraclínicos
+```
+
+3. Antes de construir el demo, define un formato de datos que sirva para todos los casos futuros.
+
+El archivo de un caso debe poder contener solamente datos, pero debe soportar desde ahora estos tipos:
+
+```text
+- Datos seleccionables.
+- Conversación médico-paciente.
+- Respuestas ampliables con profundidad.
+- Acordeones por sistema o sección.
+- Hallazgos de examen físico.
+- Resultados de paraclínicos: prueba, valor, unidad y referencia.
+- Campos de texto del estudiante.
+- Diagnóstico sindromático.
+- Tier 3.
+- Datos necesarios para el Venn.
+- Campos de manejo clínico.
+```
+
+No quiero que un caso futuro necesite crear funciones como `renderM1()` o HTML propio.
+
+4. Crea también un archivo:
+
+```text
+README.md
+```
+
+Debe explicar en lenguaje simple:
+
+```text
+- Qué archivo controla el diseño.
+- Qué archivo controla el funcionamiento.
+- Qué archivo contiene los datos de cada caso.
+- Cómo agregar un caso nuevo.
+- Qué no debo modificar manualmente.
+```
+
+5. En esta primera construcción, crea solo el laboratorio técnico con los 8 módulos y datos claramente marcados como “Dato de demostración”.
+
+No uses contenido clínico real todavía.
+
+6. Cuando termines, no modifiques `index.html` ni `caso-1.html`.
+
+Prueba exclusivamente `caso-demo.html` en Preview y reporta:
+
+```text
+- archivos creados;
+- qué funciones fueron probadas;
+- qué falló, si algo falló;
+- confirmación de que caso-1.html sigue intacto.
+```
+
+Después de darme ese reporte, espera mi aprobación antes de avanzar.
