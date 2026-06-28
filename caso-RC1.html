@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>H-CR v3 — RC1</title>
+  <link rel="stylesheet" href="app/styles.css?v=2">
+</head>
+<body>
+
+<section id="startScreen">
+  <div class="start-card">
+    <h1>Caso clínico</h1>
+    <p>Diseñado por Adriel Pereira, estudiante de Medicina de la Universidad del Zulia.</p>
+    <button class="continue" id="beginCase">Continuar →</button>
+  </div>
+</section>
+
+<div id="app">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="topbar-title">H-CR v3 — RC1</div>
+      <div class="topbar-meta">Razonamiento clínico</div>
+      <div class="topbar-spacer"></div>
+      <button class="small-btn" id="togglePad">Minimizar Pad diagnóstico</button>
+    </div>
+  </header>
+  <nav class="tabs" id="tabs"></nav>
+  <div id="workspace">
+    <main id="modules"></main>
+    <aside class="card pad" id="pad">
+      <div class="pad-header">
+        <h2>Pad diagnóstico</h2>
+        <button class="pad-toggle" id="padSideBtn">−</button>
+      </div>
+      <div class="pad-body">
+        <div class="pad-meta">
+          <span class="badge" id="timeBadge">Módulo 1</span>
+          <span class="badge" id="selectedBadge">0 datos</span>
+        </div>
+        <div id="padGroups"></div>
+        <h3>Enfermedad actual</h3>
+        <div class="pad-note" id="padIllness">Pendiente</div>
+        <h3>Diagnóstico sindromático</h3>
+        <div class="pad-note" id="padSyndrome">Pendiente</div>
+        <h3>Tier 3 actual</h3>
+        <div class="pad-note" id="padTier">Pendiente</div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script defer src="data/diagnoses.js?v=1"></script>
+<script defer src="data/drugs.js?v=1"></script>
+<script defer src="cases/RC1/case_data.js?v=1"></script>
+<script defer src="app/core.js?v=2"></script>
+<script defer src="app/modules.js?v=2"></script>
+<script defer src="app/bootstrap.js?v=2"></script>
+</body>
+</html>
