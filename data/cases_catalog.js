@@ -1,5 +1,5 @@
 window.HCR_CASES_CATALOG = {
-  version: "1.1.0",
+  version: "1.1.1",
   settings: { defaultPageSize: 24, pageSizeOptions: [12, 24, 48], defaultSort: "recommended", diagnosisPolicy: "hidden_until_module_7_evaluation" },
   filters: {
     symptoms: ["Disnea", "Dolor toracico", "Fiebre", "Fatiga", "Cefalea", "Dolor abdominal", "Mareo / Sincope", "Edema"],
@@ -44,8 +44,9 @@ document.querySelectorAll('.filter-opt input:checked').forEach((input) => {
   input.parentElement.classList.remove('active-filter');
 });
 
-const difficultyOptions = document.querySelectorAll('[data-filter-group="difficulties"] .filter-opt');
-difficultyOptions.forEach((label, index) => {
-  const text = label.childNodes[label.childNodes.length - 1];
-  if (text) text.nodeValue = ` Nivel ${index + 1}`;
-});
+const difficultyGroup = document.querySelector('[data-filter-group="difficulties"] .filter-options');
+if (difficultyGroup) {
+  difficultyGroup.innerHTML = window.HCR_CASES_CATALOG.filters.difficulties.map((level) =>
+    `<label class="filter-opt"><input type="checkbox" onchange="applyFilters()"> ${level}</label>`
+  ).join('');
+}
