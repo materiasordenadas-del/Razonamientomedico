@@ -52,3 +52,10 @@ window.HCR_CASES_CATALOG = {
     }
   ]
 };
+
+/* La biblioteca debe abrir mostrando todos los casos disponibles.
+   Los filtros iniciales heredados de la maqueta se limpian antes del renderizado. */
+document.querySelectorAll('.filter-opt input:checked').forEach((input) => {
+  input.checked = false;
+  input.parentElement.classList.remove('active-filter');
+});
