@@ -75,33 +75,33 @@ window.HCR_CASES_CATALOG = {
       modules: 8,
       difficulty: "Intermedio",
       level: "Nivel III",
-      collections: ["cardiovascular", "urgencias"],
+      collections: ["respiratorio", "infectologia", "urgencias"],
 
       patient: {
-        displayName: "Carlos M.",
-        initials: "CM",
-        age: 67,
+        displayName: "José Ramírez",
+        initials: "JR",
+        age: 68,
         sex: "Masculino",
         setting: "Urgencias"
       },
 
-      chiefConcern: "Dificultad para respirar",
+      chiefConcern: "Fiebre, tos y dificultad para respirar",
       publicPresentation:
-        "Paciente adulto mayor con disnea progresiva de días de evolución, ortopnea, edema bilateral de miembros inferiores y taquicardia al ingreso.",
+        "Paciente adulto mayor con fiebre, tos y disnea de evolución aguda. Acude al servicio de urgencias acompañado por un familiar.",
 
       /* Etiquetas seguras: permiten buscar sin revelar el diagnóstico definitivo. */
       publicTags: {
-        symptoms: ["Disnea", "Edema"],
-        syndromes: ["Síndrome disneico"],
-        systems: ["Cardiovascular", "Respiratorio"],
-        context: ["Urgencias", "Adulto mayor", "Presentación aguda"],
+        symptoms: ["Fiebre", "Tos", "Disnea"],
+        syndromes: ["Síndrome respiratorio agudo"],
+        systems: ["Respiratorio", "Infeccioso"],
+        context: ["Urgencias", "Adulto mayor", "Cuadro agudo"],
         keywords: [
-          "dificultad para respirar",
+          "fiebre",
+          "tos",
           "disnea",
-          "ortopnea",
-          "edema",
-          "taquicardia",
-          "urgencias"
+          "dificultad para respirar",
+          "urgencias",
+          "adulto mayor"
         ]
       },
 
