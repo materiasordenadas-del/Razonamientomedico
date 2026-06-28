@@ -1,0 +1,26 @@
+{
+  "id": "RC2",
+  "caseId": "rc2_nsteacs_001",
+  "route": "caso-RC2.html",
+  "status": "Disponible",
+  "format": "Caso completo",
+  "modules": 8,
+  "difficulty": "Intermedio",
+  "level": "Nivel III",
+  "collections": ["cardiovascular", "urgencias"],
+  "public": {
+    "patient": {
+      "displayName": "Elena M.",
+      "initials": "EM",
+      "age": 61,
+      "sex": "Femenino",
+      "setting": "Urgencias"
+    },
+    "chiefConcern": "Dolor torácico opresivo con náuseas",
+    "presentation": "Paciente con dolor retroesternal de inicio reciente, acompañado de náuseas y sudor frío. Refiere episodios similares de menor intensidad durante el esfuerzo en los últimos días."
+  },
+  "assets": {
+    "directory": "assets/",
+    "status": "pending"
+  }
+}
