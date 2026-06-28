@@ -68,8 +68,8 @@ window.HCR_CASES_CATALOG = {
 
   cases: [
     {
-      id: "case_cardio_001",
-      route: "caso-1.html",
+      id: "RC1",
+      route: "caso-demo.html",
       availability: "Disponible",
       format: "Caso completo",
       modules: 8,
