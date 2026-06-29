@@ -1137,33 +1137,316 @@ function renderManagementExpertEvaluation() {
   </div>`;
 }
 
-function renderM7() {
-  return `<section class="module active">
-    <div class="module-intro">
-      <h1>Módulo 7 — Evaluación</h1>
-      <p>Auditoría comparativa con datos expertos incluidos en el caso demo.</p>
-    </div>
-    <div class="card">
-      <h2>Enfermedad actual y diagnósticos: estudiante vs experto</h2>
-      <div class="eval-grid">
-        <div class="eval-col">
-          <h3>Estudiante</h3>
-          <div id="studentEval">${studentEvalRows()}</div>
-        </div>
-        <div class="eval-col">
-          <h3>Experto</h3>
-          <div id="expertEval"><div class="placeholder">La comparación experta textual se definirá por caso.</div></div>
-        </div>
+let module7ExplanationStore = {};
+
+function module7Severity(value) {
+  const normalized = String(value || '').toLowerCase().trim();
+  const map = {
+    rojo: 'red',
+    red: 'red',
+    critical: 'red',
+    amarillo: 'yellow',
+    yellow: 'yellow',
+    important: 'yellow',
+    verde: 'green',
+    green: 'green',
+    low: 'green',
+    neutro: 'neutral',
+    neutral: 'neutral'
+  };
+  return map[normalized] || 'neutral';
+}
+
+function module7Text(value, fallback) {
+  const text = String(value || '').trim();
+  return text || fallback;
+}
+
+function module7TierStudentText() {
+  const items = currentTierItems()
+    .map(item => `${item.label}: ${item.diagnosis?.name || ''}`.trim())
+    .filter(item => !item.endsWith(':'));
+  return items.join('\n');
+}
+
+function module7ExpertSource() {
+  const data = expertData();
+  if (data.comparisonByModule) return data.comparisonByModule;
+  return window.HCR_EXPERT_COMPARISON || null;
+}
+
+function module7LatestExpertModule() {
+  const comparison = module7ExpertSource();
+  if (!comparison) return null;
+  return comparison.m4 || comparison.m3 || comparison.m2 || comparison.m1 || null;
+}
+
+function module7TierExpertText(tier3) {
+  if (!tier3) return '';
+  const rows = [
+    ['Diagnóstico principal', tier3.leader],
+    ['Diagnóstico alternativo', tier3.alternative],
+    ['Diagnóstico que no se puede perder', tier3.cannotMiss]
+  ];
+  return rows
+    .filter(([, item]) => item?.diagnosis)
+    .map(([label, item]) => `${label}: ${item.diagnosis}`)
+    .join('\n');
+}
+
+function module7SourceTitle(source) {
+  const titles = {
+    Triage: 'Triage e interrogatorio',
+    Interrogatorio: 'Triage e interrogatorio',
+    Historial: 'Historia clínica',
+    'Examen funcional': 'Historia clínica',
+    'Examen físico': 'Examen físico',
+    Paraclínicos: 'Diagnósticos complementarios',
+    Manejo: 'Manejo'
+  };
+  return titles[source] || source || 'Otros';
+}
+
+function module7RowsFromLegacyFindings() {
+  const expert = expertData().findings || {};
+  const expected = new Set([...(expert.selectedExpected || []), ...(expert.missedImportant || [])]);
+  const missedImportant = new Set(expert.missedImportant || []);
+  const lowValue = new Set(expert.lowValueSelected || []);
+  const selectedIds = new Set(Object.keys(state.selected || {}));
+  const ids = [...new Set([...expected, ...lowValue])];
+  const groups = {};
+
+  ids.forEach(id => {
+    const selected = state.selected?.[id];
+    const source = selected?.source || sourceForFinding(id);
+    const text = selected?.text || findingTextById(id);
+    const severity = missedImportant.has(id)
+      ? 'red'
+      : lowValue.has(id)
+        ? 'green'
+        : 'yellow';
+    const row = {
+      id,
+      severity,
+      studentText: selectedIds.has(id) ? text : '',
+      expertText: lowValue.has(id) ? `${text} (No prioritaria)` : text,
+      expertNote: ''
+    };
+    const title = module7SourceTitle(source);
+    (groups[title] = groups[title] || []).push(row);
+  });
+
+  return Object.entries(groups).map(([title, rows]) => ({
+    id: title.toLowerCase().replace(/\s+/g, '-'),
+    title,
+    type: 'findings',
+    rows
+  }));
+}
+
+function module7RowsFromLegacyManagement() {
+  const management = expertData().management || {};
+  const rows = [];
+  (management.expected || []).forEach((item, index) => rows.push({
+    id: `management-expected-${index}`,
+    severity: 'yellow',
+    studentText: '',
+    expertText: item.label || '',
+    expertNote: item.reason || '',
+    explanation: item.reason ? { title: item.label, body: [item.reason] } : null
+  }));
+  (management.dangerousOmissions || []).forEach((item, index) => rows.push({
+    id: `management-omission-${index}`,
+    severity: 'red',
+    studentText: '',
+    expertText: item.label || '',
+    expertNote: item.reason || '',
+    explanation: item.reason ? { title: item.label, body: [item.reason] } : null
+  }));
+  (management.monitoringOmitted || []).forEach((item, index) => rows.push({
+    id: `management-monitoring-${index}`,
+    severity: 'yellow',
+    studentText: '',
+    expertText: item.label || '',
+    expertNote: item.reason || '',
+    explanation: item.reason ? { title: item.label, body: [item.reason] } : null
+  }));
+  if (management.destination) {
+    rows.push({
+      id: 'management-destination',
+      severity: 'neutral',
+      studentText: '',
+      expertText: management.destination.label || '',
+      expertNote: management.destination.reason || '',
+      explanation: management.destination.reason ? {
+        title: management.destination.label,
+        body: [management.destination.reason]
+      } : null
+    });
+  }
+  return rows.length ? [{
+    id: 'management',
+    title: 'Manejo',
+    type: 'management',
+    rows
+  }] : [];
+}
+
+function module7LegacyData() {
+  const latest = module7LatestExpertModule();
+  return {
+    illnessComparison: {
+      student: currentIllness(),
+      expert: latest?.illnessActual?.expected || ''
+    },
+    tier3Comparison: {
+      student: module7TierStudentText(),
+      expert: module7TierExpertText(latest?.tier3)
+    },
+    sections: [
+      ...module7RowsFromLegacyFindings(),
+      ...module7RowsFromLegacyManagement()
+    ]
+  };
+}
+
+function module7Data() {
+  const direct = CASE_DATA.module7Evaluation || expertData().module7Evaluation || null;
+  if (!direct) return module7LegacyData();
+  return {
+    illnessComparison: direct.illnessComparison || {},
+    tier3Comparison: direct.tier3Comparison || {},
+    sections: Array.isArray(direct.sections) ? direct.sections : []
+  };
+}
+
+function module7RegisterExplanation(row) {
+  const id = `m7-exp-${Object.keys(module7ExplanationStore).length + 1}`;
+  module7ExplanationStore[id] = {
+    title: row.explanation?.title || row.expertText || 'Explicación',
+    question: row.explanation?.question || '¿Por qué era importante?',
+    body: Array.isArray(row.explanation?.body) ? row.explanation.body : [],
+    bullets: Array.isArray(row.explanation?.bullets) ? row.explanation.bullets : [],
+    closing: row.explanation?.closing || ''
+  };
+  return id;
+}
+
+function module7BookIcon() {
+  return `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d="M4 5.5c2.8-.9 5.3-.5 8 1.2 2.7-1.7 5.2-2.1 8-1.2v12.8c-2.8-.9-5.3-.5-8 1.2-2.7-1.7-5.2-2.1-8-1.2V5.5Z"></path>
+    <path d="M12 6.7v12.8"></path>
+  </svg>`;
+}
+
+function renderModule7PairedBlock(title, studentText, expertText) {
+  return `<div class="m7-card">
+    <h2>${esc(title)}</h2>
+    <div class="m7-pair">
+      <div class="m7-pair-col">
+        <div class="m7-col-title">Estudiante</div>
+        <div class="m7-free-text">${esc(module7Text(studentText, 'Sin respuesta registrada'))}</div>
+      </div>
+      <div class="m7-pair-col expert">
+        <div class="m7-col-title">Experto</div>
+        <div class="m7-free-text">${esc(module7Text(expertText, 'Pendiente de contenido experto'))}</div>
       </div>
     </div>
-    <div class="card">
-      <h2>Hallazgos seleccionados: estudiante vs experto</h2>
-      <div id="expertFindingsEval">${renderExpertFindingComparison()}</div>
+  </div>`;
+}
+
+function renderModule7Row(row) {
+  const severity = module7Severity(row.severity);
+  const explanationId = module7RegisterExplanation(row);
+  const studentText = module7Text(row.studentText, '—');
+  const expertText = module7Text(row.expertText, 'Pendiente experto');
+  return `<div class="m7-table-row">
+    <div class="m7-table-cell student">
+      <span class="m7-severity ${severity}" aria-hidden="true"></span>
+      <span class="m7-row-text ${studentText === '—' ? 'muted' : ''}">${esc(studentText)}</span>
     </div>
-    <div class="card">
-      <h2>Evaluación del manejo</h2>
-      <div id="managementEval">${renderManagementExpertEvaluation()}</div>
+    <div class="m7-table-cell expert">
+      <span class="m7-severity ${severity}" aria-hidden="true"></span>
+      <span class="m7-row-main">
+        <span class="m7-row-text">${esc(expertText)}</span>
+        ${row.expertNote ? `<span class="m7-row-note">${esc(row.expertNote)}</span>` : ''}
+      </span>
+      <button class="m7-book-btn" type="button" onclick="openModule7Explanation('${explanationId}')" aria-label="Abrir explicación experta">
+        ${module7BookIcon()}
+      </button>
     </div>
+  </div>`;
+}
+
+function renderModule7Section(section) {
+  const rows = Array.isArray(section.rows) ? section.rows : [];
+  return `<div class="m7-card">
+    <div class="m7-section-header">
+      <h2>${esc(section.title || 'Sección')}</h2>
+      <span>${esc(section.type || 'findings')}</span>
+    </div>
+    <div class="m7-table">
+      <div class="m7-table-head">
+        <div>Estudiante</div>
+        <div>Experto</div>
+      </div>
+      ${rows.length ? rows.map(renderModule7Row).join('') : '<div class="m7-empty">Sin datos comparativos para esta sección.</div>'}
+    </div>
+  </div>`;
+}
+
+function renderModule7ExplanationModal() {
+  return `<div class="m7-modal" id="module7Modal" hidden>
+    <div class="m7-modal-backdrop" onclick="closeModule7Explanation()"></div>
+    <div class="m7-modal-panel" role="dialog" aria-modal="true" aria-labelledby="module7ModalTitle">
+      <h2 id="module7ModalTitle"></h2>
+      <hr>
+      <h3 id="module7ModalQuestion"></h3>
+      <div id="module7ModalBody"></div>
+      <hr>
+      <button class="action secondary" type="button" onclick="closeModule7Explanation()">Cerrar</button>
+    </div>
+  </div>`;
+}
+
+function openModule7Explanation(id) {
+  const data = module7ExplanationStore[id] || {};
+  const modal = document.getElementById('module7Modal');
+  if (!modal) return;
+  document.getElementById('module7ModalTitle').textContent = data.title || 'Explicación';
+  document.getElementById('module7ModalQuestion').textContent = data.question || '¿Por qué era importante?';
+  const body = document.getElementById('module7ModalBody');
+  const hasBody = (data.body || []).length || (data.bullets || []).length || data.closing;
+  body.innerHTML = hasBody
+    ? `${(data.body || []).map(p => `<p>${esc(p)}</p>`).join('')}
+       ${(data.bullets || []).length ? `<ul>${data.bullets.map(item => `<li>${esc(item)}</li>`).join('')}</ul>` : ''}
+       ${data.closing ? `<p>${esc(data.closing)}</p>` : ''}`
+    : '<p>Explicación contextual pendiente para este caso.</p>';
+  modal.hidden = false;
+}
+
+function closeModule7Explanation() {
+  const modal = document.getElementById('module7Modal');
+  if (modal) modal.hidden = true;
+}
+
+function renderM7() {
+  module7ExplanationStore = {};
+  const data = module7Data();
+  return `<section class="module active">
+    <div class="m7-header">
+      <div class="m7-kicker">Módulo 7 · Evaluación experta</div>
+      <h1>Enfermedad actual y diagnóstico</h1>
+      <p>Estudiante vs Experto</p>
+    </div>
+    <div class="m7-layout">
+      ${renderModule7PairedBlock('Enfermedad actual', data.illnessComparison?.student, data.illnessComparison?.expert)}
+      ${renderModule7PairedBlock('Tier 3 / Representación del problema', data.tier3Comparison?.student, data.tier3Comparison?.expert)}
+      ${(data.sections || []).length
+        ? data.sections.map(renderModule7Section).join('')
+        : '<div class="m7-card"><div class="m7-empty">No hay secciones comparativas disponibles para este caso.</div></div>'}
+    </div>
+    ${renderModule7ExplanationModal()}
     <div class="footer-actions">
       <button class="action secondary" onclick="goModule('m6')">← Volver</button>
       <button class="action" onclick="goModule('m8')">Continuar a exportar →</button>
