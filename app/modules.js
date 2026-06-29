@@ -757,7 +757,7 @@ function renderDrugTree(nodes = drugBank(), level = 0, path = []) {
       return `<div class="drug-leaf-group drug-level-${Math.min(level, 3)}">
         <div class="drug-leaf-title">${esc(node.group)}</div>
         <div class="drug-chip-list">
-          ${node.drugs.map(drug => `<button type="button" class="drug-chip ${state.guidedManagement.drugs[drug.id] ? 'selected' : ''}" onclick="selectGuidedDrug('${drug.id}')">${esc(drug.name)}</button>`).join('')}
+          ${node.drugs.map(drug => renderDrugChip(drug, nextPath)).join('')}
         </div>
       </div>`;
     }
@@ -770,7 +770,7 @@ function renderDrugTree(nodes = drugBank(), level = 0, path = []) {
       <div class="drug-node-body">
         ${hasChildren ? renderDrugTree(node.children, level + 1, nextPath) : ''}
         ${isLeafGroup ? `<div class="drug-chip-list">
-          ${node.drugs.map(drug => `<button type="button" class="drug-chip ${state.guidedManagement.drugs[drug.id] ? 'selected' : ''}" onclick="selectGuidedDrug('${drug.id}')">${esc(drug.name)}</button>`).join('')}
+          ${node.drugs.map(drug => renderDrugChip(drug, nextPath)).join('')}
         </div>` : ''}
       </div>
     </details>`;
@@ -779,7 +779,9 @@ function renderDrugTree(nodes = drugBank(), level = 0, path = []) {
 
 function renderDrugForm(drug) {
   const selected = state.guidedManagement.drugs[drug.id] || {};
-  const hasStructuredForm = (drug.presentations || []).length || (drug.routes || []).length || (drug.frequencies || []).length || drug.duration;
+  const doses = drug.doses || drug.presentations || [];
+  const durations = drug.durations || (drug.duration ? ['Otra duración'] : []);
+  const hasStructuredForm = doses.length || (drug.routes || []).length || (drug.frequencies || []).length || durations.length;
   if (!hasStructuredForm) {
     return `<div class="drug-form basic-drug-order">
       <div class="drug-form-header">
@@ -799,7 +801,7 @@ function renderDrugForm(drug) {
     <label>Presentación / dosis
       <select onchange="updateGuidedDrug('${drug.id}','presentation',this.value)">
         <option value="">Seleccionar</option>
-        ${(drug.presentations || []).map(v => `<option ${selected.presentation === v ? 'selected' : ''}>${esc(v)}</option>`).join('')}
+        ${doses.map(v => `<option ${selected.presentation === v ? 'selected' : ''}>${esc(v)}</option>`).join('')}
       </select>
     </label>
     <label>Vía
@@ -820,6 +822,193 @@ function renderDrugForm(drug) {
   </div>`;
 }
 
+function jsArg(value) {
+  return JSON.stringify(String(value || '')).replace(/</g, '\\u003C').replace(/"/g, '&quot;');
+}
+
+function allDrugOptions(nodes = drugBank(), path = [], out = []) {
+  nodes.forEach(node => {
+    const nextPath = node.group ? path.concat(node.group) : path;
+    (node.drugs || []).forEach(drug => out.push({ ...drug, groupPath: nextPath }));
+    if (node.children) allDrugOptions(node.children, nextPath, out);
+  });
+  return out;
+}
+
+function isCustomDrugOption(value) {
+  const text = normalizeText(value);
+  return text.includes('otra') || text.includes('otro') || text.includes('definir') || text.includes('personalizar');
+}
+
+function renderDrugSearch() {
+  return `<div class="m6-med-search">
+    <div class="m6-med-search-field">
+      <label class="m6-med-search-box">
+        <span aria-hidden="true">&#128269;</span>
+        <input id="m6DrugSearch"
+          placeholder="Buscar y añadir medicamento..."
+          autocomplete="off"
+          oninput="refreshGuidedDrugSuggestions(this.value)"
+          onfocus="refreshGuidedDrugSuggestions(this.value)"
+          onkeydown="if(event.key==='Enter')selectGuidedDrugFromSearch(this.value)">
+      </label>
+      <div class="diagnosis-suggestions m6-med-suggestions" id="m6DrugSuggestions"></div>
+    </div>
+    <button type="button" class="m6-med-add" onclick="selectGuidedDrugFromSearch(document.getElementById('m6DrugSearch')?.value)">Añadir</button>
+  </div>`;
+}
+
+function drugQuickSchemas(drug) {
+  const direct = drug.esquemasRapidos || drug.quickSchemes || drug.schemes || [];
+  if (direct.length) {
+    return direct.map(item => ({
+      presentation: item.dosis || item.presentation || '',
+      route: item.via || item.route || '',
+      label: item.etiqueta || item.label || [item.dosis || item.presentation, item.via || item.route].filter(Boolean).join(' ')
+    }));
+  }
+  const presentations = (drug.doses || drug.presentations || []).filter(v => !isCustomDrugOption(v));
+  const routes = (drug.routes || []).filter(v => !isCustomDrugOption(v));
+  if (presentations.length && routes.length) {
+    return presentations.flatMap(presentation => routes.map(route => ({
+      presentation,
+      route,
+      label: `${presentation} ${route}`
+    }))).slice(0, 8);
+  }
+  return presentations.map(presentation => ({ presentation, route: '', label: presentation })).slice(0, 8);
+}
+
+function renderDrugInlineOptions(drug) {
+  const selected = state.guidedManagement.drugs[drug.id] || {};
+  const doses = (drug.doses || drug.presentations || []).filter(v => !isCustomDrugOption(v));
+  const routes = (drug.routes || []).filter(v => !isCustomDrugOption(v));
+  const frequencies = (drug.frequencies || []).filter(v => !isCustomDrugOption(v));
+  const rawDurations = drug.durations || (drug.duration ? ['Otra duración'] : []);
+  const durations = rawDurations.filter(v => !isCustomDrugOption(v));
+  const hasDurationOptions = rawDurations.length > 0;
+  return `<div class="m6-drug-inline">
+    <div class="m6-drug-row m6-drug-dose-route-row">
+      <div class="m6-drug-option-group">
+        ${doses.map(value => `<button type="button" class="m6-drug-pill ${selected.presentation === value ? 'active' : ''}"
+          onclick="setGuidedDrugPresentation(${jsArg(drug.id)},${jsArg(value)})">${esc(value)}</button>`).join('')}
+      </div>
+      <div class="m6-drug-option-group">
+        ${routes.map(value => `<button type="button" class="m6-drug-pill ${selected.route === value ? 'active' : ''}"
+          onclick="setGuidedDrugRoute(${jsArg(drug.id)},${jsArg(value)})">${esc(value)}</button>`).join('')}
+      </div>
+      <button type="button" class="m6-drug-pill" onclick="showGuidedDrugCustom(${jsArg(drug.id)},'dose')">Otra dosis</button>
+    </div>
+    ${selected.customDoseOpen ? `<div class="m6-drug-custom">
+      <input placeholder="Dosis" value="${esc(selected.presentation || '')}" oninput="updateGuidedDrug(${jsArg(drug.id)},'presentation',this.value)">
+      <input placeholder="Vía" value="${esc(selected.route || '')}" oninput="updateGuidedDrug(${jsArg(drug.id)},'route',this.value)">
+    </div>` : ''}
+    <div class="m6-drug-row">
+      ${frequencies.map(value => `<button type="button" class="m6-drug-pill ${selected.frequency === value ? 'active' : ''}"
+        onclick="setGuidedDrugFrequency(${jsArg(drug.id)},${jsArg(value)})">${esc(value)}</button>`).join('')}
+      <button type="button" class="m6-drug-pill" onclick="showGuidedDrugCustom(${jsArg(drug.id)},'frequency')">Otra frecuencia</button>
+    </div>
+    ${selected.customFrequencyOpen ? `<div class="m6-drug-custom">
+      <input placeholder="Frecuencia" value="${esc(selected.frequency || '')}" oninput="updateGuidedDrug(${jsArg(drug.id)},'frequency',this.value)">
+    </div>` : ''}
+    ${hasDurationOptions ? `<div class="m6-drug-row">
+      ${durations.map(value => `<button type="button" class="m6-drug-pill ${selected.duration === value ? 'active' : ''}"
+        onclick="setGuidedDrugDuration(${jsArg(drug.id)},${jsArg(value)})">${esc(value)}</button>`).join('')}
+      <button type="button" class="m6-drug-pill" onclick="showGuidedDrugCustom(${jsArg(drug.id)},'duration')">Otra duración</button>
+    </div>` : ''}
+    ${selected.customDurationOpen ? `<div class="m6-drug-custom compact">
+      <input placeholder="Duración" value="${esc(selected.duration || '')}" oninput="updateGuidedDrug(${jsArg(drug.id)},'duration',this.value)">
+    </div>` : ''}
+    <button type="button" class="m6-drug-remove" onclick="removeGuidedDrug(${jsArg(drug.id)})">Quitar</button>
+  </div>`;
+}
+
+function renderDrugChip(drug, groupPath = []) {
+  const selected = !!state.guidedManagement.drugs[drug.id];
+  const fullDrug = { ...drug, groupPath };
+  return `<div class="m6-drug-choice">
+    <button type="button" class="drug-chip ${selected ? 'selected' : ''}" onclick="selectGuidedDrug(${jsArg(drug.id)})">${esc(drug.name)}</button>
+    ${selected ? renderDrugInlineOptions(fullDrug) : ''}
+  </div>`;
+}
+
+function guidedDrugOrderLabel(drug) {
+  const selected = state.guidedManagement.drugs[drug.id] || {};
+  const doseRoute = [selected.presentation, selected.route].filter(Boolean).join(' ');
+  const details = [doseRoute, selected.frequency, selected.duration].filter(Boolean);
+  return details.length ? `${drug.name} · ${details.join(' · ')}` : drug.name;
+}
+
+function renderRemovableOrderItem(label, onRemove, removeLabel) {
+  return `<div class="order-item order-item-removable">
+    <div class="order-item-copy">
+      <strong>${esc(label)}</strong>
+    </div>
+    <button type="button" class="order-remove" onclick="${onRemove}" aria-label="${esc(removeLabel)}">×</button>
+  </div>`;
+}
+
+function renderOrderCategory(title, items, resetSection = '') {
+  if (!items.length) return '';
+  return `<section class="order-category">
+    <div class="order-category-head">
+      <h3>${esc(title)}</h3>
+      ${resetSection ? `<button type="button" class="order-reset" onclick="resetGuidedSection(${jsArg(resetSection)})">Reiniciar</button>` : ''}
+    </div>
+    <div class="order-category-list">${items.join('')}</div>
+  </section>`;
+}
+
+function guidedOrderGroups() {
+  const gm = state.guidedManagement;
+  const consults = gm.consults || [];
+  const consultAndDestination = consults
+    .map(c => renderRemovableOrderItem(c.service || 'Pendiente', `removeGuidedConsult(${jsArg(c.id)})`, `Quitar ${c.service || 'interconsulta'}`))
+    .concat(gm.destination ? [renderRemovableOrderItem(gm.destination, `setGuidedDestination(${jsArg('')})`, `Quitar ${gm.destination}`)] : []);
+  return {
+    general: Object.entries(gm.general)
+      .filter(([, value]) => !!value)
+      .map(([id]) => renderRemovableOrderItem(optionLabel(guidedGeneralOptions, id), `setGuidedGeneral(${jsArg(id)},false)`, `Quitar ${optionLabel(guidedGeneralOptions, id)}`)),
+    drugs: Object.keys(gm.drugs)
+      .map(id => findDrugById(id))
+      .filter(Boolean)
+      .map(drug => renderRemovableOrderItem(guidedDrugOrderLabel(drug), `removeGuidedDrug(${jsArg(drug.id)})`, `Quitar ${drug.name}`)),
+    procedures: Object.keys(gm.procedures)
+      .map(id => ({ id, label: optionLabel(guidedProcedureOptions, id) }))
+      .map(item => renderRemovableOrderItem(item.label, `setGuidedProcedure(${jsArg(item.id)},false)`, `Quitar ${item.label}`)),
+    monitoring: Object.entries(gm.monitoring)
+      .filter(([, value]) => !!value)
+      .map(([id]) => ({ id, label: optionLabel(guidedMonitoringOptions, id) }))
+      .map(item => renderRemovableOrderItem(item.label, `setGuidedMonitoring(${jsArg(item.id)},false)`, `Quitar ${item.label}`)),
+    consultDestination: consultAndDestination,
+    precautions: gm.precautions ? [renderRemovableOrderItem(gm.precautions, `setGuidedPrecautions(${jsArg('')});renderModules()`, 'Quitar precauciones')] : []
+  };
+}
+
+function renderGuidedOrderSlot(title, items) {
+  const resetMap = {
+    'Manejo general': 'general',
+    'Fármacos': 'drugs',
+    'Procedimientos y soporte': 'procedures',
+    'Monitorización': 'monitoring',
+    'Interconsultas y destino': 'consultDestination',
+    'Precauciones': 'precautions'
+  };
+  const content = renderOrderCategory(title, items, resetMap[title] || '');
+  return `<aside class="orders-panel m6-order-column">
+    ${content ? `<div class="orders-panel-inner m6-order-slot">${content}</div>` : ''}
+  </aside>`;
+}
+
+function renderGuidedCategoryRow(title, orderItems, optionsHtml) {
+  return `<div class="m6-guided-row">
+    ${renderGuidedOrderSlot(title, orderItems)}
+    <div class="library-panel">
+      <div class="m6-library guided-management">${optionsHtml}</div>
+    </div>
+  </div>`;
+}
+
 function renderGuidedDrugs() {
   return `<details class="guided-section" open>
     <summary>Manejo farmacológico</summary>
@@ -828,6 +1017,7 @@ function renderGuidedDrugs() {
         <h3>FÁRMACOS</h3>
         <p>Clasificación farmacológica</p>
       </div>
+      ${renderDrugSearch()}
       <div class="drug-tree">${renderDrugTree()}</div>
     </div>
   </details>`;
@@ -894,6 +1084,18 @@ function renderGuidedManagement() {
   </div>`;
 }
 
+function renderGuidedWorkspace() {
+  const groups = guidedOrderGroups();
+  return `<div class="m6-guided-workspace">
+    ${renderGuidedCategoryRow('Manejo general', groups.general, renderGuidedGeneral())}
+    ${renderGuidedCategoryRow('Fármacos', groups.drugs, renderGuidedDrugs())}
+    ${renderGuidedCategoryRow('Procedimientos y soporte', groups.procedures, renderGuidedProcedures())}
+    ${renderGuidedCategoryRow('Monitorización', groups.monitoring, renderGuidedMonitoring())}
+    ${renderGuidedCategoryRow('Interconsultas y destino', groups.consultDestination, renderGuidedConsults())}
+    ${renderGuidedCategoryRow('Precauciones', groups.precautions, renderGuidedPrecautions())}
+  </div>`;
+}
+
 function optionLabel(options, id) {
   return options.find(([key]) => key === id)?.[1] || id;
 }
@@ -929,25 +1131,18 @@ function renderOxygenOrderForm() {
 }
 
 function renderGuidedOrdersSummary() {
-  const gm = state.guidedManagement;
-  const general = Object.entries(gm.general).filter(([, value]) => !!value).map(([id]) => optionLabel(guidedGeneralOptions, id));
-  const drugs = Object.keys(gm.drugs).map(id => findDrugById(id)).filter(Boolean);
-  const procedures = Object.keys(gm.procedures).map(id => optionLabel(guidedProcedureOptions, id));
-  const monitoring = Object.entries(gm.monitoring).filter(([, value]) => !!value).map(([id]) => optionLabel(guidedMonitoringOptions, id));
-  const hasOrders = general.length || drugs.length || procedures.length || monitoring.length || gm.consults.length || gm.destination || gm.precautions;
+  const groups = guidedOrderGroups();
+  const hasOrders = Object.values(groups).some(items => items.length);
   return `<div class="orders-panel-inner">
     <h2>Órdenes seleccionadas</h2>
     ${hasOrders ? `<div class="order-summary-list">
-      ${general.map(label => `<div class="order-item"><span>Manejo general</span><strong>${esc(label)}</strong></div>`).join('')}
-      ${drugs.map(drug => `<div class="order-item"><span>Fármaco</span><strong>${esc(drug.name)}</strong></div>`).join('')}
-      ${procedures.map(label => `<div class="order-item"><span>Procedimiento o soporte</span><strong>${esc(label)}</strong></div>`).join('')}
-      ${monitoring.map(label => `<div class="order-item"><span>Monitorización</span><strong>${esc(label)}</strong></div>`).join('')}
-      ${gm.consults.map(c => `<div class="order-item"><span>Interconsulta</span><strong>${esc(c.service || 'Pendiente')}</strong></div>`).join('')}
-      ${gm.destination ? `<div class="order-item"><span>Destino global</span><strong>${esc(gm.destination)}</strong></div>` : ''}
-      ${gm.precautions ? `<div class="order-item"><span>Precauciones</span><strong>${esc(gm.precautions)}</strong></div>` : ''}
+      ${renderOrderCategory('Manejo general', groups.general, 'general')}
+      ${renderOrderCategory('Fármacos', groups.drugs, 'drugs')}
+      ${renderOrderCategory('Procedimientos y soporte', groups.procedures, 'procedures')}
+      ${renderOrderCategory('Monitorización', groups.monitoring, 'monitoring')}
+      ${renderOrderCategory('Interconsultas y destino', groups.consultDestination, 'consultDestination')}
+      ${renderOrderCategory('Precauciones', groups.precautions, 'precautions')}
     </div>` : '<div class="order-empty">Aún no hay órdenes seleccionadas.</div>'}
-    ${renderOxygenOrderForm()}
-    ${drugs.map(drug => renderDrugForm(drug)).join('')}
   </div>`;
 }
 
@@ -973,14 +1168,10 @@ function renderM6() {
       <p>Modo elegido: ${esc(managementModeLabel())}</p>
     </div>
     ${renderM6DxCard()}
-    <div class="m6-workspace">
-      <aside class="orders-panel">
-        ${state.managementMode === 'manual' ? renderManualOrdersSummary() : renderGuidedOrdersSummary()}
-      </aside>
-      <div class="library-panel">
-        ${state.managementMode === 'manual' ? renderManualManagement() : renderGuidedManagement()}
-      </div>
-    </div>
+    ${state.managementMode === 'manual' ? `<div class="m6-workspace">
+      <aside class="orders-panel">${renderManualOrdersSummary()}</aside>
+      <div class="library-panel">${renderManualManagement()}</div>
+    </div>` : renderGuidedWorkspace()}
     <div class="footer-actions">
       <button class="action secondary" onclick="goModule('m5')">← Volver</button>
       <button class="action" onclick="goModule('m7')">Continuar a evaluación →</button>

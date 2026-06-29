@@ -289,6 +289,25 @@ function removeGuidedConsult(id) {
   renderModules();
 }
 
+function resetGuidedSection(section) {
+  if (section === 'general') {
+    state.guidedManagement.general = {};
+  } else if (section === 'drugs') {
+    state.guidedManagement.drugs = {};
+  } else if (section === 'procedures') {
+    state.guidedManagement.procedures = {};
+  } else if (section === 'monitoring') {
+    state.guidedManagement.monitoring = {};
+  } else if (section === 'consultDestination') {
+    state.guidedManagement.consults = [];
+    state.guidedManagement.destination = '';
+  } else if (section === 'precautions') {
+    state.guidedManagement.precautions = '';
+  }
+  save();
+  renderModules();
+}
+
 function drugBank() {
   return Array.isArray(window.HCR_DRUGS) ? window.HCR_DRUGS : [];
 }
@@ -307,6 +326,10 @@ function findDrugById(id, nodes = drugBank(), path = []) {
 function selectGuidedDrug(id) {
   const drug = findDrugById(id);
   if (!drug) return;
+  (drug.groupPath || []).forEach((_, idx, path) => {
+    const key = 'drug_' + path.slice(0, idx + 1).join('_').replace(/[^A-Za-z0-9]+/g, '_');
+    state.expanded[key] = true;
+  });
   state.guidedManagement.drugs[id] = state.guidedManagement.drugs[id] || {
     id: drug.id,
     name: drug.name,
@@ -333,10 +356,111 @@ function updateGuidedDrug(id, field, val) {
   save();
 }
 
+function setGuidedDrugSchema(id, presentation, route) {
+  updateGuidedDrug(id, 'presentation', presentation);
+  updateGuidedDrug(id, 'route', route);
+  updateGuidedDrug(id, 'customDoseOpen', false);
+  renderModules();
+}
+
+function setGuidedDrugPresentation(id, val) {
+  updateGuidedDrug(id, 'presentation', val);
+  updateGuidedDrug(id, 'customDoseOpen', false);
+  renderModules();
+}
+
+function setGuidedDrugRoute(id, val) {
+  updateGuidedDrug(id, 'route', val);
+  renderModules();
+}
+
+function setGuidedDrugFrequency(id, val) {
+  updateGuidedDrug(id, 'frequency', val);
+  updateGuidedDrug(id, 'customFrequencyOpen', false);
+  renderModules();
+}
+
+function setGuidedDrugDuration(id, val) {
+  updateGuidedDrug(id, 'duration', val);
+  updateGuidedDrug(id, 'customDurationOpen', false);
+  renderModules();
+}
+
+function showGuidedDrugCustom(id, field) {
+  const key = field === 'frequency' ? 'customFrequencyOpen'
+    : field === 'duration' ? 'customDurationOpen'
+    : 'customDoseOpen';
+  updateGuidedDrug(id, key, true);
+  renderModules();
+}
+
 function removeGuidedDrug(id) {
   delete state.guidedManagement.drugs[id];
   save();
   renderModules();
+}
+
+function findDrugBySearchValue(value, nodes = drugBank()) {
+  const query = normalizeText(value);
+  if (!query) return null;
+  for (const node of nodes) {
+    const foundDrug = (node.drugs || []).find(drug => {
+      const names = [drug.name, drug.id, ...(drug.aliases || [])];
+      return names.some(name => normalizeText(name) === query);
+    });
+    if (foundDrug) return foundDrug;
+    const foundChild = node.children ? findDrugBySearchValue(value, node.children) : null;
+    if (foundChild) return foundChild;
+  }
+  return null;
+}
+
+function collectDrugSearchOptions(nodes = drugBank(), path = [], out = []) {
+  nodes.forEach(node => {
+    const nextPath = node.group ? path.concat(node.group) : path;
+    (node.drugs || []).forEach(drug => out.push({ ...drug, groupPath: nextPath }));
+    if (node.children) collectDrugSearchOptions(node.children, nextPath, out);
+  });
+  return out;
+}
+
+function searchGuidedDrugs(query) {
+  const q = normalizeText(query).trim();
+  if (!q) return [];
+  return collectDrugSearchOptions().filter(drug => {
+    const names = [drug.name, ...(drug.aliases || [])];
+    return names.some(name => normalizeText(name).startsWith(q));
+  }).slice(0, 12);
+}
+
+function guidedDrugSuggestionsHTML(query) {
+  const q = String(query || '').trim();
+  if (!q) return '';
+  const matches = searchGuidedDrugs(q);
+  if (!matches.length) {
+    return `<div class="m6-med-no-results">No hay medicamentos que comiencen con "${esc(q)}".</div>`;
+  }
+  return matches.map(drug =>
+    `<button type="button" class="diagnosis-option m6-med-option" onclick="selectGuidedDrugFromSuggestion(${JSON.stringify(drug.id).replace(/</g, '\\u003C').replace(/"/g, '&quot;')})">
+      <span>${esc(drug.name)}</span>
+      <small>${esc((drug.groupPath || []).join(' / '))}</small>
+    </button>`
+  ).join('');
+}
+
+function refreshGuidedDrugSuggestions(value) {
+  const el = document.getElementById('m6DrugSuggestions');
+  if (el) el.innerHTML = guidedDrugSuggestionsHTML(value);
+}
+
+function selectGuidedDrugFromSuggestion(id) {
+  selectGuidedDrug(id);
+}
+
+function selectGuidedDrugFromSearch(value) {
+  const drug = findDrugBySearchValue(value) || searchGuidedDrugs(value)[0];
+  if (!drug) return;
+  selectGuidedDrug(drug.id);
 }
 
 function normalizeText(s) {

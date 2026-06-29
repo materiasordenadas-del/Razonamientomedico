@@ -19,7 +19,7 @@ window.HCR_DRUGS = [
                   { id: "atenolol", canonicalId: "atenolol", name: "Atenolol", aliases: ["beta bloqueante beta 1"] },
                   { id: "bisoprolol", canonicalId: "bisoprolol", name: "Bisoprolol", aliases: ["beta bloqueante beta 1"] },
                   { id: "metoprolol", canonicalId: "metoprolol", name: "Metoprolol", aliases: ["metoprolol tartrato", "metoprolol succinato"] },
-                  { id: "esmolol", canonicalId: "esmolol", name: "Esmolol", presentations: ["Bolo IV", "Infusión IV", "Otra dosis"], routes: ["IV"], frequencies: ["Bolo", "Infusión titulada", "Otra"], duration: true },
+                  { id: "esmolol", canonicalId: "esmolol", name: "Esmolol", doses: ["Bolo IV", "Infusión IV", "Otra dosis"], presentations: ["Bolo IV", "Infusión IV", "Otra dosis"], routes: ["IV"], frequencies: ["Bolo", "Infusión titulada", "Otra frecuencia"], durations: ["Otra duración"], duration: true, allowCustom: true },
                   { id: "nebivolol", canonicalId: "nebivolol", name: "Nebivolol" }
                 ]
               },
@@ -35,7 +35,7 @@ window.HCR_DRUGS = [
                 group: "Mixtos α1 + β",
                 drugs: [
                   { id: "carvedilol", canonicalId: "carvedilol", name: "Carvedilol" },
-                  { id: "labetalol", canonicalId: "labetalol", name: "Labetalol", presentations: ["20 mg", "40 mg", "80 mg", "Otra dosis"], routes: ["IV", "VO"], frequencies: ["Bolo IV", "Cada 10 minutos según respuesta", "Cada 12 horas", "Otra"], duration: true }
+                  { id: "labetalol", canonicalId: "labetalol", name: "Labetalol", doses: ["20 mg", "40 mg", "80 mg", "Otra dosis"], presentations: ["20 mg", "40 mg", "80 mg", "Otra dosis"], routes: ["IV", "VO"], frequencies: ["Bolo IV", "Cada 10 minutos según respuesta", "Cada 12 horas", "Otra frecuencia"], durations: ["Otra duración"], duration: true, allowCustom: true }
                 ]
               }
             ]
@@ -49,8 +49,8 @@ window.HCR_DRUGS = [
                   { id: "amlodipine", canonicalId: "amlodipine", name: "Amlodipino" },
                   { id: "nifedipine", canonicalId: "nifedipine", name: "Nifedipino" },
                   { id: "felodipine", canonicalId: "felodipine", name: "Felodipino" },
-                  { id: "nicardipine", canonicalId: "nicardipine", name: "Nicardipino", presentations: ["Infusión IV", "Otra dosis"], routes: ["IV"], frequencies: ["Infusión titulada", "Otra"], duration: true },
-                  { id: "clevidipine", canonicalId: "clevidipine", name: "Clevidipino", presentations: ["Infusión IV", "Otra dosis"], routes: ["IV"], frequencies: ["Infusión titulada", "Otra"], duration: true },
+                  { id: "nicardipine", canonicalId: "nicardipine", name: "Nicardipino", doses: ["Infusión IV", "Otra dosis"], presentations: ["Infusión IV", "Otra dosis"], routes: ["IV"], frequencies: ["Infusión titulada", "Otra frecuencia"], durations: ["Otra duración"], duration: true, allowCustom: true },
+                  { id: "clevidipine", canonicalId: "clevidipine", name: "Clevidipino", doses: ["Infusión IV", "Otra dosis"], presentations: ["Infusión IV", "Otra dosis"], routes: ["IV"], frequencies: ["Infusión titulada", "Otra frecuencia"], durations: ["Otra duración"], duration: true, allowCustom: true },
                   { id: "lercanidipine", canonicalId: "lercanidipine", name: "Lercanidipino" }
                 ]
               },
@@ -58,7 +58,7 @@ window.HCR_DRUGS = [
                 group: "No dihidropiridínicos",
                 drugs: [
                   { id: "verapamil", canonicalId: "verapamil", name: "Verapamilo" },
-                  { id: "diltiazem", canonicalId: "diltiazem", name: "Diltiazem", presentations: ["Bolo IV", "Infusión IV", "VO", "Otra dosis"], routes: ["IV", "VO"], frequencies: ["Bolo", "Infusión titulada", "Cada 6-8 horas", "Otra"], duration: true }
+                  { id: "diltiazem", canonicalId: "diltiazem", name: "Diltiazem", doses: ["Bolo IV", "Infusión IV", "VO", "Otra dosis"], presentations: ["Bolo IV", "Infusión IV", "VO", "Otra dosis"], routes: ["IV", "VO"], frequencies: ["Bolo", "Infusión titulada", "Cada 6-8 horas", "Otra frecuencia"], durations: ["Otra duración"], duration: true, allowCustom: true }
                 ]
               }
             ]
@@ -68,7 +68,7 @@ window.HCR_DRUGS = [
             drugs: [
               { id: "captopril", canonicalId: "captopril", name: "Captopril" },
               { id: "enalapril", canonicalId: "enalapril", name: "Enalapril" },
-              { id: "enalaprilat", canonicalId: "enalaprilat", name: "Enalaprilato", presentations: ["IV", "Otra dosis"], routes: ["IV"], frequencies: ["Cada 6 horas", "Otra"], duration: true },
+              { id: "enalaprilat", canonicalId: "enalaprilat", name: "Enalaprilato", doses: ["IV", "Otra dosis"], presentations: ["IV", "Otra dosis"], routes: ["IV"], frequencies: ["Cada 6 horas", "Otra frecuencia"], durations: ["Otra duración"], duration: true, allowCustom: true },
               { id: "lisinopril", canonicalId: "lisinopril", name: "Lisinopril" },
               { id: "ramipril", canonicalId: "ramipril", name: "Ramipril" },
               { id: "perindopril", canonicalId: "perindopril", name: "Perindopril" }
@@ -111,8 +111,8 @@ window.HCR_DRUGS = [
           {
             group: "Vasodilatadores dependientes de óxido nítrico",
             drugs: [
-              { id: "nitroglycerin", canonicalId: "nitroglycerin", name: "Nitroglicerina", presentations: ["Infusión IV", "Sublingual", "Otra dosis"], routes: ["IV", "SL"], frequencies: ["Infusión titulada", "Cada 5 minutos según respuesta", "Otra"], duration: true },
-              { id: "nitroprusside", canonicalId: "nitroprusside", name: "Nitroprusiato", presentations: ["Infusión IV", "Otra dosis"], routes: ["IV"], frequencies: ["Infusión titulada", "Otra"], duration: true }
+              { id: "nitroglycerin", canonicalId: "nitroglycerin", name: "Nitroglicerina", doses: ["Infusión IV", "Sublingual", "Otra dosis"], presentations: ["Infusión IV", "Sublingual", "Otra dosis"], routes: ["IV", "SL"], frequencies: ["Infusión titulada", "Cada 5 minutos según respuesta", "Otra frecuencia"], durations: ["Otra duración"], duration: true, allowCustom: true },
+              { id: "nitroprusside", canonicalId: "nitroprusside", name: "Nitroprusiato", doses: ["Infusión IV", "Otra dosis"], presentations: ["Infusión IV", "Otra dosis"], routes: ["IV"], frequencies: ["Infusión titulada", "Otra frecuencia"], durations: ["Otra duración"], duration: true, allowCustom: true }
             ]
           },
           {
@@ -136,7 +136,7 @@ window.HCR_DRUGS = [
         group: "Insuficiencia cardiaca y diuréticos",
         children: [
           { group: "Diuréticos de asa", drugs: [
-            { id: "furosemide", canonicalId: "furosemide", name: "Furosemida", presentations: ["20 mg", "40 mg", "80 mg", "Otra dosis"], routes: ["IV", "VO"], frequencies: ["Dosis única", "Cada 12 horas", "Cada 24 horas", "Infusión continua", "Otra"], duration: true },
+            { id: "furosemide", canonicalId: "furosemide", name: "Furosemida", doses: ["20 mg", "40 mg", "80 mg", "Otra dosis"], presentations: ["20 mg", "40 mg", "80 mg", "Otra dosis"], routes: ["IV", "VO"], frequencies: ["Dosis única", "Cada 12 horas", "Cada 24 horas", "Infusión continua", "Otra frecuencia"], durations: ["Otra duración"], duration: true, allowCustom: true },
             { id: "bumetanide", canonicalId: "bumetanide", name: "Bumetanida" },
             { id: "torsemide", canonicalId: "torsemide", name: "Torsemida" }
           ] },
@@ -162,14 +162,14 @@ window.HCR_DRUGS = [
           { group: "Clase IB", drugs: [{ id: "lidocaine", canonicalId: "lidocaine", name: "Lidocaína" }, { id: "mexiletine", canonicalId: "mexiletine", name: "Mexiletina" }] },
           { group: "Clase IC", drugs: [{ id: "flecainide", canonicalId: "flecainide", name: "Flecainida" }, { id: "propafenone", canonicalId: "propafenone", name: "Propafenona" }] },
           { group: "Clase III", drugs: [
-            { id: "amiodarone", canonicalId: "amiodarone", name: "Amiodarona", presentations: ["150 mg", "300 mg", "Infusión IV", "Otra dosis"], routes: ["IV", "VO"], frequencies: ["Bolo", "Infusión", "Cada 24 horas", "Otra"], duration: true },
+            { id: "amiodarone", canonicalId: "amiodarone", name: "Amiodarona", doses: ["150 mg", "300 mg", "Infusión IV", "Otra dosis"], presentations: ["150 mg", "300 mg", "Infusión IV", "Otra dosis"], routes: ["IV", "VO"], frequencies: ["Bolo", "Infusión", "Cada 24 horas", "Otra frecuencia"], durations: ["Otra duración"], duration: true, allowCustom: true },
             { id: "sotalol", canonicalId: "sotalol", name: "Sotalol" },
             { id: "dofetilide", canonicalId: "dofetilide", name: "Dofetilida" },
             { id: "ibutilide", canonicalId: "ibutilide", name: "Ibutilida" }
           ] },
           { group: "Clase IV / nodo AV", drugs: [
-            { id: "adenosine", canonicalId: "adenosine", name: "Adenosina", presentations: ["6 mg", "12 mg", "Otra dosis"], routes: ["IV"], frequencies: ["Dosis rápida", "Otra"], duration: false },
-            { id: "atropine", canonicalId: "atropine", name: "Atropina", presentations: ["0,5 mg", "1 mg", "Otra dosis"], routes: ["IV"], frequencies: ["Cada 3-5 minutos según respuesta", "Otra"], duration: false }
+            { id: "adenosine", canonicalId: "adenosine", name: "Adenosina", doses: ["6 mg", "12 mg", "Otra dosis"], presentations: ["6 mg", "12 mg", "Otra dosis"], routes: ["IV"], frequencies: ["Dosis rápida", "Otra frecuencia"], duration: false, allowCustom: true },
+            { id: "atropine", canonicalId: "atropine", name: "Atropina", doses: ["0,5 mg", "1 mg", "Otra dosis"], presentations: ["0,5 mg", "1 mg", "Otra dosis"], routes: ["IV"], frequencies: ["Cada 3-5 minutos según respuesta", "Otra frecuencia"], duration: false, allowCustom: true }
           ] }
         ]
       },
@@ -184,10 +184,10 @@ window.HCR_DRUGS = [
       {
         group: "Inotrópicos y vasopresores",
         drugs: [
-          { id: "norepinephrine", canonicalId: "norepinephrine", name: "Noradrenalina", presentations: ["Infusión IV", "Otra dosis"], routes: ["IV"], frequencies: ["Infusión titulada", "Otra"], duration: true },
+          { id: "norepinephrine", canonicalId: "norepinephrine", name: "Noradrenalina", doses: ["Infusión IV", "Otra dosis"], presentations: ["Infusión IV", "Otra dosis"], routes: ["IV"], frequencies: ["Infusión titulada", "Otra frecuencia"], durations: ["Otra duración"], duration: true, allowCustom: true },
           { id: "epinephrine", canonicalId: "epinephrine", name: "Adrenalina" },
           { id: "dopamine", canonicalId: "dopamine", name: "Dopamina" },
-          { id: "dobutamine", canonicalId: "dobutamine", name: "Dobutamina", presentations: ["Infusión IV", "Otra dosis"], routes: ["IV"], frequencies: ["Infusión titulada", "Otra"], duration: true },
+          { id: "dobutamine", canonicalId: "dobutamine", name: "Dobutamina", doses: ["Infusión IV", "Otra dosis"], presentations: ["Infusión IV", "Otra dosis"], routes: ["IV"], frequencies: ["Infusión titulada", "Otra frecuencia"], durations: ["Otra duración"], duration: true, allowCustom: true },
           { id: "milrinone", canonicalId: "milrinone", name: "Milrinona" },
           { id: "vasopressin", canonicalId: "vasopressin", name: "Vasopresina" }
         ]
@@ -196,7 +196,7 @@ window.HCR_DRUGS = [
         group: "Hipolipemiantes",
         children: [
           { group: "Estatinas", drugs: [
-            { id: "atorvastatin", canonicalId: "atorvastatin", name: "Atorvastatina", presentations: ["40 mg", "80 mg", "Otra dosis"], routes: ["VO"], frequencies: ["Cada 24 horas", "Otra"], duration: true },
+            { id: "atorvastatin", canonicalId: "atorvastatin", name: "Atorvastatina", doses: ["40 mg", "80 mg", "Otra dosis"], presentations: ["40 mg", "80 mg", "Otra dosis"], routes: ["VO"], frequencies: ["Cada 24 horas", "Otra frecuencia"], durations: ["Otra duración"], duration: true, allowCustom: true },
             { id: "rosuvastatin", canonicalId: "rosuvastatin", name: "Rosuvastatina" },
             { id: "simvastatin", canonicalId: "simvastatin", name: "Simvastatina" },
             { id: "pravastatin", canonicalId: "pravastatin", name: "Pravastatina" }
@@ -228,7 +228,7 @@ window.HCR_DRUGS = [
             { group: "1ª generación", drugs: [{ id: "cefazolin", canonicalId: "cefazolin", name: "Cefazolina" }, { id: "cephalexin", canonicalId: "cephalexin", name: "Cefalexina" }] },
             { group: "2ª generación", drugs: [{ id: "cefuroxime", canonicalId: "cefuroxime", name: "Cefuroxima" }, { id: "cefoxitin", canonicalId: "cefoxitin", name: "Cefoxitina" }] },
             { group: "3ª generación", drugs: [
-              { id: "ceftriaxone", canonicalId: "ceftriaxone", name: "Ceftriaxona", presentations: ["1 g", "2 g", "Otra dosis"], routes: ["IV", "IM"], frequencies: ["Cada 12 horas", "Cada 24 horas", "Otra"], duration: true },
+              { id: "ceftriaxone", canonicalId: "ceftriaxone", name: "Ceftriaxona", doses: ["1 g", "2 g", "Otra dosis"], presentations: ["1 g", "2 g", "Otra dosis"], routes: ["IV", "IM"], frequencies: ["Cada 12 horas", "Cada 24 horas", "Otra frecuencia"], durations: ["Otra duración"], duration: true, allowCustom: true },
               { id: "cefotaxime", canonicalId: "cefotaxime", name: "Cefotaxima" },
               { id: "ceftazidime", canonicalId: "ceftazidime", name: "Ceftazidima" }
             ] },
@@ -236,12 +236,12 @@ window.HCR_DRUGS = [
             { group: "5ª generación", drugs: [{ id: "ceftaroline", canonicalId: "ceftaroline", name: "Ceftarolina" }] }
           ] },
           { group: "Carbapenémicos", drugs: [
-            { id: "meropenem", canonicalId: "meropenem", name: "Meropenem", presentations: ["1 g", "2 g", "Otra dosis"], routes: ["IV"], frequencies: ["Cada 8 horas", "Otra"], duration: true },
+            { id: "meropenem", canonicalId: "meropenem", name: "Meropenem", doses: ["1 g", "2 g", "Otra dosis"], presentations: ["1 g", "2 g", "Otra dosis"], routes: ["IV"], frequencies: ["Cada 8 horas", "Otra frecuencia"], durations: ["Otra duración"], duration: true, allowCustom: true },
             { id: "imipenem_cilastatin", canonicalId: "imipenem_cilastatin", name: "Imipenem/Cilastatina" },
             { id: "ertapenem", canonicalId: "ertapenem", name: "Ertapenem" }
           ] },
           { group: "Glucopéptidos", drugs: [
-            { id: "vancomycin", canonicalId: "vancomycin", name: "Vancomicina", presentations: ["500 mg", "1 g", "Otra dosis"], routes: ["IV", "VO"], frequencies: ["Cada 8 horas", "Cada 12 horas", "Según niveles", "Otra"], duration: true }
+            { id: "vancomycin", canonicalId: "vancomycin", name: "Vancomicina", doses: ["500 mg", "1 g", "Otra dosis"], presentations: ["500 mg", "1 g", "Otra dosis"], routes: ["IV", "VO"], frequencies: ["Cada 8 horas", "Cada 12 horas", "Según niveles", "Otra frecuencia"], durations: ["Otra duración"], duration: true, allowCustom: true }
           ] },
           { group: "Macrólidos", drugs: [{ id: "azithromycin", canonicalId: "azithromycin", name: "Azitromicina" }, { id: "clarithromycin", canonicalId: "clarithromycin", name: "Claritromicina" }] },
           { group: "Tetraciclinas", drugs: [{ id: "doxycycline", canonicalId: "doxycycline", name: "Doxiciclina" }, { id: "minocycline", canonicalId: "minocycline", name: "Minociclina" }] },
@@ -256,7 +256,7 @@ window.HCR_DRUGS = [
       {
         group: "Antivirales",
         drugs: [
-          { id: "acyclovir", canonicalId: "acyclovir", name: "Aciclovir", presentations: ["IV", "VO", "Otra dosis"], routes: ["IV", "VO"], frequencies: ["Cada 8 horas", "Cada 12 horas", "Otra"], duration: true },
+          { id: "acyclovir", canonicalId: "acyclovir", name: "Aciclovir", doses: ["IV", "VO", "Otra dosis"], presentations: ["IV", "VO", "Otra dosis"], routes: ["IV", "VO"], frequencies: ["Cada 8 horas", "Cada 12 horas", "Otra frecuencia"], durations: ["Otra duración"], duration: true, allowCustom: true },
           { id: "valacyclovir", canonicalId: "valacyclovir", name: "Valaciclovir" },
           { id: "ganciclovir", canonicalId: "ganciclovir", name: "Ganciclovir" },
           { id: "oseltamivir", canonicalId: "oseltamivir", name: "Oseltamivir" }
@@ -306,7 +306,7 @@ window.HCR_DRUGS = [
     group: "Endocrino y metabolismo",
     children: [
       { group: "Insulinas", drugs: [
-        { id: "regular_insulin", canonicalId: "regular_insulin", name: "Insulina regular", presentations: ["SC", "Infusión IV", "Otra dosis"], routes: ["SC", "IV"], frequencies: ["Según esquema", "Infusión", "Otra"], duration: true },
+        { id: "regular_insulin", canonicalId: "regular_insulin", name: "Insulina regular", doses: ["SC", "Infusión IV", "Otra dosis"], presentations: ["SC", "Infusión IV", "Otra dosis"], routes: ["SC", "IV"], frequencies: ["Según esquema", "Infusión", "Otra frecuencia"], durations: ["Otra duración"], duration: true, allowCustom: true },
         { id: "nph_insulin", canonicalId: "nph_insulin", name: "Insulina NPH" },
         { id: "glargine", canonicalId: "glargine", name: "Insulina glargina" },
         { id: "lispro", canonicalId: "lispro", name: "Insulina lispro" }
@@ -364,14 +364,14 @@ window.HCR_DRUGS = [
     group: "Anticoagulantes y antiagregantes",
     children: [
       { group: "Antiagregantes", drugs: [
-        { id: "aspirin", canonicalId: "aspirin", name: "Aspirina", presentations: ["81 mg", "100 mg", "300 mg", "Otra dosis"], routes: ["VO"], frequencies: ["Dosis de carga", "Cada 24 horas", "Otra"], duration: true },
+        { id: "aspirin", canonicalId: "aspirin", name: "Aspirina", doses: ["81 mg", "100 mg", "300 mg", "Otra dosis"], presentations: ["81 mg", "100 mg", "300 mg", "Otra dosis"], routes: ["VO"], frequencies: ["Dosis de carga", "Cada 24 horas", "Otra frecuencia"], durations: ["Otra duración"], duration: true, allowCustom: true },
         { id: "clopidogrel", canonicalId: "clopidogrel", name: "Clopidogrel" },
         { id: "ticagrelor", canonicalId: "ticagrelor", name: "Ticagrelor" },
         { id: "prasugrel", canonicalId: "prasugrel", name: "Prasugrel" }
       ] },
       { group: "Anticoagulantes parenterales", drugs: [
         { id: "unfractionated_heparin", canonicalId: "unfractionated_heparin", name: "Heparina no fraccionada" },
-        { id: "enoxaparin", canonicalId: "enoxaparin", name: "Enoxaparina", presentations: ["40 mg", "60 mg", "80 mg", "1 mg/kg", "Otra dosis"], routes: ["SC"], frequencies: ["Cada 12 horas", "Cada 24 horas", "Otra"], duration: true }
+        { id: "enoxaparin", canonicalId: "enoxaparin", name: "Enoxaparina", doses: ["40 mg", "60 mg", "80 mg", "1 mg/kg", "Otra dosis"], presentations: ["40 mg", "60 mg", "80 mg", "1 mg/kg", "Otra dosis"], routes: ["SC"], frequencies: ["Cada 12 horas", "Cada 24 horas", "Otra frecuencia"], durations: ["Otra duración"], duration: true, allowCustom: true }
       ] },
       { group: "Anticoagulantes orales", drugs: [
         { id: "warfarin", canonicalId: "warfarin", name: "Warfarina" },
