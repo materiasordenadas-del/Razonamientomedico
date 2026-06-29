@@ -50,7 +50,7 @@ function renderExpertNarrative() {
   return cards || '<div class="placeholder">Este caso aún no tiene comparación experta estructurada por módulo.</div>';
 }
 
-function renderM7() {
+function renderExpertLayerM7() {
   return `<section class="module active">
     <div class="module-intro">
       <h1>Módulo 7 — Evaluación</h1>
@@ -84,4 +84,4 @@ function renderM7() {
   </section>`;
 }
 
-if (typeof renderers !== 'undefined') renderers.m7 = renderM7;
+// M7 lo renderiza app/modules.js; esta capa no debe reemplazar renderers.m7.
