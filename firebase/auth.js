@@ -1,6 +1,9 @@
 import {
+  browserLocalPersistence,
+  browserSessionPersistence,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
+  setPersistence,
   signInWithEmailAndPassword,
   signOut
 } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js";
@@ -69,9 +72,11 @@ async function readProfile(uid) {
   return snapshot.exists() ? snapshot.data() : null;
 }
 
-async function registerUser(username, password) {
+async function registerUser(username, password, rememberSession = true) {
   const usernameNormalized = normalizeUsername(username);
   assertPassword(password);
+
+  await setPersistence(auth, rememberSession ? browserLocalPersistence : browserSessionPersistence);
 
   const credential = await createUserWithEmailAndPassword(
     auth,
@@ -87,9 +92,11 @@ async function registerUser(username, password) {
   };
 }
 
-async function loginUser(username, password) {
+async function loginUser(username, password, rememberSession = true) {
   const usernameNormalized = normalizeUsername(username);
   assertPassword(password);
+
+  await setPersistence(auth, rememberSession ? browserLocalPersistence : browserSessionPersistence);
 
   const credential = await signInWithEmailAndPassword(
     auth,

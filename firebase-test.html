@@ -3,27 +3,236 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Firebase Test</title>
+  <title>H-CR — Acceso</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0f1117;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: #e2e8f0;
+    }
+
+    .card {
+      background: #1a1d27;
+      border: 1px solid #2d3148;
+      border-radius: 10px;
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+
+    .card-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-align: center;
+      color: #a5b4fc;
+      margin-bottom: 0.3rem;
+    }
+
+    .card-subtitle {
+      font-size: 0.78rem;
+      text-align: center;
+      color: #64748b;
+      margin-bottom: 2rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 1.1rem;
+    }
+
+    .field label {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: #94a3b8;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .field input[type="text"],
+    .field input[type="password"] {
+      background: #0f1117;
+      border: 1px solid #2d3148;
+      border-radius: 6px;
+      padding: 0.65rem 0.85rem;
+      font-size: 0.95rem;
+      color: #e2e8f0;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+
+    .field input:focus {
+      border-color: #6366f1;
+    }
+
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      margin-top: 1.5rem;
+    }
+
+    button {
+      padding: 0.65rem 1rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s, background 0.2s;
+      letter-spacing: 0.02em;
+      width: 100%;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    #login {
+      background: #1e293b;
+      color: #a5b4fc;
+      border: 1px solid #2d3148;
+    }
+    #login:hover:not(:disabled) { background: #263044; }
+    #login.active {
+      background: #6366f1;
+      color: #fff;
+      border-color: #6366f1;
+    }
+    #login.active:hover:not(:disabled) { background: #4f46e5; }
+
+    #createAccount {
+      background: #1e293b;
+      color: #a5b4fc;
+      border: 1px solid #2d3148;
+    }
+    #createAccount:hover:not(:disabled) { background: #263044; }
+    #createAccount.active {
+      background: #6366f1;
+      color: #fff;
+      border-color: #6366f1;
+    }
+    #createAccount.active:hover:not(:disabled) { background: #4f46e5; }
+
+    #logout {
+      background: transparent;
+      color: #64748b;
+      border: 1px solid #2d3148;
+      font-size: 0.82rem;
+    }
+    #logout:hover:not(:disabled) { color: #94a3b8; border-color: #475569; }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #2d3148;
+      margin: 1.4rem 0 1rem;
+    }
+
+    #status {
+      font-size: 0.85rem;
+      min-height: 2.5rem;
+      padding: 0.6rem 0.85rem;
+      border-radius: 6px;
+      background: #0f1117;
+      border: 1px solid #2d3148;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+
+    #status.ok {
+      border-color: #22c55e44;
+      color: #86efac;
+      background: #052e16aa;
+    }
+
+    #status.error {
+      border-color: #ef444444;
+      color: #fca5a5;
+      background: #450a0aaa;
+    }
+
+    #status.info {
+      border-color: #6366f133;
+      color: #a5b4fc;
+    }
+
+    .remember-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1.1rem;
+    }
+
+    .remember-row input[type="checkbox"] {
+      accent-color: #6366f1;
+      width: 1rem;
+      height: 1rem;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .remember-row label {
+      font-size: 0.83rem;
+      color: #94a3b8;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .remember-hint {
+      font-size: 0.73rem;
+      color: #475569;
+      margin-top: 0.3rem;
+      padding-left: 1.5rem;
+    }
+  </style>
 </head>
 <body>
-  <main>
-    <label>
-      Usuario
-      <input id="username" type="text" autocomplete="username" inputmode="text">
-    </label>
+  <div class="card">
+    <h1 class="card-title">H-CR</h1>
+    <p class="card-subtitle">Acceso al sistema</p>
 
-    <label>
-      Contraseña
-      <input id="password" type="password" autocomplete="current-password">
-    </label>
+    <div class="field">
+      <label for="username">Usuario</label>
+      <input id="username" type="text" autocomplete="username" inputmode="text" placeholder="nombre de usuario">
+    </div>
 
-    <button id="createAccount" type="button">Crear cuenta</button>
-    <button id="login" type="button">Iniciar sesión</button>
-    <button id="logout" type="button">Cerrar sesión</button>
+    <div class="field">
+      <label for="password">Contraseña</label>
+      <input id="password" type="password" autocomplete="current-password" placeholder="••••••••">
+    </div>
 
-    <h1>Estado</h1>
+    <div class="remember-row">
+      <input type="checkbox" id="rememberMe" checked>
+      <label for="rememberMe">Mantener sesión iniciada en este dispositivo</label>
+    </div>
+    <p class="remember-hint">No la uses en equipos compartidos.</p>
+
+    <div class="actions">
+      <button id="login" type="button">Iniciar sesión</button>
+      <button id="createAccount" type="button">Crear cuenta</button>
+    </div>
+
+    <hr class="divider">
+
     <div id="status">No autenticado</div>
-  </main>
+
+    <div class="actions" style="margin-top:0.8rem">
+      <button id="logout" type="button">Cerrar sesión</button>
+    </div>
+  </div>
 
   <script type="module">
     import {
@@ -33,70 +242,101 @@
       onAuthStateChangedHCR
     } from "./firebase/auth.js";
 
-    const username = document.getElementById("username");
-    const password = document.getElementById("password");
-    const status = document.getElementById("status");
-    const createAccount = document.getElementById("createAccount");
-    const login = document.getElementById("login");
-    const logout = document.getElementById("logout");
+    const usernameInput  = document.getElementById("username");
+    const passwordInput  = document.getElementById("password");
+    const rememberMe     = document.getElementById("rememberMe");
+    const status         = document.getElementById("status");
+    const createAccount  = document.getElementById("createAccount");
+    const login          = document.getElementById("login");
+    const logout         = document.getElementById("logout");
+
+    const mode = new URLSearchParams(window.location.search).get("mode");
+
+    if (mode === "register") {
+      createAccount.classList.add("active");
+    } else {
+      login.classList.add("active");
+    }
+
+    usernameInput.focus();
 
     function credentials() {
       return {
-        username: username.value,
-        password: password.value
+        username: usernameInput.value.trim(),
+        password: passwordInput.value,
+        remember: rememberMe.checked
       };
     }
 
     function escapeHtml(value) {
-      return String(value ?? "").replace(/[&<>"']/g, (character) => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        "\"": "&quot;",
-        "'": "&#039;"
-      }[character]));
+      return String(value ?? "").replace(/[&<>"']/g, (c) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#039;"
+      }[c]));
     }
 
-    function showError(error) {
-      alert(error?.message || "No se pudo completar la accion.");
+    function setStatus(message, type = "") {
+      status.textContent = message;
+      status.className = type;
+    }
+
+    function goToLibrary() {
+      window.location.replace("index.html");
     }
 
     createAccount.addEventListener("click", async () => {
+      const { username, password, remember } = credentials();
+      createAccount.disabled = true;
+      login.disabled = true;
+      setStatus("Creando cuenta…", "info");
       try {
-        const data = credentials();
-        await registerUser(data.username, data.password);
-      } catch (error) {
-        showError(error);
+        await registerUser(username, password, remember);
+        setStatus("Cuenta creada. Abriendo biblioteca…", "ok");
+        goToLibrary();
+      } catch {
+        setStatus("No se pudo crear la cuenta. Revisa el usuario o la contraseña.", "error");
+        createAccount.disabled = false;
+        login.disabled = false;
       }
     });
 
     login.addEventListener("click", async () => {
+      const { username, password, remember } = credentials();
+      login.disabled = true;
+      createAccount.disabled = true;
+      setStatus("Iniciando sesión…", "info");
       try {
-        const data = credentials();
-        await loginUser(data.username, data.password);
-      } catch (error) {
-        showError(error);
+        await loginUser(username, password, remember);
+        setStatus("Sesión iniciada. Abriendo biblioteca…", "ok");
+        goToLibrary();
+      } catch {
+        setStatus("No se pudo iniciar sesión. Verifica tus credenciales.", "error");
+        login.disabled = false;
+        createAccount.disabled = false;
       }
     });
 
     logout.addEventListener("click", async () => {
+      logout.disabled = true;
       try {
         await logoutUser();
-      } catch (error) {
-        showError(error);
+        setStatus("Sesión cerrada.", "");
+      } catch {
+        setStatus("No se pudo cerrar la sesión.", "error");
       }
+      logout.disabled = false;
     });
 
     onAuthStateChangedHCR(({ user, profile }) => {
       if (!user) {
-        status.textContent = "No autenticado";
+        setStatus("No autenticado", "");
+        login.disabled = false;
+        createAccount.disabled = false;
         return;
       }
-
-      status.innerHTML = `
-        <div>Usuario: ${escapeHtml(profile?.usernameNormalized || "")}</div>
-        <div>UID parcial: ${escapeHtml(user.uid.slice(0, 8))}</div>
-      `;
+      setStatus(
+        `Autenticado — ${escapeHtml(profile?.usernameNormalized || user.uid.slice(0, 8))}`,
+        "ok"
+      );
     });
   </script>
 </body>

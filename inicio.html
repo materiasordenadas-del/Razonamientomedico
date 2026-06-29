@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>H-CR — Razonamiento clínico estructurado</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #0f1117;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: #e2e8f0;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 560px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .brand-mark {
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: #a5b4fc;
+    }
+
+    .brand-divider {
+      width: 2rem;
+      height: 2px;
+      background: #2d3148;
+      border-radius: 2px;
+    }
+
+    .brand-title {
+      font-size: 1rem;
+      font-weight: 400;
+      color: #64748b;
+      letter-spacing: 0.04em;
+      text-align: center;
+    }
+
+    .description {
+      font-size: 0.95rem;
+      line-height: 1.75;
+      color: #94a3b8;
+      text-align: center;
+      max-width: 480px;
+    }
+
+    .access-panel {
+      width: 100%;
+      background: #1a1d27;
+      border: 1px solid #2d3148;
+      border-radius: 10px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .access-panel.hidden { display: none; }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: none;
+      border-radius: 7px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.2s, opacity 0.2s;
+      letter-spacing: 0.02em;
+    }
+
+    .btn-primary {
+      background: #6366f1;
+      color: #fff;
+    }
+    .btn-primary:hover { background: #4f46e5; }
+
+    .btn-secondary {
+      background: #1e293b;
+      color: #a5b4fc;
+      border: 1px solid #2d3148;
+    }
+    .btn-secondary:hover { background: #263044; }
+
+    .secondary-text {
+      font-size: 0.8rem;
+      color: #475569;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .session-panel {
+      width: 100%;
+      background: #1a1d27;
+      border: 1px solid #2d3148;
+      border-radius: 10px;
+      padding: 2rem;
+      display: none;
+      flex-direction: column;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .session-panel.visible { display: flex; }
+
+    .session-label {
+      font-size: 0.78rem;
+      color: #64748b;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .session-info {
+      font-size: 0.9rem;
+      color: #86efac;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="brand">
+      <span class="brand-mark">H-CR</span>
+      <div class="brand-divider"></div>
+      <span class="brand-title">Razonamiento clínico estructurado</span>
+    </div>
+
+    <p class="description">
+      H-CR es una plataforma de simulación clínica diseñada para entrenar la adquisición de datos,
+      la representación del problema, el diagnóstico diferencial y el manejo clínico mediante casos estructurados.
+    </p>
+
+    <div class="access-panel" id="accessPanel">
+      <a class="btn btn-primary" href="firebase-test.html?mode=login">Iniciar sesión</a>
+      <a class="btn btn-secondary" href="firebase-test.html?mode=register">Crear cuenta</a>
+    </div>
+
+    <div class="session-panel" id="sessionPanel">
+      <span class="session-label">Sesión activa</span>
+      <span class="session-info" id="sessionUser"></span>
+      <a class="btn btn-primary" href="index.html">Continuar a la biblioteca</a>
+    </div>
+
+    <p class="secondary-text">
+      La plataforma guarda tu progreso por caso para que puedas continuar tu razonamiento clínico donde lo dejaste.
+    </p>
+
+  </div>
+
+  <script type="module">
+    import { onAuthStateChangedHCR } from "./firebase/auth.js";
+
+    const accessPanel  = document.getElementById("accessPanel");
+    const sessionPanel = document.getElementById("sessionPanel");
+    const sessionUser  = document.getElementById("sessionUser");
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (c) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#039;"
+      }[c]));
+    }
+
+    onAuthStateChangedHCR(({ user, profile }) => {
+      if (user) {
+        const name = profile?.usernameNormalized || "";
+        sessionUser.textContent = name ? `@${escapeHtml(name)}` : "";
+        accessPanel.classList.add("hidden");
+        sessionPanel.classList.add("visible");
+      } else {
+        accessPanel.classList.remove("hidden");
+        sessionPanel.classList.remove("visible");
+      }
+    });
+  </script>
+</body>
+</html>
