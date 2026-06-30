@@ -428,14 +428,16 @@ function renderTabs() {
 function renderModules() {
   document.getElementById('modules').innerHTML = renderers[state.current]();
   const app = document.getElementById('app');
-  app.classList.remove('pad-collapsed', 'pad-hidden', 'm5-pad-collapsed');
+  app.classList.remove('pad-collapsed', 'pad-hidden', 'm5-pad-collapsed', 'phase-pad-aligned');
   if (state.current === 'm5') {
     app.classList.add('pad-collapsed', 'm5-pad-collapsed');
     renderVenn();
   } else if (state.current === 'managementSelect' || state.current === 'm6' || state.current === 'm7') {
     app.classList.add('pad-hidden');
+  } else if (['m1', 'm2', 'm3', 'm4'].includes(state.current)) {
+    app.classList.add('phase-pad-aligned');
   } else {
-    app.classList.remove('pad-collapsed', 'pad-hidden', 'm5-pad-collapsed');
+    app.classList.remove('pad-collapsed', 'pad-hidden', 'm5-pad-collapsed', 'phase-pad-aligned');
   }
   renderTabs();
   renderPad();

@@ -53,3 +53,6 @@ button,input,textarea,select{font:inherit} button{cursor:pointer}
 .m5-pad-collapsed:not(.pad-collapsed) .pad{margin-top:64px}.m5-pad-collapsed:not(.pad-collapsed) .venn-board{overflow:auto}.m5-pad-collapsed:not(.pad-collapsed) .venn-board::before{content:"";display:block;width:850px;height:720px;pointer-events:none}
 .physical-exam-images{display:grid;gap:10px;margin:0 0 10px}.physical-exam-image-card{margin:0}.physical-exam-image-card .diagnostic-image-img{max-height:520px}
 .lab-table .lab-eye-cell{width:52px;text-align:center;vertical-align:middle}.lab-table .lab-eye-cell .hcr-term-btn{margin:0 auto;flex:0 0 30px}
+.tier-card{border-color:transparent;background:transparent;box-shadow:none}
+.phase-pad-aligned .pad{margin-top:64px}.pad-tier-item{border-top:0}
+.diagnosis-suggestions:not(:has(.diagnosis-option)){display:none}
