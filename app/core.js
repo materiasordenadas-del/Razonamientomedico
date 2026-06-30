@@ -883,6 +883,17 @@ function resetCase() {
   }
 }
 
+function centerM5VennBoard() {
+  const app = document.getElementById('app');
+  if (!app || !app.classList.contains('m5-pad-collapsed')) return;
+  const board = document.querySelector('.m5-card .venn-board');
+  if (!board) return;
+  requestAnimationFrame(() => {
+    board.scrollLeft = Math.max(0, (board.scrollWidth - board.clientWidth) / 2);
+    board.scrollTop = Math.max(0, (board.scrollHeight - board.clientHeight) / 2);
+  });
+}
+
 function togglePad() {
   document.getElementById('app').classList.toggle('pad-collapsed');
   const btn = document.getElementById('togglePad');
@@ -891,4 +902,5 @@ function togglePad() {
       ? 'Mostrar Pad diagnóstico'
       : 'Minimizar Pad diagnóstico';
   }
+  centerM5VennBoard();
 }

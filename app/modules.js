@@ -375,17 +375,23 @@ function renderTabs() {
 function renderModules() {
   document.getElementById('modules').innerHTML = renderers[state.current]();
   const app = document.getElementById('app');
-  app.classList.remove('pad-collapsed', 'pad-hidden');
+  app.classList.remove('pad-collapsed', 'pad-hidden', 'm5-pad-collapsed');
   if (state.current === 'm5') {
-    app.classList.add('pad-collapsed');
+    app.classList.add('pad-collapsed', 'm5-pad-collapsed');
     renderVenn();
   } else if (state.current === 'managementSelect' || state.current === 'm6' || state.current === 'm7') {
     app.classList.add('pad-hidden');
   } else {
-    app.classList.remove('pad-collapsed', 'pad-hidden');
+    app.classList.remove('pad-collapsed', 'pad-hidden', 'm5-pad-collapsed');
   }
   renderTabs();
   renderPad();
+  const padToggle = document.getElementById('togglePad');
+  if (padToggle) {
+    padToggle.textContent = app.classList.contains('pad-collapsed')
+      ? 'Mostrar Pad diagnóstico'
+      : 'Minimizar Pad diagnóstico';
+  }
   if (typeof verifyHcrIcons === 'function') verifyHcrIcons(document.getElementById('modules'));
 }
 
