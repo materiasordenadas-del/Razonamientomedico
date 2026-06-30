@@ -121,11 +121,8 @@ function renderHcrClinicalTermButtonForIds(termIds) {
 
 function renderHcrFindingEyeButton(termIds, findingText) {
   const ids = hcrValidTermIds(termIds);
-  if (ids.length) return renderHcrClinicalTermButtonForIds(ids);
-  return `<button type="button" class="hcr-icon-btn hcr-term-btn" aria-label="Abrir detalle del hallazgo"
-    onclick="event.preventDefault();event.stopPropagation();openHcrFindingDetail('${hcrJsArg(findingText)}')">
-    ${renderHcrIcon('terminoClinico', 'Abrir detalle del hallazgo')}
-  </button>`;
+  if (!ids.length) return '';
+  return renderHcrClinicalTermButtonForIds(ids);
 }
 
 function findHcrClinicalTerm(text) {
@@ -226,7 +223,7 @@ function openHcrClinicalTerms(keys) {
   const terms = ids.map(id => hcrClinicalTermData(id)).filter(Boolean);
   const root = hcrModalRoot();
   root.className = 'hcr-help-modal hcr-term-modal';
-  const title = terms.length === 1 ? hcrClinicalTermTitle(terms[0]) : 'Conceptos clinicos';
+  const title = terms.length === 1 ? hcrClinicalTermTitle(terms[0]) : 'Conceptos clinicos relacionados';
   root.innerHTML = `<div class="hcr-help-backdrop" onclick="closeHcrHelpModal()"></div>
     <div class="hcr-help-panel hcr-term-panel" role="dialog" aria-modal="true" aria-labelledby="hcrTermTitle">
       <div class="hcr-help-header">

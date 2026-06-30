@@ -18,7 +18,7 @@ function hcrFieldHelpKey(key, title) {
 
 function hcrModuleTitle(title, helpKey) {
   if (typeof renderHcrHelpTitle === 'function') {
-    return renderHcrHelpTitle(title, helpKey || hcrModuleHelpKeyForTitle(title));
+    return renderHcrHelpTitle(title, helpKey || '');
   }
   return esc(title);
 }
@@ -72,17 +72,13 @@ function conversationBlock(item) {
   </div>`;
 }
 
-function accordion(title, items, id, defaultOpen, extraContent = '') {
+function accordion(title, items, id, defaultOpen, extraContent = '', helpId = '') {
   const expandedKey = id || 'accordion_' + title;
   const hasStoredState = Object.prototype.hasOwnProperty.call(state.expanded, expandedKey);
   const isOpen = hasStoredState ? state.expanded[expandedKey] : !!defaultOpen;
-  const defaultHelpKey = id && id.startsWith('m3_physical') ? 'examen_fisico'
-    : id && id.startsWith('m4_paraclinicos') ? 'paraclinicos'
-    : id && id.startsWith('m2_') ? 'antecedentes'
-    : '';
   return `<details class="accordion" ${isOpen ? 'open' : ''}
     ontoggle="markExpanded('${esc(expandedKey)}',this.open)">
-    <summary>${hcrModuleTitle(title, defaultHelpKey || undefined)}</summary>
+    <summary>${hcrModuleTitle(title, helpId)}</summary>
     <div class="accordion-body">
       ${extraContent}
       ${renderFindingList(items)}
@@ -130,7 +126,7 @@ function renderFindingList(items) {
 
 function renderAccordionGroup(sections, keyPrefix) {
   return (sections || []).map((section, idx) =>
-    accordion(section.title || section.name, section.items || section.findings || [], `${keyPrefix}_${idx}`, false)
+    accordion(section.title || section.name, section.items || section.findings || [], `${keyPrefix}_${idx}`, false, '', section.helpId || '')
   ).join('');
 }
 
@@ -184,7 +180,8 @@ function renderPhysicalExamSections(sections) {
       section.items || section.findings || [],
       `m3_physical_${idx}`,
       false,
-      renderPhysicalExamImages(section, idx)
+      renderPhysicalExamImages(section, idx),
+      section.helpId || ''
     )
   ).join('');
 }
@@ -231,6 +228,23 @@ function diagnosticImageCategory(item) {
     other: 'Otros'
   };
   return item.category || map[item.type] || 'Otros';
+}
+
+function diagnosticImageHelpId(item, category) {
+  const map = {
+    ecg: 'electrocardiograma',
+    xray: 'rayos_x',
+    ultrasound: 'ecogramas',
+    ct: 'tomografia_computarizada',
+    other: 'otros_estudios'
+  };
+  return item.categoryHelpId || item.helpId || map[item.type] || {
+    'Electrocardiograma': 'electrocardiograma',
+    'Rayos X': 'rayos_x',
+    'Ecogramas': 'ecogramas',
+    'TC': 'tomografia_computarizada',
+    'Otros': 'otros_estudios'
+  }[category] || 'imagenes_diagnosticas';
 }
 
 function diagnosticImageDescriptionAllowed() {
@@ -303,8 +317,9 @@ function renderDiagnosticImages(d) {
     <h2>Imágenes diagnósticas</h2>
     <div class="diagnostic-images-grid">
       ${order.filter(category => (groups[category] || []).length).map(category => {
+        const firstItem = (groups[category] || [])[0] || {};
         return `<details class="diagnostic-image-category">
-          <summary>${hcrModuleTitle(category, 'paraclinicos')}</summary>
+          <summary>${hcrModuleTitle(category, diagnosticImageHelpId(firstItem, category))}</summary>
           <div class="diagnostic-image-category-body">
             ${groups[category].map((item, idx) => diagnosticImageItem(item, idx)).join('')}
           </div>
@@ -673,11 +688,11 @@ function renderM2() {
       <p>Selecciona los antecedentes y síntomas funcionales relevantes.</p>
     </div>
     <div class="card m2-help-on-open">
-      <h2>Historial</h2>
+      <h2>${hcrModuleTitle('Historial', 'historia_clinica')}</h2>
       ${renderAccordionGroup(d.historial, 'm2_historial')}
     </div>
     <div class="card m2-help-on-open">
-      <h2>Examen funcional subjetivo</h2>
+      <h2>${hcrModuleTitle('Examen funcional subjetivo', 'examen_funcional')}</h2>
       ${renderAccordionGroup(d.examenFuncional, 'm2_examen_funcional')}
     </div>
     ${phaseClose('m2')}
@@ -696,7 +711,7 @@ function renderM3() {
       <p>Selecciona los hallazgos que cambian tu diagnóstico diferencial.</p>
     </div>
     <div class="card help-on-open">
-      <h2>Examen físico por sistemas</h2>
+      <h2>${hcrModuleTitle('Examen físico por sistemas', 'examen_fisico')}</h2>
       ${renderPhysicalExamSections(d.physicalExam || d.systems || [])}
     </div>
     ${phaseClose('m3')}
@@ -711,13 +726,15 @@ function renderM4() {
   const d = CASE_DATA.m4;
   const diagnosticImages = diagnosticImagesForModule(d);
   const visibleTables = (d.tables || []).filter(t => shouldShowDiagnosticTable(t.title, diagnosticImages.length > 0));
-  const tableHTML = (title, rows, idx) => {
+  const tableHTML = (table, idx) => {
+    const title = table.title || '';
+    const rows = table.rows || [];
     const expandedKey = 'm4_paraclinicos_' + idx;
     const hasStoredState = Object.prototype.hasOwnProperty.call(state.expanded, expandedKey);
     const isOpen = hasStoredState ? state.expanded[expandedKey] : false;
     return `<details class="accordion" ${isOpen ? 'open' : ''}
       ontoggle="markExpanded('${expandedKey}',this.open)">
-      <summary>${hcrModuleTitle(title, 'paraclinicos')}</summary>
+      <summary>${hcrModuleTitle(title, table.helpId || '')}</summary>
       <div class="accordion-body">
         <table class="lab-table">
           <thead><tr><th></th><th>Prueba</th><th></th><th>Valor</th><th>Unidad</th><th>Referencia</th></tr></thead>
@@ -732,8 +749,8 @@ function renderM4() {
       <p>Selecciona los resultados que cambian tu representación del problema o el diagnóstico diferencial.</p>
     </div>
     <div class="card help-on-open">
-      <h2>Estudios disponibles</h2>
-      ${visibleTables.map((t, idx) => tableHTML(t.title, t.rows, idx)).join('')}
+      <h2>${hcrModuleTitle('Estudios disponibles', 'estudios_diagnosticos')}</h2>
+      ${visibleTables.map((t, idx) => tableHTML(t, idx)).join('')}
     </div>
     ${renderDiagnosticImages(d)}
     ${phaseClose('m4')}
