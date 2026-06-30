@@ -199,9 +199,10 @@ function labRow(item) {
       data-id="${esc(item.id)}" data-source="${esc(item.source)}" data-text="${esc(txt)}"
       ${sel ? 'checked' : ''}></td>
     <td>${esc(item.label)}</td>
+    <td class="lab-eye-cell">${hcrTermButtons(item.termIds, txt, true)}</td>
     <td>${esc(item.value)}</td>
     <td>${esc(item.unit)}</td>
-    <td><span class="lab-ref-text">${esc(item.ref)}</span>${hcrTermButtons(item.termIds, txt, true)}</td>
+    <td><span class="lab-ref-text">${esc(item.ref)}</span></td>
   </tr>`;
 }
 
@@ -717,7 +718,7 @@ function renderM4() {
       <summary>${hcrModuleTitle(title, 'paraclinicos')}</summary>
       <div class="accordion-body">
         <table class="lab-table">
-          <thead><tr><th></th><th>Prueba</th><th>Valor</th><th>Unidad</th><th>Referencia</th></tr></thead>
+          <thead><tr><th></th><th>Prueba</th><th></th><th>Valor</th><th>Unidad</th><th>Referencia</th></tr></thead>
           <tbody>${rows.map(r => labRow(r)).join('')}</tbody>
         </table>
       </div>
