@@ -50,4 +50,23 @@ window.HCR_CASE_MODULES.RC2.module4 = {
     ]
   };
 
-window.HCR_CASE_MODULES.RC2.module4Media = [];
+window.HCR_CASE_MODULES.RC2.module4.diagnosticImages = [
+  {
+    id: 'ecg_ejemplo_infarto_inferior_antiguo',
+    type: 'ecg',
+    category: 'Electrocardiograma',
+    title: 'Electrocardiograma de 12 derivaciones — ejemplo visual',
+    image: 'cases/RC2/assets/ecg/ecg_ejemplo_infarto_inferior_antiguo.png',
+    description: 'Imagen de ejemplo cargada solo para previsualizar el componente de Módulo 4; no corresponde al caso clínico.'
+  },
+  {
+    id: 'rx_ejemplo_enfisema',
+    type: 'xray',
+    category: 'Rayos X',
+    title: 'Radiografía de tórax — ejemplo visual',
+    image: 'cases/RC2/assets/xray/rx_ejemplo_enfisema.jpg',
+    description: 'Imagen de ejemplo cargada solo para previsualizar el componente de Módulo 4; no corresponde al caso clínico.'
+  }
+];
+
+window.HCR_CASE_MODULES.RC2.module4Media = window.HCR_CASE_MODULES.RC2.module4.diagnosticImages;

@@ -1,10 +1,44 @@
+function hcrModuleHelpKeyForTitle(title) {
+  const text = String(title || '').toLowerCase();
+  if (text.includes('enfermedad actual')) return 'enfermedad_actual';
+  if (text.includes('motivo')) return 'motivo_consulta';
+  if (text.includes('diagnóstico principal') || text.includes('diagnostico principal')) return 'diagnostico_principal';
+  if (text.includes('diagnóstico secundario') || text.includes('diagnostico secundario')) return 'diagnostico_secundario';
+  if (text.includes('fatal') || text.includes('no puedo perder') || text.includes('no se puede perder')) return 'diagnostico_no_perder';
+  if (text.includes('antecedente') || text.includes('historial')) return 'antecedentes';
+  if (text.includes('examen físico') || text.includes('examen fisico')) return 'examen_fisico';
+  if (text.includes('paraclínico') || text.includes('paraclinico') || text.includes('estudios disponibles')) return 'paraclinicos';
+  return '';
+}
+
+function hcrFieldHelpKey(key, title) {
+  if (/^ill_m[1-4]$/.test(key)) return 'enfermedad_actual';
+  return hcrModuleHelpKeyForTitle(title);
+}
+
+function hcrModuleTitle(title, helpKey) {
+  if (typeof renderHcrHelpTitle === 'function') {
+    return renderHcrHelpTitle(title, helpKey || hcrModuleHelpKeyForTitle(title));
+  }
+  return esc(title);
+}
+
+function hcrTermForText(text) {
+  if (typeof renderHcrClinicalTermButtonForText !== 'function') return '';
+  return renderHcrClinicalTermButtonForText(text);
+}
+
+function hcrTextWithTerm(text) {
+  return `${esc(text)}${hcrTermForText(text)}`;
+}
+
 function choice(id, source, text) {
   const sel = isSelected(id);
   return `<label class="selectable${sel ? ' selected' : ''}">
     <input class="finding-check" type="checkbox"
       data-id="${esc(id)}" data-source="${esc(source)}" data-text="${esc(text)}"
       ${sel ? 'checked' : ''}>
-    <span class="fact-label">${esc(text)}</span>
+    <span class="fact-label">${hcrTextWithTerm(text)}</span>
   </label>`;
 }
 
@@ -17,7 +51,7 @@ function conversationBlock(item) {
       ${state.expanded[dlgId] ? 'open' : ''}
       ontoggle="markExpanded('${dlgId}',this.open)">
       <summary>
-        <span class="patient-text">${esc(item.text)}</span>
+        <span class="patient-text">${hcrTextWithTerm(item.text)}</span>
         <input class="patient-check finding-check" type="checkbox"
           data-id="${esc(item.id)}" data-source="${esc(item.source)}" data-text="${esc(item.text)}"
           ${sel ? 'checked' : ''}
@@ -36,7 +70,7 @@ function accordion(title, items, id, defaultOpen) {
   const isOpen = hasStoredState ? state.expanded[expandedKey] : !!defaultOpen;
   return `<details class="accordion" ${isOpen ? 'open' : ''}
     ontoggle="markExpanded('${esc(expandedKey)}',this.open)">
-    <summary>${esc(title)}</summary>
+    <summary>${hcrModuleTitle(title)}</summary>
     <div class="accordion-body">
       ${renderFindingList(items)}
     </div>
@@ -51,7 +85,7 @@ function expandablePatientItem(item) {
   return `<details class="expandable-finding" ${state.expanded[detailId] ? 'open' : ''}
     ontoggle="markExpanded('${detailId}',this.open)">
     <summary>
-      <span class="patient-text">${esc(item.text)}</span>
+      <span class="patient-text">${hcrTextWithTerm(item.text)}</span>
       <input class="patient-check finding-check" type="checkbox"
         data-id="${esc(item.id)}" data-source="${esc(item.source)}" data-text="${esc(item.text)}"
         ${sel ? 'checked' : ''}
@@ -63,7 +97,7 @@ function expandablePatientItem(item) {
         <input class="finding-check" type="checkbox"
           data-id="${esc(detail.id)}" data-source="${esc(item.source)}" data-text="${esc(detail.patient)}"
           ${detailSel ? 'checked' : ''}>
-        <span class="fact-label">Paciente: ${esc(detail.patient)}</span>
+        <span class="fact-label">Paciente: ${hcrTextWithTerm(detail.patient)}</span>
       </label>
     </div>
   </details>`;
@@ -96,11 +130,119 @@ function labRow(item) {
     <td><input class="lab-check finding-check" type="checkbox"
       data-id="${esc(item.id)}" data-source="${esc(item.source)}" data-text="${esc(txt)}"
       ${sel ? 'checked' : ''}></td>
-    <td>${esc(item.label)}</td>
+    <td>${esc(item.label)}${hcrTermForText(txt)}</td>
     <td>${esc(item.value)}</td>
     <td>${esc(item.unit)}</td>
     <td>${esc(item.ref)}</td>
   </tr>`;
+}
+
+function activeCaseModuleBundle() {
+  const bundles = window.HCR_CASE_MODULES || {};
+  return Object.values(bundles).find(bundle => bundle?.module4 === CASE_DATA.m4) || {};
+}
+
+function diagnosticImagesForModule(d) {
+  const bundle = activeCaseModuleBundle();
+  const items = d.diagnosticImages
+    || d.imaging
+    || bundle.diagnosticImages
+    || bundle.module4DiagnosticImages
+    || bundle.module4Media
+    || [];
+  return Array.isArray(items) ? items : [];
+}
+
+function diagnosticImageCategory(item) {
+  const map = {
+    ecg: 'Electrocardiograma',
+    xray: 'Rayos X',
+    ultrasound: 'Ecogramas',
+    ct: 'TC',
+    other: 'Otros'
+  };
+  return item.category || map[item.type] || 'Otros';
+}
+
+function diagnosticImageDescriptionAllowed() {
+  const metadata = window.HCR_CASE_ACTIVE_METADATA || {};
+  const level = metadata.level || metadata.difficultyLabel || '';
+  const difficulty = Number(metadata.difficulty);
+  if (Number.isFinite(difficulty) && difficulty > 0) return difficulty <= 3;
+  return !/(nivel\s*)?(iv|v|4|5)\b/i.test(String(level));
+}
+
+function shouldShowDiagnosticTable(title, hasDiagnosticImages) {
+  if (!hasDiagnosticImages) return true;
+  const normalized = String(title || '').toLowerCase();
+  return !(
+    normalized.includes('electrocardiograma')
+    || normalized.includes('electrocardiografía')
+    || normalized.includes('electrocardiografia')
+    || normalized.includes('informes seriados')
+    || normalized.includes('imágenes')
+    || normalized.includes('imagenes')
+    || normalized.includes('evaluación cardiaca')
+    || normalized.includes('evaluacion cardiaca')
+  );
+}
+
+function diagnosticImageItem(item, idx) {
+  const id = item.id || `diagnostic_image_${idx}`;
+  const title = item.title || item.label || 'Estudio diagnóstico';
+  const image = item.image || item.src || '';
+  const description = item.description || item.report || item.caption || '';
+  const selectable = item.selectable !== false;
+  const selected = selectable && isSelected(id);
+  const findingText = item.findingText || title;
+  return `<article class="diagnostic-image-card${selected ? ' selected' : ''}">
+    <div class="diagnostic-image-head">
+      ${selectable
+        ? `<label class="diagnostic-image-select selectable${selected ? ' selected' : ''}">
+            <input class="finding-check" type="checkbox"
+              data-id="${esc(id)}" data-source="${esc(item.source || 'Paraclínicos')}" data-text="${esc(findingText)}"
+              ${selected ? 'checked' : ''}>
+            <span>${esc(title)}</span>
+          </label>`
+        : `<h3>${esc(title)}</h3>`}
+    </div>
+    <div class="diagnostic-image-media">
+      ${image
+        ? `<img class="diagnostic-image-img" src="${esc(image)}" alt="${esc(title)}" onerror="this.hidden=true;this.nextElementSibling.hidden=false">`
+        : ''}
+      <div class="diagnostic-image-empty" ${image ? 'hidden' : ''}>Sin imagen disponible para este caso.</div>
+    </div>
+    ${description && diagnosticImageDescriptionAllowed()
+      ? `<details class="diagnostic-image-description">
+          <summary>Ver descripción</summary>
+          <p>${esc(description)}</p>
+        </details>`
+      : ''}
+  </article>`;
+}
+
+function renderDiagnosticImages(d) {
+  const items = diagnosticImagesForModule(d);
+  if (!items.length) return '';
+  const order = ['Electrocardiograma', 'Rayos X', 'Ecogramas', 'TC', 'Otros'];
+  const groups = {};
+  items.forEach(item => {
+    const category = diagnosticImageCategory(item);
+    (groups[category] = groups[category] || []).push(item);
+  });
+  return `<div class="card diagnostic-images-section">
+    <h2>${hcrModuleTitle('Imágenes diagnósticas', 'paraclinicos')}</h2>
+    <div class="diagnostic-images-grid">
+      ${order.filter(category => (groups[category] || []).length).map(category => {
+        return `<details class="diagnostic-image-category">
+          <summary>${esc(category)}</summary>
+          <div class="diagnostic-image-category-body">
+            ${groups[category].map((item, idx) => diagnosticImageItem(item, idx)).join('')}
+          </div>
+        </details>`;
+      }).join('')}
+    </div>
+  </div>`;
 }
 
 function field(key, title, placeholder, hint, short) {
@@ -112,7 +254,7 @@ function field(key, title, placeholder, hint, short) {
     ? `<input type="text" placeholder="${esc(placeholder)}" value="${val}" ${handler}>`
     : `<textarea placeholder="${esc(placeholder)}" ${handler}>${val}</textarea>`;
   return `<div class="field">
-    <div class="field-title">${esc(title)}</div>
+    <div class="field-title">${hcrModuleTitle(title, hcrFieldHelpKey(key, title))}</div>
     ${hint ? `<div class="field-instruction">${esc(hint)}</div>` : ''}
     ${input}
   </div>`;
@@ -160,7 +302,7 @@ function tier(phase) {
     ${[1,2,3].map(i => {
       const k = `tier_${phase}_${i}`;
       return `<div class="tier-card">
-        <h4>${esc(labels[i])}</h4>
+        <h4>${hcrModuleTitle(labels[i], hcrModuleHelpKeyForTitle(labels[i]))}</h4>
         ${diagnosisPicker(k, labels[i])}
       </div>`;
     }).join('')}
@@ -228,6 +370,7 @@ function renderModules() {
   }
   renderTabs();
   renderPad();
+  if (typeof verifyHcrIcons === 'function') verifyHcrIcons(document.getElementById('modules'));
 }
 
 function loadTierToVenn() {
@@ -423,17 +566,17 @@ function renderM1() {
     <div class="m1-grid">
       <div class="triage-panel">
         <div class="card">
-          <div class="section-title">Triage</div>
+          <div class="section-title">${hcrModuleTitle('Triage')}</div>
           <div class="patient-identity">
             <b>${esc(CASE_DATA.patient.name)}</b> · ${esc(CASE_DATA.patient.age)} · ${esc(CASE_DATA.patient.sex)}<br>
-            <span style="color:var(--muted)">Motivo: ${esc(CASE_DATA.patient.reason)}</span>
+            <span style="color:var(--muted)">${hcrModuleTitle('Motivo de consulta', 'motivo_consulta')}: ${esc(CASE_DATA.patient.reason)}</span>
           </div>
           ${d.triage.map(f => choice(f.id, f.source, f.text)).join('')}
         </div>
       </div>
       <div class="conversation-panel">
         <div class="card">
-          <div class="section-title">Interrogatorio</div>
+          <div class="section-title">${hcrModuleTitle('Interrogatorio')}</div>
           ${d.interrogatorio.map(item => conversationBlock(item)).join('')}
         </div>
         ${phaseClose('m1')}
@@ -453,11 +596,11 @@ function renderM2() {
       <p>Selecciona los antecedentes y síntomas funcionales relevantes.</p>
     </div>
     <div class="card">
-      <h2>Historial</h2>
+      <h2>${hcrModuleTitle('Historial', 'antecedentes')}</h2>
       ${renderAccordionGroup(d.historial, 'm2_historial')}
     </div>
     <div class="card">
-      <h2>Examen funcional subjetivo</h2>
+      <h2>${hcrModuleTitle('Examen funcional subjetivo')}</h2>
       ${renderAccordionGroup(d.examenFuncional, 'm2_examen_funcional')}
     </div>
     ${phaseClose('m2')}
@@ -476,7 +619,7 @@ function renderM3() {
       <p>Selecciona los hallazgos que cambian tu diagnóstico diferencial.</p>
     </div>
     <div class="card">
-      <h2>Examen físico por sistemas</h2>
+      <h2>${hcrModuleTitle('Examen físico por sistemas', 'examen_fisico')}</h2>
       ${renderPhysicalExamSections(d.physicalExam || d.systems || [])}
     </div>
     ${phaseClose('m3')}
@@ -489,13 +632,15 @@ function renderM3() {
 
 function renderM4() {
   const d = CASE_DATA.m4;
+  const diagnosticImages = diagnosticImagesForModule(d);
+  const visibleTables = (d.tables || []).filter(t => shouldShowDiagnosticTable(t.title, diagnosticImages.length > 0));
   const tableHTML = (title, rows, idx) => {
     const expandedKey = 'm4_paraclinicos_' + idx;
     const hasStoredState = Object.prototype.hasOwnProperty.call(state.expanded, expandedKey);
     const isOpen = hasStoredState ? state.expanded[expandedKey] : false;
     return `<details class="accordion" ${isOpen ? 'open' : ''}
       ontoggle="markExpanded('${expandedKey}',this.open)">
-      <summary>${esc(title)}</summary>
+      <summary>${hcrModuleTitle(title, 'paraclinicos')}</summary>
       <div class="accordion-body">
         <table class="lab-table">
           <thead><tr><th></th><th>Prueba</th><th>Valor</th><th>Unidad</th><th>Referencia</th></tr></thead>
@@ -510,9 +655,10 @@ function renderM4() {
       <p>Selecciona los resultados que cambian tu representación del problema o el diagnóstico diferencial.</p>
     </div>
     <div class="card">
-      <h2>Estudios disponibles</h2>
-      ${d.tables.map((t, idx) => tableHTML(t.title, t.rows, idx)).join('')}
+      <h2>${hcrModuleTitle('Estudios disponibles', 'paraclinicos')}</h2>
+      ${visibleTables.map((t, idx) => tableHTML(t.title, t.rows, idx)).join('')}
     </div>
+    ${renderDiagnosticImages(d)}
     ${phaseClose('m4')}
     <div class="footer-actions">
       <button class="action secondary" onclick="goModule('m3')">← Volver</button>
