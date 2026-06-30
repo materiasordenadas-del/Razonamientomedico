@@ -8,275 +8,322 @@
 :root{
   --bg:#f4f6fb;--surface:#fff;--ink:#172033;--muted:#6a7485;
   --line:#d8deea;--dark:#172033;--accent:#0ea5e9;--accent2:#f0f9ff;
-  --sidebar:#1e293b;--sidebar-active:#0284c7;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;font-size:14px;line-height:1.5;min-height:100vh;display:flex;flex-direction:column}
 
-/* TOPBAR */
-.topbar{background:var(--dark);color:#fff;padding:0 20px;height:52px;display:flex;align-items:center;gap:16px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.2)}
-.topbar-logo{font-weight:900;font-size:16px;letter-spacing:-.02em;color:#fff}
-.topbar-sep{color:#475569;font-size:18px;font-weight:200}
-.topbar-sub{font-size:12px;color:#94a3b8;font-weight:500}
-.topbar-right{margin-left:auto;font-size:12px;color:#64748b}
+/* ── TOPBAR ── */
+.topbar{background:var(--dark);color:#fff;padding:0 24px;height:52px;display:flex;align-items:center;gap:14px;flex-shrink:0;box-shadow:0 2px 10px rgba(0,0,0,.22)}
+.topbar-logo{font-weight:900;font-size:17px;letter-spacing:-.03em;color:#fff}
+.topbar-sep{color:#334155;font-size:20px;font-weight:200}
+.topbar-sub{font-size:12px;color:#94a3b8;font-weight:500;letter-spacing:.01em}
+.topbar-right{margin-left:auto}
+.topbar-btn{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.01em;text-decoration:none;transition:background .12s}
+.topbar-btn:hover{background:#0284c7}
 
-/* LAYOUT */
-.layout{display:flex;flex:1;min-height:0}
+/* ── HOME LAYOUT (sidebar + main) ── */
+.home-layout{position:relative;flex:1;display:flex;gap:24px;max-width:1400px;width:100%;margin:0 auto;padding:5cm 24px 48px}
+@media(max-width:900px){.home-layout{flex-direction:column;padding:32px 24px 48px}}
 
-/* SIDEBAR */
-.sidebar{width:220px;background:var(--sidebar);color:#cbd5e1;flex-shrink:0;display:flex;flex-direction:column;overflow-y:auto}
-.sidebar-section{padding:18px 16px 10px}
-.sidebar-section-title{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#64748b;margin-bottom:10px}
-.sidebar-link{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;color:#94a3b8;font-size:13px;font-weight:500;cursor:pointer;margin-bottom:2px;transition:background .12s,color .12s;user-select:none}
-.sidebar-link:hover{background:rgba(255,255,255,.06);color:#e2e8f0}
-.sidebar-link.active{background:var(--sidebar-active);color:#fff;font-weight:700}
-.sidebar-link svg{flex-shrink:0;opacity:.7}
-.sidebar-divider{height:1px;background:#334155;margin:8px 16px}
+/* ── SIDEBAR ── */
+.home-sidebar{width:190px;flex-shrink:0;display:flex;flex-direction:column;gap:18px}
+@media(max-width:900px){.home-sidebar{width:100%;flex-direction:row;flex-wrap:wrap;gap:14px}}
 
-.filter-group{padding:4px 16px 12px}
-.filter-group-title{font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
-.filter-group-title span{transition:transform .2s}
-.filter-group-title.open span{transform:rotate(180deg)}
-.filter-options{display:flex;flex-direction:column;gap:4px}
-.filter-opt{display:flex;align-items:center;gap:8px;font-size:12px;color:#94a3b8;cursor:pointer;padding:3px 2px;border-radius:5px;transition:color .12s}
-.filter-opt:hover{color:#e2e8f0}
-.filter-opt input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px}
-.filter-opt.active-filter{color:#38bdf8}
-.clear-filters{font-size:11px;color:#38bdf8;cursor:pointer;padding:4px 16px 12px;display:block;font-weight:600}
-.clear-filters:hover{color:#7dd3fc}
+.home-sidebar-block{display:flex;flex-direction:column;gap:8px}
+.home-sidebar-block .home-filter-label{margin:0}
+.home-sidebar-block .filter-options{display:flex;flex-direction:column;gap:6px}
+@media(max-width:900px){.home-sidebar-block .filter-options{flex-direction:row;flex-wrap:wrap;gap:6px}}
+.home-sidebar-block .filter-opt{width:100%}
+@media(max-width:900px){.home-sidebar-block .filter-opt{width:auto}}
+.home-sidebar-block .filter-opt-chip{width:100%;justify-content:center}
+@media(max-width:900px){.home-sidebar-block .filter-opt-chip{width:auto;justify-content:flex-start}}
 
-/* MAIN */
-.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:auto}
+/* Roman chips in sidebar */
+.home-sidebar-block .filter-roman-chip{width:30px;height:30px}
+.home-sidebar-block.level-block .filter-options{flex-direction:row;flex-wrap:nowrap;gap:6px}
+.home-sidebar-block.level-block .filter-opt{width:auto}
+.filter-subtitle{font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.07em;margin-top:4px}
 
-.main-header{background:#fff;border-bottom:1px solid var(--line);padding:14px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;flex-shrink:0}
-.breadcrumb{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.01em}
-.breadcrumb b{color:var(--ink)}
-.search-wrap{margin-left:auto;position:relative}
-.search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#94a3b8;pointer-events:none}
-.search-input{border:1px solid var(--line);border-radius:9px;padding:7px 12px 7px 32px;font-size:13px;width:220px;background:#fafbfd;color:var(--ink);outline:none}
-.search-input:focus{border-color:#0ea5e9;box-shadow:0 0 0 3px rgba(14,165,233,.1)}
-.count-badge{font-size:12px;color:var(--muted);white-space:nowrap}
+/* search moved above the left controls */
+.home-sidebar > .home-sidebar-block:first-child{position:absolute;right:24px;top:32px;width:320px}
+.home-sidebar > .home-sidebar-block:first-child .home-search-wrap{max-width:none;width:100%}
+@media(max-width:900px){.home-sidebar > .home-sidebar-block:first-child{position:static;width:100%}}
 
-.notice-bar{background:#f0f9ff;border-bottom:1px solid #7dd3fc;padding:8px 20px;display:flex;align-items:center;gap:8px;font-size:12px;color:#0369a1;font-weight:600;flex-shrink:0}
-.notice-bar svg{flex-shrink:0}
+/* ── MAIN ── */
+.home-main{flex:1;min-width:0}
 
-/* TABLE */
-.table-wrap{padding:16px 20px;flex:1}
-.cases-table{width:100%;border-collapse:separate;border-spacing:0 6px}
-.cases-table thead th{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:6px 12px;text-align:left;cursor:pointer;user-select:none;white-space:nowrap}
-.cases-table thead th:hover{color:var(--ink)}
-.cases-table thead th .sort-icon{margin-left:4px;opacity:.4;font-size:10px}
+/* ── HERO ── */
+.home-hero{margin-bottom:22px}
+.home-hero h1{font-size:24px;font-weight:900;letter-spacing:-.03em;color:var(--ink);margin-bottom:6px}
+.home-hero p{font-size:14px;color:var(--muted);font-weight:500}
 
-.case-row{background:#fff;border:1px solid var(--line);border-radius:12px;transition:box-shadow .15s,border-color .15s;cursor:pointer}
-.case-row:hover{box-shadow:0 4px 18px rgba(13,148,136,.12);border-color:#5eead4}
-.case-row td{padding:14px 12px;vertical-align:middle}
-.case-row td:first-child{border-radius:12px 0 0 12px;padding-left:16px}
-.case-row td:last-child{border-radius:0 12px 12px 0;padding-right:16px}
+/* ── FILTER CHIPS ── */
+.home-filters{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px;align-items:center}
+.home-filter-label{font-size:11px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.08em;margin-right:4px;flex-shrink:0}
+.home-chip-clear{display:inline-flex;align-items:center;background:var(--ink);color:#fff;border:1px solid var(--ink);border-radius:999px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;transition:opacity .12s;white-space:nowrap}
+.home-chip-clear:hover{opacity:.82}
 
-.patient-cell{display:flex;align-items:center;gap:10px}
-.avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#0d9488,#0891b2);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px;flex-shrink:0}
-.patient-name{font-weight:700;font-size:13px;color:var(--ink)}
-.patient-demo{font-size:11px;color:var(--muted);margin-top:1px}
+/* hidden filter groups — keep for JS compatibility */
+.home-filter-group{display:contents}
+.home-filter-group .filter-options{display:contents}
+.filter-opt{display:inline-flex;align-items:center;gap:0;list-style:none}
+.filter-opt input[type=checkbox]{position:absolute;opacity:0;pointer-events:none;width:0;height:0}
+.filter-opt-chip{display:inline-flex;align-items:center;background:#fff;color:#475569;border:1px solid var(--line);border-radius:999px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .12s,border-color .12s,color .12s;user-select:none}
+.filter-opt-chip:hover{border-color:#94a3b8;background:#f8fafc}
+.filter-opt.active-filter .filter-opt-chip{background:var(--ink);color:#fff;border-color:var(--ink)}
 
-.concern-cell{min-width:120px}
-.concern-tag{display:inline-block;background:#e0f2fe;color:#0369a1;border:1px solid #7dd3fc;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700}
+/* Roman numeral circle chips */
+.filter-roman-chip{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:#fff;color:#475569;border:1px solid var(--line);font-size:13px;font-weight:800;cursor:pointer;white-space:nowrap;transition:background .12s,border-color .12s,color .12s;user-select:none}
+.filter-roman-chip:hover{border-color:#94a3b8;background:#f8fafc}
+.filter-opt.active-filter .filter-roman-chip{background:var(--ink);color:#fff;border-color:var(--ink)}
 
-.repr-cell{font-size:12px;color:#374151;line-height:1.5;max-width:420px}
+/* search */
+.home-search-row{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.home-search-wrap{position:relative;flex:1;max-width:320px}
+.home-search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#94a3b8;pointer-events:none}
+.home-search-input{width:100%;border:1px solid var(--line);border-radius:10px;padding:8px 12px 8px 34px;font-size:13px;background:#fff;color:var(--ink);outline:none}
+.home-search-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(14,165,233,.1)}
+.home-count{font-size:12px;color:var(--muted);white-space:nowrap}
 
-.modules-cell{white-space:nowrap}
-.mod-badge{display:inline-flex;align-items:center;gap:4px;background:#f1f5f9;color:#475569;border-radius:8px;padding:5px 9px;font-size:12px;font-weight:600}
-.mod-dot{width:7px;height:7px;border-radius:50%;background:#0ea5e9}
+/* ── SECTION ── */
+.library-section-title{font-size:16px;font-weight:800;color:var(--ink);margin-bottom:16px;letter-spacing:-.01em}
 
-.action-cell{text-align:right}
-.go-btn{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;transition:background .12s}
-.go-btn:hover{background:#0284c7}
-.go-btn svg{flex-shrink:0}
+/* ── CARD GRID ── */
+.library-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:1100px){.library-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:900px){.library-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:640px){.library-grid{grid-template-columns:repeat(2,1fr);gap:10px}}
+@media(max-width:400px){.library-grid{grid-template-columns:1fr;gap:10px}}
 
-/* COMING SOON TABLE ROWS */
-.coming-row td{padding:12px 12px;vertical-align:middle;opacity:.55}
-.coming-row td:first-child{border-radius:12px 0 0 12px;padding-left:16px}
-.coming-row td:last-child{border-radius:0 12px 12px 0;padding-right:16px}
-.coming-row{background:#fafbfd;border:1px dashed #d0d8ec;border-radius:12px;cursor:default}
-.soon-badge{display:inline-block;background:#f1f5f9;color:#94a3b8;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:700}
+/* ── CASE CARD ── */
+.case-card-wrap{border-radius:11px;overflow:hidden;background:var(--surface);box-shadow:0 2px 10px rgba(23,32,51,.08);border:1px solid var(--line);transition:transform .18s,box-shadow .18s;cursor:pointer;display:block;text-decoration:none;color:inherit}
+.case-card-wrap:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(23,32,51,.13)}
 
-/* FOOTER */
-footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-top:1px solid var(--line);background:#fff}
+.case-card-img{position:relative;width:100%;padding-top:66%;overflow:hidden}
+.case-card-img-inner{position:absolute;inset:0;background-size:cover;background-position:center}
+.case-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,20,35,.9) 0%,rgba(15,20,35,.22) 52%,transparent 100%)}
+.case-card-badge{position:absolute;top:8px;left:8px;background:rgba(255,255,255,.18);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.22);color:#fff;border-radius:5px;padding:2px 6px;font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
 
-@media(max-width:900px){
-  .sidebar{display:none}
-  .repr-cell{display:none}
-  .search-input{width:160px}
-}
-@media(max-width:600px){
-  .modules-cell{display:none}
-  .main-header{padding:10px 12px}
-  .table-wrap{padding:10px 12px}
-}
+/* ── ROMAN ORB ON CARD ── */
+.case-card-orb{position:absolute;top:8px;right:8px;z-index:2;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.18);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1.5px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:900;letter-spacing:.02em;text-shadow:0 1px 4px rgba(0,0,0,.35)}
+
+.case-card-body{position:absolute;bottom:0;left:0;right:0;padding:10px 10px 9px}
+.case-card-symptoms{font-size:11px;font-weight:600;color:rgba(255,255,255,.93);margin-bottom:4px;line-height:1.3}
+.case-card-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.case-card-category{font-size:10px;font-weight:700;color:rgba(255,255,255,.7)}
+
+.case-card-footer{padding:8px 10px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--line);gap:6px}
+.case-card-patient{font-size:11px;color:var(--muted);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.case-card-btn{display:inline-flex;align-items:center;gap:4px;background:var(--accent);color:#fff;border:none;border-radius:6px;padding:5px 9px;font-size:11px;font-weight:700;cursor:pointer;text-decoration:none;transition:background .12s;white-space:nowrap;flex-shrink:0}
+.case-card-btn:hover{background:#0284c7}
+.case-card-btn svg{flex-shrink:0}
+
+/* ── COMING SOON CARD ── */
+.case-card-wrap.coming-row{opacity:.6;cursor:default;pointer-events:none}
+.case-card-wrap.coming-row:hover{transform:none;box-shadow:0 2px 12px rgba(23,32,51,.08)}
+.case-card-coming-img{position:absolute;inset:0;background:linear-gradient(160deg,#8898aa 0%,#adb9c7 100%)}
+.case-card-coming-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:12px;font-weight:800;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.1em}
+
+/* ── NOTICE ── */
+.home-notice{background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:10px 16px;display:flex;align-items:center;gap:8px;font-size:12px;color:#0369a1;font-weight:600;margin-bottom:28px}
+.home-notice svg{flex-shrink:0}
+
+/* ── FOOTER ── */
+footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-top:1px solid var(--line);background:#fff;margin-top:auto}
 </style>
 </head>
 <body>
 
 <header class="topbar">
-  <div class="topbar-logo">H-CR v3</div>
+  <div class="topbar-logo">H-CR</div>
   <div class="topbar-sep">|</div>
-  <div class="topbar-sub">Biblioteca de casos clínicos</div>
-  <div class="topbar-right">Simulación clínica interactiva</div>
+  <div class="topbar-sub">Simulación de razonamiento clínico</div>
+  <div class="topbar-right">
+    <a class="topbar-btn" href="#">
+      <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7h18M3 12h18M3 17h18"/></svg>
+      Biblioteca
+    </a>
+  </div>
 </header>
 
-<div class="layout">
+<div class="home-layout">
 
   <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-section">
-      <div class="sidebar-section-title">Menú</div>
-      <div class="sidebar-link active">
-        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7h18M3 12h18M3 17h18"/></svg>
-        Biblioteca de casos
+  <aside class="home-sidebar">
+
+    <!-- Search -->
+    <div class="home-sidebar-block">
+      <div class="home-search-wrap">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg>
+        <input class="home-search-input" id="searchInput" type="text" placeholder="Buscar…" oninput="applyFilters()">
       </div>
     </div>
 
-    <div class="sidebar-divider"></div>
-
-    <div class="sidebar-section">
-      <div class="sidebar-section-title">Filtros</div>
-    </div>
-
-    <div class="filter-group" data-filter-group="symptoms">
-      <div class="filter-group-title open" onclick="toggleFilter(this)">
-        Síntoma principal <span>▾</span>
-      </div>
-      <div class="filter-options">
-        <label class="filter-opt active-filter"><input type="checkbox" checked onchange="applyFilters()"> Disnea</label>
-        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"> Dolor torácico</label>
-        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"> Fiebre</label>
-        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"> Fatiga</label>
-        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"> Cefalea</label>
-        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"> Dolor abdominal</label>
-        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"> Mareo / Síncope</label>
-        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"> Edema</label>
+    <!-- LEVEL -->
+    <div class="home-sidebar-block level-block" data-filter-group="difficulties">
+      <span class="home-filter-label">Nivel</span>
+      <div class="filter-options" id="levelFilterOpts">
+        <label class="filter-opt" data-filter-value="nivel 1"><input type="checkbox" onchange="applyFilters()"><span class="filter-roman-chip">I</span></label>
+        <label class="filter-opt" data-filter-value="nivel 2"><input type="checkbox" onchange="applyFilters()"><span class="filter-roman-chip">II</span></label>
+        <label class="filter-opt" data-filter-value="nivel 3"><input type="checkbox" onchange="applyFilters()"><span class="filter-roman-chip">III</span></label>
+        <label class="filter-opt" data-filter-value="nivel 4"><input type="checkbox" onchange="applyFilters()"><span class="filter-roman-chip">IV</span></label>
+        <label class="filter-opt" data-filter-value="nivel 5"><input type="checkbox" onchange="applyFilters()"><span class="filter-roman-chip">V</span></label>
       </div>
     </div>
 
-    <div class="filter-group" data-filter-group="systems">
-      <div class="filter-group-title open" onclick="toggleFilter(this)">
-        Sistema orgánico <span>▾</span>
+    <!-- FILTRAR -->
+    <div class="home-sidebar-block">
+      <span class="home-filter-label">Filtrar</span>
+      <span class="filter-subtitle">Sistema</span>
+      <div class="filter-options" data-filter-group="systems">
+        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"><span class="filter-opt-chip">Infeccioso</span></label>
+        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"><span class="filter-opt-chip">Cardiovascular</span></label>
+        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"><span class="filter-opt-chip">Respiratorio</span></label>
+        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"><span class="filter-opt-chip">Digestivo</span></label>
+        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"><span class="filter-opt-chip">Neurologico</span></label>
+        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"><span class="filter-opt-chip">Endocrinologico</span></label>
+        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"><span class="filter-opt-chip">Nefrologico</span></label>
+        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"><span class="filter-opt-chip">Hematologico</span></label>
       </div>
-      <div class="filter-options">
-        <label class="filter-opt active-filter"><input type="checkbox" checked onchange="applyFilters()"> Cardiovascular</label>
-        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"> Respiratorio</label>
-        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"> Digestivo</label>
-        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"> Neurológico</label>
-        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"> Endocrinológico</label>
+      <span class="filter-subtitle">Sintoma</span>
+      <div class="filter-options" data-filter-group="symptoms">
+        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"><span class="filter-opt-chip">Fiebre</span></label>
+        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"><span class="filter-opt-chip">Tos</span></label>
+        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"><span class="filter-opt-chip">Disnea</span></label>
+        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"><span class="filter-opt-chip">Dolor toracico</span></label>
+        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"><span class="filter-opt-chip">Fatiga</span></label>
+        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"><span class="filter-opt-chip">Cefalea</span></label>
+        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"><span class="filter-opt-chip">Dolor abdominal</span></label>
       </div>
     </div>
 
-    <div class="filter-group" data-filter-group="difficulties">
-      <div class="filter-group-title open" onclick="toggleFilter(this)">
-        Dificultad <span>▾</span>
-      </div>
-      <div class="filter-options">
-        <label class="filter-opt active-filter"><input type="checkbox" checked onchange="applyFilters()"> Intermedio</label>
-        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"> Básico</label>
-        <label class="filter-opt"><input type="checkbox" onchange="applyFilters()"> Avanzado</label>
-      </div>
-    </div>
+    <span class="home-chip-clear" onclick="clearFilters()" style="margin-top:4px">Limpiar</span>
 
-    <span class="clear-filters" onclick="clearFilters()">Limpiar filtros</span>
   </aside>
 
   <!-- MAIN -->
-  <div class="main">
+  <div class="home-main">
 
-    <div class="main-header">
-      <div class="breadcrumb">Biblioteca <b>› Todos los casos</b></div>
-      <span class="count-badge" id="countBadge">0 casos disponibles · 8 próximamente</span>
-      <div class="search-wrap">
-        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg>
-        <input class="search-input" id="searchInput" type="text" placeholder="Buscar por síntoma…" oninput="applyFilters()">
-      </div>
+    <div class="home-hero">
+      <h1>Biblioteca de casos clínicos</h1>
+      <p>Entrena adquisición de datos, diagnóstico diferencial y manejo clínico.</p>
     </div>
 
-    <div class="notice-bar">
+    <div class="home-notice">
       <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
-      El diagnóstico definitivo solo se revela en el Módulo 7 — Evaluación. Trabaja los módulos en orden para una experiencia real.
+      El diagnóstico definitivo solo se revela en el Módulo 7 — Evaluación. Trabaja los módulos en orden.
     </div>
 
-    <div class="table-wrap">
-      <table class="cases-table" id="casesTable">
-        <thead>
-          <tr>
-            <th>Paciente <span class="sort-icon">▲</span></th>
-            <th>Síntoma principal <span class="sort-icon">↕</span></th>
-            <th class="repr-cell">Presentación clínica</th>
-            <th>Módulos</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="caseBody">
+    <div class="library-section-title">Casos disponibles <span class="home-count" id="countBadge" style="font-weight:500;margin-left:8px">0 casos</span></div>
+    <div class="library-grid" id="caseBody">
 
-          <!-- PRÓXIMAMENTE -->
-          <tr class="coming-row">
-            <td><div class="patient-cell"><div class="avatar" style="background:linear-gradient(135deg,#94a3b8,#cbd5e1)">?</div><div><div class="patient-name" style="color:#94a3b8">Próximamente</div><div class="patient-demo">En desarrollo</div></div></div></td>
-            <td><span class="soon-badge">💉 Dolor torácico</span></td>
-            <td class="repr-cell" style="color:#94a3b8;font-style:italic">Caso en desarrollo — disponible próximamente.</td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr class="coming-row">
-            <td><div class="patient-cell"><div class="avatar" style="background:linear-gradient(135deg,#94a3b8,#cbd5e1)">?</div><div><div class="patient-name" style="color:#94a3b8">Próximamente</div><div class="patient-demo">En desarrollo</div></div></div></td>
-            <td><span class="soon-badge">🌡️ Fiebre + escalofríos</span></td>
-            <td class="repr-cell" style="color:#94a3b8;font-style:italic">Caso en desarrollo — disponible próximamente.</td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr class="coming-row">
-            <td><div class="patient-cell"><div class="avatar" style="background:linear-gradient(135deg,#94a3b8,#cbd5e1)">?</div><div><div class="patient-name" style="color:#94a3b8">Próximamente</div><div class="patient-demo">En desarrollo</div></div></div></td>
-            <td><span class="soon-badge">😴 Fatiga y cansancio</span></td>
-            <td class="repr-cell" style="color:#94a3b8;font-style:italic">Caso en desarrollo — disponible próximamente.</td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr class="coming-row">
-            <td><div class="patient-cell"><div class="avatar" style="background:linear-gradient(135deg,#94a3b8,#cbd5e1)">?</div><div><div class="patient-name" style="color:#94a3b8">Próximamente</div><div class="patient-demo">En desarrollo</div></div></div></td>
-            <td><span class="soon-badge">🤕 Cefalea intensa</span></td>
-            <td class="repr-cell" style="color:#94a3b8;font-style:italic">Caso en desarrollo — disponible próximamente.</td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr class="coming-row">
-            <td><div class="patient-cell"><div class="avatar" style="background:linear-gradient(135deg,#94a3b8,#cbd5e1)">?</div><div><div class="patient-name" style="color:#94a3b8">Próximamente</div><div class="patient-demo">En desarrollo</div></div></div></td>
-            <td><span class="soon-badge">🤢 Dolor abdominal</span></td>
-            <td class="repr-cell" style="color:#94a3b8;font-style:italic">Caso en desarrollo — disponible próximamente.</td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr class="coming-row">
-            <td><div class="patient-cell"><div class="avatar" style="background:linear-gradient(135deg,#94a3b8,#cbd5e1)">?</div><div><div class="patient-name" style="color:#94a3b8">Próximamente</div><div class="patient-demo">En desarrollo</div></div></div></td>
-            <td><span class="soon-badge">💫 Mareo y síncope</span></td>
-            <td class="repr-cell" style="color:#94a3b8;font-style:italic">Caso en desarrollo — disponible próximamente.</td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr class="coming-row">
-            <td><div class="patient-cell"><div class="avatar" style="background:linear-gradient(135deg,#94a3b8,#cbd5e1)">?</div><div><div class="patient-name" style="color:#94a3b8">Próximamente</div><div class="patient-demo">En desarrollo</div></div></div></td>
-            <td><span class="soon-badge">🦵 Edema asimétrico</span></td>
-            <td class="repr-cell" style="color:#94a3b8;font-style:italic">Caso en desarrollo — disponible próximamente.</td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr class="coming-row">
-            <td><div class="patient-cell"><div class="avatar" style="background:linear-gradient(135deg,#94a3b8,#cbd5e1)">?</div><div><div class="patient-name" style="color:#94a3b8">Próximamente</div><div class="patient-demo">En desarrollo</div></div></div></td>
-            <td><span class="soon-badge">🩸 Sangrado activo</span></td>
-            <td class="repr-cell" style="color:#94a3b8;font-style:italic">Caso en desarrollo — disponible próximamente.</td>
-            <td></td>
-            <td></td>
-          </tr>
+    <!-- COMING SOON CARDS (static placeholders) -->
+    <div class="case-card-wrap coming-row">
+      <div class="case-card-img">
+        <div class="case-card-img-inner" style="background:linear-gradient(160deg,#1a2a3c 0%,#2d4a6a 60%,#3a6080 100%)"></div>
+        <div class="case-card-overlay"></div>
+        <div class="case-card-coming-label">Próximamente</div>
+        <div class="case-card-body">
+          <div class="case-card-symptoms">Dolor torácico · presión</div>
+          <div class="case-card-meta"><span class="case-card-level">Nivel III</span><span class="case-card-sep">·</span><span class="case-card-category">Cardiovascular</span></div>
+        </div>
+      </div>
+      <div class="case-card-footer"><span class="case-card-patient">En desarrollo</span></div>
+    </div>
 
-        </tbody>
-      </table>
+    <div class="case-card-wrap coming-row">
+      <div class="case-card-img">
+        <div class="case-card-img-inner" style="background:linear-gradient(160deg,#1a2e1a 0%,#2d5a3a 60%,#3a7050 100%)"></div>
+        <div class="case-card-overlay"></div>
+        <div class="case-card-coming-label">Próximamente</div>
+        <div class="case-card-body">
+          <div class="case-card-symptoms">Fiebre · escalofríos · malestar</div>
+          <div class="case-card-meta"><span class="case-card-level">Nivel II</span><span class="case-card-sep">·</span><span class="case-card-category">Infeccioso</span></div>
+        </div>
+      </div>
+      <div class="case-card-footer"><span class="case-card-patient">En desarrollo</span></div>
+    </div>
+
+    <div class="case-card-wrap coming-row">
+      <div class="case-card-img">
+        <div class="case-card-img-inner" style="background:linear-gradient(160deg,#1e1030 0%,#3a1a5a 60%,#522880 100%)"></div>
+        <div class="case-card-overlay"></div>
+        <div class="case-card-coming-label">Próximamente</div>
+        <div class="case-card-body">
+          <div class="case-card-symptoms">Cefalea · fotofobia · fiebre</div>
+          <div class="case-card-meta"><span class="case-card-level">Nivel III</span><span class="case-card-sep">·</span><span class="case-card-category">Neurológico</span></div>
+        </div>
+      </div>
+      <div class="case-card-footer"><span class="case-card-patient">En desarrollo</span></div>
+    </div>
+
+    <div class="case-card-wrap coming-row">
+      <div class="case-card-img">
+        <div class="case-card-img-inner" style="background:linear-gradient(160deg,#2a1808 0%,#5a3818 60%,#7a5228 100%)"></div>
+        <div class="case-card-overlay"></div>
+        <div class="case-card-coming-label">Próximamente</div>
+        <div class="case-card-body">
+          <div class="case-card-symptoms">Dolor abdominal · náuseas · vómitos</div>
+          <div class="case-card-meta"><span class="case-card-level">Nivel II</span><span class="case-card-sep">·</span><span class="case-card-category">Digestivo</span></div>
+        </div>
+      </div>
+      <div class="case-card-footer"><span class="case-card-patient">En desarrollo</span></div>
+    </div>
+
+    <div class="case-card-wrap coming-row">
+      <div class="case-card-img">
+        <div class="case-card-img-inner" style="background:linear-gradient(160deg,#0e2030 0%,#1a3a50 60%,#2a5570 100%)"></div>
+        <div class="case-card-overlay"></div>
+        <div class="case-card-coming-label">Próximamente</div>
+        <div class="case-card-body">
+          <div class="case-card-symptoms">Fatiga · disnea de esfuerzo · edema</div>
+          <div class="case-card-meta"><span class="case-card-level">Nivel III</span><span class="case-card-sep">·</span><span class="case-card-category">Cardiovascular</span></div>
+        </div>
+      </div>
+      <div class="case-card-footer"><span class="case-card-patient">En desarrollo</span></div>
+    </div>
+
+    <div class="case-card-wrap coming-row">
+      <div class="case-card-img">
+        <div class="case-card-img-inner" style="background:linear-gradient(160deg,#0e2838 0%,#1a4858 60%,#2a6878 100%)"></div>
+        <div class="case-card-overlay"></div>
+        <div class="case-card-coming-label">Próximamente</div>
+        <div class="case-card-body">
+          <div class="case-card-symptoms">Mareo · inestabilidad · cefalea</div>
+          <div class="case-card-meta"><span class="case-card-level">Nivel II</span><span class="case-card-sep">·</span><span class="case-card-category">Neurológico</span></div>
+        </div>
+      </div>
+      <div class="case-card-footer"><span class="case-card-patient">En desarrollo</span></div>
+    </div>
+
+    <div class="case-card-wrap coming-row">
+      <div class="case-card-img">
+        <div class="case-card-img-inner" style="background:linear-gradient(160deg,#1a1a2e 0%,#2a2a50 60%,#383870 100%)"></div>
+        <div class="case-card-overlay"></div>
+        <div class="case-card-coming-label">Próximamente</div>
+        <div class="case-card-body">
+          <div class="case-card-symptoms">Edema asimétrico · dolor en pierna</div>
+          <div class="case-card-meta"><span class="case-card-level">Nivel III</span><span class="case-card-sep">·</span><span class="case-card-category">Cardiovascular</span></div>
+        </div>
+      </div>
+      <div class="case-card-footer"><span class="case-card-patient">En desarrollo</span></div>
+    </div>
+
+    <div class="case-card-wrap coming-row">
+      <div class="case-card-img">
+        <div class="case-card-img-inner" style="background:linear-gradient(160deg,#2a1010 0%,#501a1a 60%,#702828 100%)"></div>
+        <div class="case-card-overlay"></div>
+        <div class="case-card-coming-label">Próximamente</div>
+        <div class="case-card-body">
+          <div class="case-card-symptoms">Sangrado · palidez · debilidad</div>
+          <div class="case-card-meta"><span class="case-card-level">Nivel III</span><span class="case-card-sep">·</span><span class="case-card-category">Urgencias</span></div>
+        </div>
+      </div>
+      <div class="case-card-footer"><span class="case-card-patient">En desarrollo</span></div>
     </div>
 
   </div>
+</div>
 </div>
 
 <footer>
@@ -285,84 +332,120 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:11px;border-t
 
 <script src="data/cases_catalog.js"></script>
 <script>
-function toggleFilter(el){
-  el.classList.toggle('open');
-  const opts=el.nextElementSibling;
-  opts.style.display=opts.style.display==='none'?'flex':'none';
+/* Restore roman numeral level filters after catalog.js overwrites them */
+(function restoreRomanFilters(){
+  const opts=document.getElementById('levelFilterOpts');
+  if(!opts)return;
+  const romans=['I','II','III','IV','V'];
+  opts.innerHTML=romans.map((r,i)=>
+    `<label class="filter-opt" data-filter-value="nivel ${i+1}"><input type="checkbox" onchange="applyFilters()"><span class="filter-roman-chip">${r}</span></label>`
+  ).join('');
+})();
+</script>
+<script>
+/* ── CATEGORY HELPERS ── */
+function getCategoryGradient(collections, systems){
+  const c=(collections&&collections[0])||'';
+  const s=((systems&&systems[0])||'').toLowerCase();
+  if(c==='cardiovascular'||s.includes('cardiovascular')) return 'linear-gradient(160deg,#2c1010 0%,#5a1a1a 60%,#7a2828 100%)';
+  if(c==='respiratorio'||s.includes('respiratorio'))    return 'linear-gradient(160deg,#0e2838 0%,#1a4858 60%,#236878 100%)';
+  if(c==='infectologia'||s.includes('infeccioso'))      return 'linear-gradient(160deg,#0e2820 0%,#1a4838 60%,#236852 100%)';
+  if(c==='neurologia'||s.includes('neurolog'))          return 'linear-gradient(160deg,#1e1030 0%,#3a1a5a 60%,#52287a 100%)';
+  if(c==='gastroenterologia'||s.includes('digestivo'))  return 'linear-gradient(160deg,#2a1808 0%,#5a3818 60%,#7a5228 100%)';
+  if(c==='endocrinologia'||s.includes('endocrino'))     return 'linear-gradient(160deg,#201030 0%,#3a1a5a 60%,#502870 100%)';
+  if(c==='nefrologia'||s.includes('nefrol'))            return 'linear-gradient(160deg,#102030 0%,#1a3a4a 60%,#285060 100%)';
+  return 'linear-gradient(160deg,#101828 0%,#1a2e48 60%,#223860 100%)';
 }
 
+function getCategoryLabel(collections, systems){
+  const c=(collections&&collections[0])||'';
+  const s=((systems&&systems[0])||'').toLowerCase();
+  if(c==='cardiovascular'||s.includes('cardiovascular')) return 'Cardiovascular';
+  if(c==='respiratorio'||s.includes('respiratorio'))    return 'Respiratorio';
+  if(c==='infectologia'||s.includes('infeccioso'))      return 'Infeccioso';
+  if(c==='neurologia'||s.includes('neurolog'))          return 'Neurológico';
+  if(c==='gastroenterologia'||s.includes('digestivo'))  return 'Digestivo';
+  if(c==='endocrinologia'||s.includes('endocrino'))     return 'Endocrino';
+  if(c==='nefrologia'||s.includes('nefrol'))            return 'Renal';
+  return 'Clínico';
+}
+
+/* ── HELPERS ── */
 function escapeHtml(value){
-  return String(value ?? '').replace(/[&<>"']/g, ch => ({
-    '&':'&amp;',
-    '<':'&lt;',
-    '>':'&gt;',
-    '"':'&quot;',
-    "'":'&#39;'
-  }[ch]));
+  return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 }
-
-function normalize(value){
-  return String(value ?? '').toLowerCase();
-}
+function normalize(value){return String(value??'').toLowerCase()}
 
 function caseSearchText(item){
   const patient=item.patient||{};
   const tags=item.publicTags||{};
-  return [
-    item.id,
-    patient.displayName,
-    patient.age,
-    patient.sex,
-    patient.setting,
-    item.chiefConcern,
-    item.publicPresentation,
-    item.difficulty,
-    ...(tags.symptoms||[]),
-    ...(tags.systems||[]),
-    ...(tags.context||[]),
-    ...(tags.keywords||[])
-  ].join(' ').toLowerCase();
+  return [item.id,patient.displayName,patient.age,patient.sex,patient.setting,item.chiefConcern,item.publicPresentation,item.difficulty,...(tags.symptoms||[]),...(tags.systems||[]),...(tags.context||[]),...(tags.keywords||[])].join(' ').toLowerCase();
+}
+
+/* ── BUILD CARD ── */
+function getLevelDots(level){
+  const v=String(level??'').toLowerCase().replace(/\s/g,'');
+  // Handle roman numerals
+  if(v.includes('iii')) return 3;
+  if(v.includes('iv'))  return 4;
+  if(v.includes('v'))   return 5;
+  if(v.includes('ii'))  return 2;
+  if(v.includes('i'))   return 1;
+  if(v.includes('5')) return 5;
+  if(v.includes('4')) return 4;
+  if(v.includes('3')) return 3;
+  if(v.includes('2')) return 2;
+  if(v.includes('1')) return 1;
+  return 1;
+}
+function getRomanNum(level){
+  const n=getLevelDots(level);
+  return ['','I','II','III','IV','V'][n]||'I';
 }
 
 function buildCaseRow(item){
   const patient=item.patient||{};
   const route=item.route||'#';
-  const symptoms=(item.publicTags?.symptoms||[item.chiefConcern]).join('|');
+  const symptoms=(item.publicTags?.symptoms||[item.chiefConcern]).join(' · ');
   const systems=(item.publicTags?.systems||[]).join('|');
-  const demo=[patient.age?`${patient.age} años`:'',patient.sex,patient.setting].filter(Boolean).join(' · ');
-  const tr=document.createElement('tr');
-  tr.className='case-row';
-  tr.dataset.search=caseSearchText(item);
-  tr.dataset.symptoms=normalize(symptoms);
-  tr.dataset.systems=normalize(systems);
-  tr.dataset.difficulty=normalize(item.difficulty);
-  tr.onclick=()=>{window.location=route};
-  tr.innerHTML=`
-    <td>
-      <div class="patient-cell">
-        <div class="avatar">${escapeHtml(patient.initials||'--')}</div>
-        <div>
-          <div class="patient-name">${escapeHtml(patient.displayName||'Caso')}</div>
-          <div class="patient-demo">${escapeHtml(demo)}</div>
+  const symptomFilters=(item.publicTags?.symptoms||[]).join('|');
+  const difficulty=item.difficulty||item.level||'';
+  const level=item.level||item.difficulty||'';
+  const gradient=getCategoryGradient(item.collections,item.publicTags?.systems);
+  const catLabel=getCategoryLabel(item.collections,item.publicTags?.systems);
+  const demo=[patient.age?`${patient.age}a`:'',patient.sex,patient.setting].filter(Boolean).join(' · ');
+
+  const el=document.createElement('div');
+  el.className='case-card-wrap case-row';
+  el.dataset.search=caseSearchText(item);
+  el.dataset.symptoms=normalize(symptomFilters);
+  el.dataset.systems=normalize(systems);
+  el.dataset.difficulty=normalize(difficulty);
+  el.onclick=()=>{window.location=route};
+  el.innerHTML=`
+    <div class="case-card-img">
+      <div class="case-card-img-inner" style="background:${escapeHtml(gradient)}"></div>
+      <div class="case-card-overlay"></div>
+      ${item.availability==='Disponible'?`<div class="case-card-badge">Disponible</div>`:''}
+      <div class="case-card-orb">${escapeHtml(getRomanNum(level))}</div>
+      <div class="case-card-body">
+        <div class="case-card-symptoms">${escapeHtml(symptoms)}</div>
+        <div class="case-card-meta">
+          <span class="case-card-category">${escapeHtml(catLabel)}</span>
         </div>
       </div>
-    </td>
-    <td class="concern-cell">
-      <span class="concern-tag">${escapeHtml(item.chiefConcern||'Caso clínico')}</span>
-    </td>
-    <td class="repr-cell">${escapeHtml(item.publicPresentation||'')}</td>
-    <td class="modules-cell">
-      <span class="mod-badge"><span class="mod-dot"></span>${escapeHtml(item.modules||0)} módulos</span>
-    </td>
-    <td class="action-cell">
-      <a class="go-btn" href="${escapeHtml(route)}" onclick="event.stopPropagation()">
+    </div>
+    <div class="case-card-footer">
+      <span class="case-card-patient">${escapeHtml(demo)}</span>
+      <a class="case-card-btn" href="${escapeHtml(route)}" onclick="event.stopPropagation()">
         Iniciar
-        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 18l6-6-6-6"/></svg>
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 18l6-6-6-6"/></svg>
       </a>
-    </td>`;
-  return tr;
+    </div>`;
+  return el;
 }
 
+/* ── RENDER ── */
 function renderCasesFromCatalog(){
   const body=document.getElementById('caseBody');
   const catalog=window.HCR_CASES_CATALOG;
@@ -376,15 +459,19 @@ function renderCasesFromCatalog(){
   }
 }
 
+/* ── FILTERS ── */
 function checkedFilters(groupName){
   const group=document.querySelector(`[data-filter-group="${groupName}"]`);
-  if(!group){return []}
-  return [...group.querySelectorAll('.filter-opt input:checked')].map(input=>input.parentElement.textContent.trim().toLowerCase());
+  if(!group){return[]}
+  return[...group.querySelectorAll('.filter-opt input:checked')].map(input=>{
+    const val=input.parentElement.dataset.filterValue;
+    if(val)return val.trim().toLowerCase();
+    const chip=input.parentElement.querySelector('.filter-opt-chip');
+    return(chip?chip.textContent:input.parentElement.textContent).trim().toLowerCase();
+  });
 }
 
-function matchesAny(text,values){
-  return values.length===0 || values.some(value=>text.includes(value));
-}
+function matchesAny(text,values){return values.length===0||values.some(v=>text.includes(v))}
 
 function applyFilters(){
   const q=document.getElementById('searchInput').value.toLowerCase();
@@ -395,9 +482,9 @@ function applyFilters(){
     opt.classList.toggle('active-filter',opt.querySelector('input').checked);
   });
   document.querySelectorAll('.case-row').forEach(row=>{
-    const visible=(!q||row.dataset.search.includes(q)) &&
-      matchesAny(row.dataset.symptoms||'',symptoms) &&
-      matchesAny(row.dataset.systems||'',systems) &&
+    const visible=(!q||row.dataset.search.includes(q))&&
+      matchesAny(row.dataset.symptoms||'',symptoms)&&
+      matchesAny(row.dataset.systems||'',systems)&&
       matchesAny(row.dataset.difficulty||'',difficulties);
     row.style.display=visible?'':'none';
   });
@@ -408,6 +495,8 @@ function clearFilters(){
   document.getElementById('searchInput').value='';
   applyFilters();
 }
+
+function toggleFilter(){}
 
 renderCasesFromCatalog();
 applyFilters();

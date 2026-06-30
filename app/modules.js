@@ -246,12 +246,12 @@ function renderDiagnosticImages(d) {
     const category = diagnosticImageCategory(item);
     (groups[category] = groups[category] || []).push(item);
   });
-  return `<div class="card diagnostic-images-section">
-    <h2>${hcrModuleTitle('Imágenes diagnósticas', 'paraclinicos')}</h2>
+  return `<div class="card diagnostic-images-section help-on-open">
+    <h2>Imágenes diagnósticas</h2>
     <div class="diagnostic-images-grid">
       ${order.filter(category => (groups[category] || []).length).map(category => {
         return `<details class="diagnostic-image-category">
-          <summary>${esc(category)}</summary>
+          <summary>${hcrModuleTitle(category, 'paraclinicos')}</summary>
           <div class="diagnostic-image-category-body">
             ${groups[category].map((item, idx) => diagnosticImageItem(item, idx)).join('')}
           </div>
@@ -611,12 +611,12 @@ function renderM2() {
       <h1>Módulo 2 — Historial y examen funcional subjetivo</h1>
       <p>Selecciona los antecedentes y síntomas funcionales relevantes.</p>
     </div>
-    <div class="card">
-      <h2>${hcrModuleTitle('Historial', 'antecedentes')}</h2>
+    <div class="card m2-help-on-open">
+      <h2>Historial</h2>
       ${renderAccordionGroup(d.historial, 'm2_historial')}
     </div>
-    <div class="card">
-      <h2>${hcrModuleTitle('Examen funcional subjetivo')}</h2>
+    <div class="card m2-help-on-open">
+      <h2>Examen funcional subjetivo</h2>
       ${renderAccordionGroup(d.examenFuncional, 'm2_examen_funcional')}
     </div>
     ${phaseClose('m2')}
@@ -634,8 +634,8 @@ function renderM3() {
       <h1>Módulo 3 — Examen físico</h1>
       <p>Selecciona los hallazgos que cambian tu diagnóstico diferencial.</p>
     </div>
-    <div class="card">
-      <h2>${hcrModuleTitle('Examen físico por sistemas', 'examen_fisico')}</h2>
+    <div class="card help-on-open">
+      <h2>Examen físico por sistemas</h2>
       ${renderPhysicalExamSections(d.physicalExam || d.systems || [])}
     </div>
     ${phaseClose('m3')}
@@ -670,8 +670,8 @@ function renderM4() {
       <h1>Módulo 4 — Paraclínicos</h1>
       <p>Selecciona los resultados que cambian tu representación del problema o el diagnóstico diferencial.</p>
     </div>
-    <div class="card">
-      <h2>${hcrModuleTitle('Estudios disponibles', 'paraclinicos')}</h2>
+    <div class="card help-on-open">
+      <h2>Estudios disponibles</h2>
       ${visibleTables.map((t, idx) => tableHTML(t.title, t.rows, idx)).join('')}
     </div>
     ${renderDiagnosticImages(d)}
