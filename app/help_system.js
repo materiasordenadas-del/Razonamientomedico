@@ -27,14 +27,23 @@ function hcrNormalize(value) {
 
 function hcrIconName(iconRole) {
   const fallbacks = {
+    ayudaModulo: 'brain',
+    terminoClinico: 'eye',
+    explicacionExperta: 'book',
     moduleHelp: 'brain',
     clinicalTerm: 'eye',
     expertExplanation: 'book'
   };
-  return window.HCR_UI_ICONS?.[iconRole] || fallbacks[iconRole] || 'book';
+  const aliases = {
+    moduleHelp: 'ayudaModulo',
+    clinicalTerm: 'terminoClinico',
+    expertExplanation: 'explicacionExperta'
+  };
+  return window.HCR_UI_ICONS?.[iconRole]
+    || window.HCR_UI_ICONS?.[aliases[iconRole]]
+    || fallbacks[iconRole]
+    || 'book';
 }
-
-const hcrIconLoadCache = {};
 
 function hcrShowIconFallback(iconEl) {
   if (!iconEl) return;
@@ -44,41 +53,25 @@ function hcrShowIconFallback(iconEl) {
 }
 
 function verifyHcrIcons(root) {
-  if (window.location?.protocol === 'file:') return;
   const container = root || document;
-  container.querySelectorAll('.hcr-icon-img[data-hcr-icon-url]').forEach(iconEl => {
-    const src = iconEl.getAttribute('data-hcr-icon-url');
-    if (!src) return;
-    if (hcrIconLoadCache[src] === false) {
-      hcrShowIconFallback(iconEl);
-      return;
-    }
-    if (hcrIconLoadCache[src] === true) return;
-    hcrIconLoadCache[src] = 'pending';
-    fetch(src, { cache: 'force-cache' })
-      .then(response => {
-        hcrIconLoadCache[src] = response.ok;
-        if (!response.ok) hcrShowIconFallback(iconEl);
-      })
-      .catch(() => {
-        hcrIconLoadCache[src] = false;
-        hcrShowIconFallback(iconEl);
-      });
+  container.querySelectorAll('.hcr-icon-img').forEach(iconEl => {
+    if (iconEl.complete && iconEl.naturalWidth === 0) hcrShowIconFallback(iconEl);
   });
+}
+
+function hcrIconPath(iconName) {
+  const pngIcons = new Set(['brain', 'eye']);
+  const extension = pngIcons.has(iconName) ? 'png' : 'svg';
+  return `ui/icons/${encodeURIComponent(iconName)}.${extension}`;
 }
 
 function renderHcrIcon(iconRole, ariaLabel) {
   const iconName = hcrIconName(iconRole);
   const safeLabel = hcrAttribute(ariaLabel || 'Ayuda');
-  const src = `ui/icons/${encodeURIComponent(iconName)}.svg`;
-  if (window.location?.protocol === 'file:') {
-    return `<span class="hcr-icon-wrap" aria-hidden="true">
-      <img class="hcr-icon-img hcr-icon-img-file" src="${hcrAttribute(src)}" alt="" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
-      <span class="hcr-icon-fallback" hidden>?</span>
-    </span><span class="sr-only">${safeLabel}</span>`;
-  }
+  const src = hcrIconPath(iconName);
   return `<span class="hcr-icon-wrap" aria-hidden="true">
-    <span class="hcr-icon-img" data-hcr-icon-url="${hcrAttribute(src)}" style="--hcr-icon-url:url('${hcrAttribute(src)}')"></span>
+    <img class="hcr-icon-img" src="${hcrAttribute(src)}" alt="" loading="lazy"
+      onerror="this.hidden=true;this.nextElementSibling.hidden=false">
     <span class="hcr-icon-fallback" hidden>?</span>
   </span><span class="sr-only">${safeLabel}</span>`;
 }
@@ -87,15 +80,51 @@ function renderHcrModuleHelpButton(key) {
   if (!window.HCR_MODULE_HELP?.[key]) return '';
   return `<button type="button" class="hcr-icon-btn hcr-help-btn" aria-label="Abrir ayuda"
     onclick="event.preventDefault();event.stopPropagation();openHcrModuleHelp('${hcrJsArg(key)}')">
-    ${renderHcrIcon('moduleHelp', 'Abrir ayuda')}
+    ${renderHcrIcon('ayudaModulo', 'Abrir ayuda')}
   </button>`;
 }
 
-function renderHcrClinicalTermButton(key) {
-  if (!window.HCR_CLINICAL_TERMS?.[key]) return '';
-  return `<button type="button" class="hcr-icon-btn hcr-term-btn" aria-label="Abrir explicacion semiologica"
-    onclick="event.preventDefault();event.stopPropagation();openHcrClinicalTerm('${hcrJsArg(key)}')">
-    ${renderHcrIcon('clinicalTerm', 'Abrir explicacion semiologica')}
+function hcrClinicalTermData(key) {
+  return window.HCR_CLINICAL_TERMS?.[key] || null;
+}
+
+function hcrClinicalTermTitle(data) {
+  return data?.titulo || data?.title || 'Termino clinico';
+}
+
+function hcrClinicalTermDefinition(data) {
+  return data?.definicion || data?.definition || '';
+}
+
+function hcrClinicalTermRelevance(data) {
+  return data?.relevancia || data?.relevance || '';
+}
+
+function hcrClinicalTermKeyPoints(data) {
+  return data?.puntosClave || data?.keyPoints || [];
+}
+
+function hcrValidTermIds(termIds) {
+  return (Array.isArray(termIds) ? termIds : [termIds])
+    .map(id => String(id || '').trim())
+    .filter((id, idx, list) => id && list.indexOf(id) === idx && hcrClinicalTermData(id));
+}
+
+function renderHcrClinicalTermButtonForIds(termIds) {
+  const ids = hcrValidTermIds(termIds);
+  if (!ids.length) return '';
+  return `<button type="button" class="hcr-icon-btn hcr-term-btn" aria-label="Abrir conceptos clinicos"
+    onclick="event.preventDefault();event.stopPropagation();openHcrClinicalTerms('${hcrJsArg(ids.join(','))}')">
+    ${renderHcrIcon('terminoClinico', 'Abrir conceptos clinicos')}
+  </button>`;
+}
+
+function renderHcrFindingEyeButton(termIds, findingText) {
+  const ids = hcrValidTermIds(termIds);
+  if (ids.length) return renderHcrClinicalTermButtonForIds(ids);
+  return `<button type="button" class="hcr-icon-btn hcr-term-btn" aria-label="Abrir detalle del hallazgo"
+    onclick="event.preventDefault();event.stopPropagation();openHcrFindingDetail('${hcrJsArg(findingText)}')">
+    ${renderHcrIcon('terminoClinico', 'Abrir detalle del hallazgo')}
   </button>`;
 }
 
@@ -103,7 +132,7 @@ function findHcrClinicalTerm(text) {
   const normalized = hcrNormalize(text);
   const terms = window.HCR_CLINICAL_TERMS || {};
   return Object.entries(terms).find(([key, data]) => {
-    const aliases = [key, data.title, ...(data.aliases || [])]
+    const aliases = [key, data.title, data.titulo, ...(data.aliases || [])]
       .map(hcrNormalize)
       .filter(Boolean);
     return aliases.some(alias => {
@@ -117,12 +146,12 @@ function findHcrClinicalTerm(text) {
 
 function renderHcrClinicalTermButtonForText(text) {
   const key = findHcrClinicalTerm(text);
-  return key ? renderHcrClinicalTermButton(key) : '';
+  return key ? renderHcrClinicalTermButtonForIds([key]) : '';
 }
 
 function renderHcrHelpTitle(title, helpKey) {
   const button = helpKey ? renderHcrModuleHelpButton(helpKey) : '';
-  return `<span class="hcr-title-help-wrap"><span>${hcrEscape(title)}</span>${button}</span>`;
+  return `<span class="hcr-title-help-wrap"><span class="hcr-title-text">${hcrEscape(title)}</span>${button}</span>`;
 }
 
 function hcrModalRoot() {
@@ -169,24 +198,53 @@ function openHcrModuleHelp(key) {
 }
 
 function openHcrClinicalTerm(key) {
-  const data = window.HCR_CLINICAL_TERMS?.[key];
-  if (!data) return;
+  openHcrClinicalTerms(key);
+}
+
+function openHcrFindingDetail(findingText) {
   const root = hcrModalRoot();
   root.className = 'hcr-help-modal hcr-term-modal';
   root.innerHTML = `<div class="hcr-help-backdrop" onclick="closeHcrHelpModal()"></div>
-    <div class="hcr-help-panel hcr-term-panel" role="dialog" aria-modal="true" aria-labelledby="hcrTermTitle">
+    <div class="hcr-help-panel hcr-term-panel" role="dialog" aria-modal="true" aria-labelledby="hcrFindingTitle">
       <div class="hcr-help-header">
-        <h2 id="hcrTermTitle">${hcrEscape(data.title || 'Termino clinico')}</h2>
+        <h2 id="hcrFindingTitle">Hallazgo</h2>
         <button type="button" class="hcr-help-close" onclick="closeHcrHelpModal()" aria-label="Cerrar">Cerrar</button>
       </div>
       <div class="hcr-term-content">
-        <h3>Definicion</h3>
-        <p>${hcrEscape(data.definition || '')}</p>
-        <h3>Relevancia semiologica</h3>
-        <p>${hcrEscape(data.relevance || '')}</p>
-        ${(data.keyPoints || []).length
-          ? `<h3>Puntos clave</h3><ul>${data.keyPoints.map(item => `<li>${hcrEscape(item)}</li>`).join('')}</ul>`
-          : ''}
+        <section class="hcr-term-section">
+          <h4>Dato seleccionado</h4>
+          <p>${hcrEscape(findingText || '')}</p>
+        </section>
+      </div>
+    </div>`;
+  root.hidden = false;
+}
+
+function openHcrClinicalTerms(keys) {
+  const ids = hcrValidTermIds(String(keys || '').split(','));
+  if (!ids.length) return;
+  const terms = ids.map(id => hcrClinicalTermData(id)).filter(Boolean);
+  const root = hcrModalRoot();
+  root.className = 'hcr-help-modal hcr-term-modal';
+  const title = terms.length === 1 ? hcrClinicalTermTitle(terms[0]) : 'Conceptos clinicos';
+  root.innerHTML = `<div class="hcr-help-backdrop" onclick="closeHcrHelpModal()"></div>
+    <div class="hcr-help-panel hcr-term-panel" role="dialog" aria-modal="true" aria-labelledby="hcrTermTitle">
+      <div class="hcr-help-header">
+        <h2 id="hcrTermTitle">${hcrEscape(title)}</h2>
+        <button type="button" class="hcr-help-close" onclick="closeHcrHelpModal()" aria-label="Cerrar">Cerrar</button>
+      </div>
+      <div class="hcr-term-content">
+        ${terms.map(data => {
+          const points = hcrClinicalTermKeyPoints(data);
+          return `<section class="hcr-term-section">
+            ${terms.length > 1 ? `<h3>${hcrEscape(hcrClinicalTermTitle(data))}</h3>` : ''}
+            <h4>Definicion</h4>
+            <p>${hcrEscape(hcrClinicalTermDefinition(data))}</p>
+            <h4>Relevancia clinica general</h4>
+            <p>${hcrEscape(hcrClinicalTermRelevance(data))}</p>
+            ${points.length ? `<h4>Puntos clave</h4><ul>${points.map(item => `<li>${hcrEscape(item)}</li>`).join('')}</ul>` : ''}
+          </section>`;
+        }).join('')}
       </div>
     </div>`;
   root.hidden = false;

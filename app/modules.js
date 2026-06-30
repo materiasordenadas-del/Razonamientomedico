@@ -23,35 +23,43 @@ function hcrModuleTitle(title, helpKey) {
   return esc(title);
 }
 
-function hcrTermForText(text) {
-  if (typeof renderHcrClinicalTermButtonForText !== 'function') return '';
-  return renderHcrClinicalTermButtonForText(text);
+function hcrTermButtons(termIds, findingText, showEye) {
+  if (!showEye) return '';
+  if (typeof renderHcrFindingEyeButton === 'function') {
+    return renderHcrFindingEyeButton(termIds || [], findingText || '');
+  }
+  if (typeof renderHcrClinicalTermButtonForIds !== 'function') return '';
+  return renderHcrClinicalTermButtonForIds(termIds || []);
 }
 
-function hcrTextWithTerm(text) {
-  return `${esc(text)}${hcrTermForText(text)}`;
+function hcrFindingText(text) {
+  return esc(text);
 }
 
-function choice(id, source, text) {
+function choice(id, source, text, termIds, showEye) {
   const sel = isSelected(id);
+  const termButton = hcrTermButtons(termIds, text, showEye);
   return `<label class="selectable${sel ? ' selected' : ''}">
     <input class="finding-check" type="checkbox"
       data-id="${esc(id)}" data-source="${esc(source)}" data-text="${esc(text)}"
       ${sel ? 'checked' : ''}>
-    <span class="fact-label">${hcrTextWithTerm(text)}</span>
+    <span class="fact-label">${hcrFindingText(text)}</span>
+    ${termButton}
   </label>`;
 }
 
 function conversationBlock(item) {
   const sel = isSelected(item.id);
   const dlgId = 'dlg_' + item.id;
+  const termButton = hcrTermButtons(item.termIds, item.text, false);
   return `<div class="dialogue">
     <p class="doctor">${esc(item.question)}</p>
     <details class="patient-details" id="${dlgId}"
       ${state.expanded[dlgId] ? 'open' : ''}
       ontoggle="markExpanded('${dlgId}',this.open)">
       <summary>
-        <span class="patient-text">${hcrTextWithTerm(item.text)}</span>
+        <span class="patient-text">${hcrFindingText(item.text)}</span>
+        ${termButton}
         <input class="patient-check finding-check" type="checkbox"
           data-id="${esc(item.id)}" data-source="${esc(item.source)}" data-text="${esc(item.text)}"
           ${sel ? 'checked' : ''}
@@ -68,9 +76,13 @@ function accordion(title, items, id, defaultOpen) {
   const expandedKey = id || 'accordion_' + title;
   const hasStoredState = Object.prototype.hasOwnProperty.call(state.expanded, expandedKey);
   const isOpen = hasStoredState ? state.expanded[expandedKey] : !!defaultOpen;
+  const defaultHelpKey = id && id.startsWith('m3_physical') ? 'examen_fisico'
+    : id && id.startsWith('m4_paraclinicos') ? 'paraclinicos'
+    : id && id.startsWith('m2_') ? 'antecedentes'
+    : '';
   return `<details class="accordion" ${isOpen ? 'open' : ''}
     ontoggle="markExpanded('${esc(expandedKey)}',this.open)">
-    <summary>${hcrModuleTitle(title)}</summary>
+    <summary>${hcrModuleTitle(title, defaultHelpKey || undefined)}</summary>
     <div class="accordion-body">
       ${renderFindingList(items)}
     </div>
@@ -82,10 +94,13 @@ function expandablePatientItem(item) {
   const detail = item.expandable;
   const detailId = 'exp_' + item.id;
   const detailSel = detail ? isSelected(detail.id) : false;
+  const termButton = hcrTermButtons(item.termIds, item.text, true);
+  const detailTermButton = detail ? hcrTermButtons(detail.termIds, detail.patient, true) : '';
   return `<details class="expandable-finding" ${state.expanded[detailId] ? 'open' : ''}
     ontoggle="markExpanded('${detailId}',this.open)">
     <summary>
-      <span class="patient-text">${hcrTextWithTerm(item.text)}</span>
+      <span class="patient-text">${hcrFindingText(item.text)}</span>
+      ${termButton}
       <input class="patient-check finding-check" type="checkbox"
         data-id="${esc(item.id)}" data-source="${esc(item.source)}" data-text="${esc(item.text)}"
         ${sel ? 'checked' : ''}
@@ -97,18 +112,19 @@ function expandablePatientItem(item) {
         <input class="finding-check" type="checkbox"
           data-id="${esc(detail.id)}" data-source="${esc(item.source)}" data-text="${esc(detail.patient)}"
           ${detailSel ? 'checked' : ''}>
-        <span class="fact-label">Paciente: ${hcrTextWithTerm(detail.patient)}</span>
+        <span class="fact-label">Paciente: ${hcrFindingText(detail.patient)}</span>
+        ${detailTermButton}
       </label>
     </div>
   </details>`;
 }
 
-function findingItem(item) {
-  return item.expandable ? expandablePatientItem(item) : choice(item.id, item.source, item.text);
+function findingItem(item, showEye = true) {
+  return item.expandable ? expandablePatientItem(item) : choice(item.id, item.source, item.text, item.termIds, showEye);
 }
 
 function renderFindingList(items) {
-  return items.map(item => findingItem(item)).join('');
+  return items.map(item => findingItem(item, true)).join('');
 }
 
 function renderAccordionGroup(sections, keyPrefix) {
@@ -130,10 +146,10 @@ function labRow(item) {
     <td><input class="lab-check finding-check" type="checkbox"
       data-id="${esc(item.id)}" data-source="${esc(item.source)}" data-text="${esc(txt)}"
       ${sel ? 'checked' : ''}></td>
-    <td>${esc(item.label)}${hcrTermForText(txt)}</td>
+    <td>${esc(item.label)}</td>
     <td>${esc(item.value)}</td>
     <td>${esc(item.unit)}</td>
-    <td>${esc(item.ref)}</td>
+    <td><span class="lab-ref-text">${esc(item.ref)}</span>${hcrTermButtons(item.termIds, txt, true)}</td>
   </tr>`;
 }
 
@@ -569,9 +585,9 @@ function renderM1() {
           <div class="section-title">${hcrModuleTitle('Triage')}</div>
           <div class="patient-identity">
             <b>${esc(CASE_DATA.patient.name)}</b> · ${esc(CASE_DATA.patient.age)} · ${esc(CASE_DATA.patient.sex)}<br>
-            <span style="color:var(--muted)">${hcrModuleTitle('Motivo de consulta', 'motivo_consulta')}: ${esc(CASE_DATA.patient.reason)}</span>
+            <span class="patient-reason-line" style="color:var(--muted)">${hcrModuleTitle('Motivo de consulta: ' + CASE_DATA.patient.reason, 'motivo_consulta')}</span>
           </div>
-          ${d.triage.map(f => choice(f.id, f.source, f.text)).join('')}
+          ${d.triage.map(f => findingItem(f, false)).join('')}
         </div>
       </div>
       <div class="conversation-panel">

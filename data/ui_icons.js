@@ -1,5 +1,5 @@
 window.HCR_UI_ICONS = {
-  moduleHelp: "brain",
-  clinicalTerm: "eye",
-  expertExplanation: "book"
+  ayudaModulo: "brain",
+  terminoClinico: "eye",
+  explicacionExperta: "book"
 };

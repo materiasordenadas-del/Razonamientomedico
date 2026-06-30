@@ -11,6 +11,10 @@ window.HCR_MODULE_HELP = {
         body: "Permite convertir datos sueltos en una representacion clinica coherente antes de elegir diagnosticos."
       },
       {
+        heading: "Como debe abordarlo el estudiante",
+        body: "Ordena los sintomas en el tiempo, separa datos positivos y negativos, y escribe solo lo que el paciente aporta."
+      },
+      {
         heading: "Errores frecuentes",
         bullets: [
           "Escribir diagnosticos antes de describir lo que ocurrio.",
@@ -30,6 +34,10 @@ window.HCR_MODULE_HELP = {
       {
         heading: "Por que importa",
         body: "Define el punto de partida del razonamiento y ayuda a priorizar problemas urgentes."
+      },
+      {
+        heading: "Como debe abordarlo el estudiante",
+        body: "Identifica el sintoma o problema principal y evita convertirlo en un diagnostico antes de tener datos suficientes."
       },
       {
         heading: "Errores frecuentes",
@@ -53,6 +61,10 @@ window.HCR_MODULE_HELP = {
         body: "Ayuda a organizar las decisiones diagnosticas y terapeuticas sin cerrar prematuramente el caso."
       },
       {
+        heading: "Como debe abordarlo el estudiante",
+        body: "Elige la hipotesis que mejor integre los hallazgos y mantenla abierta a cambios si aparecen datos nuevos."
+      },
+      {
         heading: "Errores frecuentes",
         bullets: [
           "Elegir una enfermedad solo por un dato aislado.",
@@ -72,6 +84,10 @@ window.HCR_MODULE_HELP = {
       {
         heading: "Por que importa",
         body: "Mantiene abierto el razonamiento y evita depender de una sola explicacion."
+      },
+      {
+        heading: "Como debe abordarlo el estudiante",
+        body: "Incluye alternativas que expliquen datos importantes y compara que hallazgos las apoyan o las reducen."
       },
       {
         heading: "Errores frecuentes",
@@ -95,6 +111,10 @@ window.HCR_MODULE_HELP = {
         body: "Protege al paciente de errores por cierre prematuro cuando existe riesgo alto."
       },
       {
+        heading: "Como debe abordarlo el estudiante",
+        body: "Piensa en condiciones graves que no puedes pasar por alto y busca datos que aumenten o reduzcan su riesgo."
+      },
+      {
         heading: "Errores frecuentes",
         bullets: [
           "Elegir solo diagnosticos raros sin relacion con el caso.",
@@ -114,6 +134,10 @@ window.HCR_MODULE_HELP = {
       {
         heading: "Por que importan",
         body: "Ayudan a ajustar el razonamiento al contexto real del paciente."
+      },
+      {
+        heading: "Como debe abordarlo el estudiante",
+        body: "Selecciona antecedentes que cambien riesgo, interpretacion del cuadro o seguridad del manejo."
       },
       {
         heading: "Errores frecuentes",
@@ -137,6 +161,10 @@ window.HCR_MODULE_HELP = {
         body: "Permite estimar gravedad, localizar sistemas comprometidos y decidir que estudios o manejo son necesarios."
       },
       {
+        heading: "Como debe abordarlo el estudiante",
+        body: "Relaciona cada signo con una pregunta clinica concreta y no lo interpretes aislado del contexto."
+      },
+      {
         heading: "Errores frecuentes",
         bullets: [
           "Seleccionar signos sin interpretar su relevancia.",
@@ -156,6 +184,10 @@ window.HCR_MODULE_HELP = {
       {
         heading: "Por que importan",
         body: "Pueden confirmar, descartar, estratificar gravedad o revelar complicaciones."
+      },
+      {
+        heading: "Como debe abordarlo el estudiante",
+        body: "Interpreta cada resultado segun la pregunta clinica, el momento del caso y los hallazgos previos."
       },
       {
         heading: "Errores frecuentes",
