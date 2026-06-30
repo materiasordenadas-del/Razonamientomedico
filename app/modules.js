@@ -72,7 +72,7 @@ function conversationBlock(item) {
   </div>`;
 }
 
-function accordion(title, items, id, defaultOpen) {
+function accordion(title, items, id, defaultOpen, extraContent = '') {
   const expandedKey = id || 'accordion_' + title;
   const hasStoredState = Object.prototype.hasOwnProperty.call(state.expanded, expandedKey);
   const isOpen = hasStoredState ? state.expanded[expandedKey] : !!defaultOpen;
@@ -84,6 +84,7 @@ function accordion(title, items, id, defaultOpen) {
     ontoggle="markExpanded('${esc(expandedKey)}',this.open)">
     <summary>${hcrModuleTitle(title, defaultHelpKey || undefined)}</summary>
     <div class="accordion-body">
+      ${extraContent}
       ${renderFindingList(items)}
     </div>
   </details>`;
@@ -133,8 +134,59 @@ function renderAccordionGroup(sections, keyPrefix) {
   ).join('');
 }
 
+function physicalExamImageItem(item, idx, sectionTitle) {
+  const id = item.id || `physical_exam_image_${idx}`;
+  const title = item.title || item.label || 'Imagen de examen físico';
+  const image = item.image || item.src || '';
+  const description = item.description || item.caption || '';
+  const selectable = item.selectable === true;
+  const selected = selectable && isSelected(id);
+  const findingText = item.findingText || title;
+  return `<article class="physical-exam-image-card diagnostic-image-card${selected ? ' selected' : ''}">
+    <div class="diagnostic-image-head">
+      ${selectable
+        ? `<label class="diagnostic-image-select selectable${selected ? ' selected' : ''}">
+            <input class="finding-check" type="checkbox"
+              data-id="${esc(id)}" data-source="${esc(item.source || 'Examen físico')}" data-text="${esc(findingText)}"
+              ${selected ? 'checked' : ''}>
+            <span>${esc(title)}</span>
+          </label>`
+        : `<h3>${esc(title)}</h3>`}
+    </div>
+    <div class="diagnostic-image-media">
+      ${image
+        ? `<img class="diagnostic-image-img" src="${esc(image)}" alt="${esc(title)}" onerror="this.hidden=true;this.nextElementSibling.hidden=false">`
+        : ''}
+      <div class="diagnostic-image-empty" ${image ? 'hidden' : ''}>Sin imagen disponible para ${esc(sectionTitle || 'este sistema')}.</div>
+    </div>
+    ${description
+      ? `<details class="diagnostic-image-description">
+          <summary>Ver descripción</summary>
+          <p>${esc(description)}</p>
+        </details>`
+      : ''}
+  </article>`;
+}
+
+function renderPhysicalExamImages(section, idx) {
+  const images = section.images || section.media || section.physicalImages || [];
+  if (!Array.isArray(images) || !images.length) return '';
+  const title = section.title || section.name || '';
+  return `<div class="physical-exam-images">
+    ${images.map((item, imageIdx) => physicalExamImageItem(item, `${idx}_${imageIdx}`, title)).join('')}
+  </div>`;
+}
+
 function renderPhysicalExamSections(sections) {
-  return renderAccordionGroup(sections, 'm3_physical');
+  return (sections || []).map((section, idx) =>
+    accordion(
+      section.title || section.name,
+      section.items || section.findings || [],
+      `m3_physical_${idx}`,
+      false,
+      renderPhysicalExamImages(section, idx)
+    )
+  ).join('');
 }
 
 function labRow(item) {

@@ -63,7 +63,15 @@ window.HCR_CASE_MODULES.RC2.module3 = {
         { id:'f35', source:'Examen físico', text:'Sin estertores crepitantes ni sibilancias difusas' },
         { id:'f36', source:'Examen físico', text:'Sin roce pleural; percusión pulmonar sonoridad conservada bilateralmente' }
       ]},
-      { title:'Corazón', items:[
+      { title:'Corazón', images:[
+        {
+          id:'m3_corazon_imagen_ejemplo_sca',
+          title:'Imagen de ejemplo para examen fisico por sistema',
+          image:'cases/RC2/assets/physical/sca_ejemplo_examen_fisico.jpg',
+          description:'Imagen de ejemplo usada para probar el soporte visual dentro del examen fisico por sistemas. No corresponde necesariamente al caso.',
+          selectable:false
+        }
+      ], items:[
         { id:'f37', source:'Examen físico', text:'Ritmo regular, taquicárdico alrededor de 100 lpm' },
         { id:'f38', source:'Examen físico', text:'Ruidos cardíacos audibles, sin soplo nuevo ni galope evidente' },
         { id:'f39', source:'Examen físico', text:'Sin roce pericárdico a la auscultación en posición sentada e inclinada hacia adelante' }
