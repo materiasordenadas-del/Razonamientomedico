@@ -641,10 +641,10 @@ function renderM1() {
     <div class="m1-grid">
       <div class="triage-panel">
         <div class="card">
-          <div class="section-title">${hcrModuleTitle('Triage')}</div>
+          <div class="section-title">${hcrModuleTitle('Triage', 'motivo_consulta')}</div>
           <div class="patient-identity">
             <b>${esc(CASE_DATA.patient.name)}</b> · ${esc(CASE_DATA.patient.age)} · ${esc(CASE_DATA.patient.sex)}<br>
-            <span class="patient-reason-line" style="color:var(--muted)">${hcrModuleTitle('Motivo de consulta: ' + CASE_DATA.patient.reason, 'motivo_consulta')}</span>
+            <span class="patient-reason-line" style="color:var(--muted)">Motivo de consulta: ${esc(CASE_DATA.patient.reason)}</span>
           </div>
           ${d.triage.map(f => findingItem(f, false)).join('')}
         </div>
