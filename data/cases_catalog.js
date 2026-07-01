@@ -1,5 +1,5 @@
 window.HCR_CASES_CATALOG = {
-  version: "1.1.1",
+  version: "1.1.2",
   settings: { defaultPageSize: 24, pageSizeOptions: [12, 24, 48], defaultSort: "recommended", diagnosisPolicy: "hidden_until_module_7_evaluation" },
   filters: {
     symptoms: ["Disnea", "Dolor toracico", "Fiebre", "Fatiga", "Cefalea", "Dolor abdominal", "Mareo / Sincope", "Edema"],
@@ -35,6 +35,14 @@ window.HCR_CASES_CATALOG = {
       publicPresentation: "Paciente con dolor retroesternal de inicio reciente, acompanado de nauseas y sudor frio. Refiere episodios similares de menor intensidad durante el esfuerzo en los ultimos dias.",
       publicTags: { symptoms: ["Dolor toracico", "Disnea"], syndromes: ["Sindrome de dolor toracico agudo"], systems: ["Cardiovascular"], context: ["Urgencias", "Adulto", "Cuadro agudo"], keywords: ["dolor toracico", "presion en el pecho", "nauseas", "sudor frio", "dolor de esfuerzo", "urgencias"] },
       sort: { recommendedRank: 2, publishedAt: "2026-06-27" }
+    },
+    {
+      id: "RC3", route: "caso-RC3.html", availability: "Disponible", format: "Caso completo", modules: 8, difficulty: "Nivel 3", level: "Nivel III", collections: ["infectologia", "neurologia", "urgencias"],
+      patient: { displayName: "Andres R.", initials: "AR", age: 34, sex: "Masculino", setting: "Urgencias" },
+      chiefConcern: "Fiebre, cefalea intensa y confusion",
+      publicPresentation: "Paciente adulto joven con cuadro febril agudo, cefalea intensa, vomitos y dificultad para responder con claridad.",
+      publicTags: { symptoms: ["Fiebre", "Cefalea"], syndromes: ["Sindrome febril agudo"], systems: ["Infeccioso", "Neurologico"], context: ["Urgencias", "Adulto joven", "Cuadro agudo"], keywords: ["fiebre", "cefalea", "confusion", "vomitos", "fotofobia", "urgencias"] },
+      sort: { recommendedRank: 3, publishedAt: "2026-06-30" }
     }
   ]
 };
