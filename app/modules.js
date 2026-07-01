@@ -1458,15 +1458,15 @@ function expertData() {
 function allCaseFindings() {
   const out = [];
   (CASE_DATA.m1?.triage || []).forEach(item => out.push(item));
-  (CASE_DATA.m1?.dialogue || []).forEach(item => {
+  ([...(CASE_DATA.m1?.dialogue || []), ...(CASE_DATA.m1?.interrogatorio || [])]).forEach(item => {
     out.push(item);
     if (item.expandable) out.push({ ...item.expandable, source: item.source, text: item.expandable.patient });
   });
-  (CASE_DATA.m2?.history || []).forEach(section => (section.items || []).forEach(item => {
+  ([...(CASE_DATA.m2?.history || []), ...(CASE_DATA.m2?.historial || [])]).forEach(section => (section.items || []).forEach(item => {
     out.push(item);
     if (item.expandable) out.push({ ...item.expandable, source: item.source, text: item.expandable.patient });
   }));
-  (CASE_DATA.m2?.functional || []).forEach(section => (section.items || []).forEach(item => {
+  ([...(CASE_DATA.m2?.functional || []), ...(CASE_DATA.m2?.examenFuncional || [])]).forEach(section => (section.items || []).forEach(item => {
     out.push(item);
     if (item.expandable) out.push({ ...item.expandable, source: item.source, text: item.expandable.patient });
   }));
@@ -1625,11 +1625,23 @@ function module7Text(value, fallback) {
   return text || fallback;
 }
 
+const module7ModuleOrder = [
+  { key: 'm1', label: 'triaje', title: 'Triage e interrogatorio' },
+  { key: 'm2', label: 'historial', title: 'Historial y examen funcional' },
+  { key: 'm3', label: 'examen físico', title: 'Examen físico' },
+  { key: 'm4', label: 'paraclínicos', title: 'Paraclínicos' }
+];
+
+function module7TierStudentTextForModule(moduleKey) {
+  const labels = ['Diagnóstico principal', 'Diagnóstico secundario', 'Diagnóstico fatal'];
+  return [1,2,3].map((i, idx) => {
+    const diagnosis = diagnosisData(`tier_${moduleKey}_${i}`);
+    return diagnosis?.name ? `${labels[idx]}: ${diagnosis.name}` : '';
+  }).filter(Boolean).join('\n');
+}
+
 function module7TierStudentText() {
-  const items = currentTierItems()
-    .map(item => `${item.label}: ${item.diagnosis?.name || ''}`.trim())
-    .filter(item => !item.endsWith(':'));
-  return items.join('\n');
+  return module7TierStudentTextForModule(currentTierPrefix().replace('tier_', ''));
 }
 
 function module7ExpertSource() {
@@ -1755,6 +1767,78 @@ function module7RowsFromLegacyManagement() {
   }] : [];
 }
 
+function module7RowsFromSourceComparison(moduleKey, moduleData) {
+  const selectedIds = new Set(Object.keys(state.selected || {}));
+  const sourceComparison = moduleData?.sourceComparison || {};
+  const rows = [];
+
+  Object.entries(sourceComparison).forEach(([groupKey, group]) => {
+    const critical = new Set(group.criticalMisses || []);
+    const expectedIds = [...new Set([...(group.expectedSelected || []), ...(group.criticalMisses || [])])];
+    const explanation = group.rationale
+      ? { title: groupKey, question: '¿Por qué era importante?', body: [group.rationale] }
+      : null;
+
+    expectedIds.forEach(id => {
+      const selected = state.selected?.[id];
+      const text = selected?.text || findingTextById(id);
+      rows.push({
+        id: `${moduleKey}-${groupKey}-${id}`,
+        severity: critical.has(id) ? 'red' : 'yellow',
+        studentText: selectedIds.has(id) ? text : '',
+        expertText: text,
+        explanation
+      });
+    });
+
+    (group.lowValueIfSelected || []).forEach(id => {
+      if (!selectedIds.has(id)) return;
+      const selected = state.selected?.[id];
+      const text = selected?.text || findingTextById(id);
+      rows.push({
+        id: `${moduleKey}-${groupKey}-${id}-low`,
+        severity: 'green',
+        studentText: text,
+        expertText: `No prioritario: ${text}`,
+        explanation
+      });
+    });
+  });
+
+  const meta = module7ModuleOrder.find(item => item.key === moduleKey);
+  return rows.length ? [{
+    id: `${moduleKey}-findings`,
+    title: meta?.title || moduleData?.title || moduleKey,
+    type: 'hallazgos',
+    rows
+  }] : [];
+}
+
+function module7DataFromComparisonByModule(comparison) {
+  const pairedBlocks = [];
+  const sections = [];
+
+  module7ModuleOrder.forEach(meta => {
+    const moduleData = comparison?.[meta.key];
+    if (!moduleData) return;
+
+    pairedBlocks.push({
+      title: `Enfermedad actual ${meta.label}`,
+      student: state.fields[`ill_${meta.key}`] || '',
+      expert: moduleData.illnessActual?.expected || ''
+    });
+    pairedBlocks.push({
+      title: `Diagnósticos Tier 3 ${meta.label}`,
+      student: module7TierStudentTextForModule(meta.key),
+      expert: module7TierExpertText(moduleData.tier3)
+    });
+    sections.push(...module7RowsFromSourceComparison(meta.key, moduleData));
+  });
+
+  sections.push(...module7RowsFromLegacyManagement());
+  return { pairedBlocks, sections };
+}
+
 function module7LegacyData() {
   const latest = module7LatestExpertModule();
   return {
@@ -1774,6 +1858,9 @@ function module7LegacyData() {
 }
 
 function module7Data() {
+  const comparison = module7ExpertSource();
+  if (comparison) return module7DataFromComparisonByModule(comparison);
+
   const direct = CASE_DATA.module7Evaluation || expertData().module7Evaluation || null;
   if (!direct) return module7LegacyData();
   return {
@@ -1785,10 +1872,15 @@ function module7Data() {
 
 function module7RegisterExplanation(row) {
   const id = `m7-exp-${Object.keys(module7ExplanationStore).length + 1}`;
+  const body = Array.isArray(row.explanation?.body)
+    ? row.explanation.body
+    : row.expertNote
+      ? [row.expertNote]
+      : [];
   module7ExplanationStore[id] = {
     title: row.explanation?.title || row.expertText || 'Explicación',
     question: row.explanation?.question || '¿Por qué era importante?',
-    body: Array.isArray(row.explanation?.body) ? row.explanation.body : [],
+    body,
     bullets: Array.isArray(row.explanation?.bullets) ? row.explanation.bullets : [],
     closing: row.explanation?.closing || ''
   };
@@ -1803,18 +1895,42 @@ function module7BookIcon() {
 }
 
 function renderModule7PairedBlock(title, studentText, expertText) {
+  const isTierBlock = String(title || '').toLowerCase().includes('diagnósticos tier 3') ||
+    String(title || '').toLowerCase().includes('diagnosticos tier 3');
+  const studentContent = isTierBlock
+    ? renderModule7DiagnosisCards(studentText)
+    : `<div class="m7-free-text">${esc(module7Text(studentText, 'Sin respuesta registrada'))}</div>`;
+  const expertContent = isTierBlock
+    ? renderModule7DiagnosisCards(expertText)
+    : `<div class="m7-free-text">${esc(module7Text(expertText, 'Pendiente de contenido experto'))}</div>`;
   return `<div class="m7-card">
     <h2>${esc(title)}</h2>
     <div class="m7-pair">
       <div class="m7-pair-col">
         <div class="m7-col-title">Estudiante</div>
-        <div class="m7-free-text">${esc(module7Text(studentText, 'Sin respuesta registrada'))}</div>
+        ${studentContent}
       </div>
       <div class="m7-pair-col expert">
         <div class="m7-col-title">Experto</div>
-        <div class="m7-free-text">${esc(module7Text(expertText, 'Pendiente de contenido experto'))}</div>
+        ${expertContent}
       </div>
     </div>
+  </div>`;
+}
+
+function module7DiagnosisNames(value) {
+  return String(value || '').split(/\r?\n/)
+    .map(line => line.trim())
+    .filter(Boolean)
+    .map(line => line.includes(':') ? line.slice(line.indexOf(':') + 1).trim() : line)
+    .filter(Boolean);
+}
+
+function renderModule7DiagnosisCards(value) {
+  const diagnoses = module7DiagnosisNames(value);
+  if (!diagnoses.length) return '<div class="m7-dx-empty">Sin respuesta registrada</div>';
+  return `<div class="m7-dx-card">
+    ${diagnoses.map(name => `<strong>${esc(name)}</strong>`).join('')}
   </div>`;
 }
 
@@ -1832,7 +1948,6 @@ function renderModule7Row(row) {
       <span class="m7-severity ${severity}" aria-hidden="true"></span>
       <span class="m7-row-main">
         <span class="m7-row-text">${esc(expertText)}</span>
-        ${row.expertNote ? `<span class="m7-row-note">${esc(row.expertNote)}</span>` : ''}
       </span>
       <button class="m7-book-btn" type="button" onclick="openModule7Explanation('${explanationId}')" aria-label="Abrir explicación experta">
         ${module7BookIcon()}
@@ -1896,15 +2011,18 @@ function closeModule7Explanation() {
 function renderM7() {
   module7ExplanationStore = {};
   const data = module7Data();
+  const pairedBlocks = data.pairedBlocks || [
+    { title: 'Enfermedad actual', student: data.illnessComparison?.student, expert: data.illnessComparison?.expert },
+    { title: 'Tier 3 / Representación del problema', student: data.tier3Comparison?.student, expert: data.tier3Comparison?.expert }
+  ];
   return `<section class="module active">
     <div class="m7-header">
       <div class="m7-kicker">Módulo 7 · Evaluación experta</div>
-      <h1>Enfermedad actual y diagnóstico</h1>
+      <h1>Enfermedad actual y diagnósticos por etapa</h1>
       <p>Estudiante vs Experto</p>
     </div>
     <div class="m7-layout">
-      ${renderModule7PairedBlock('Enfermedad actual', data.illnessComparison?.student, data.illnessComparison?.expert)}
-      ${renderModule7PairedBlock('Tier 3 / Representación del problema', data.tier3Comparison?.student, data.tier3Comparison?.expert)}
+      ${pairedBlocks.map(block => renderModule7PairedBlock(block.title, block.student, block.expert)).join('')}
       ${(data.sections || []).length
         ? data.sections.map(renderModule7Section).join('')
         : '<div class="m7-card"><div class="m7-empty">No hay secciones comparativas disponibles para este caso.</div></div>'}
