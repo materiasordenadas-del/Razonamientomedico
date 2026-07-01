@@ -1,0 +1,31 @@
+{
+  "id": "RC4",
+  "caseId": "rc4_001",
+  "route": "caso-RC4.html",
+  "status": "Disponible",
+  "format": "Caso completo",
+  "modules": 8,
+  "difficulty": "Nivel 4",
+  "level": "Nivel IV",
+  "collections": [
+    "infectologia",
+    "cardiovascular",
+    "neurologia",
+    "urgencias"
+  ],
+  "public": {
+    "patient": {
+      "displayName": "Pablo M.",
+      "initials": "PM",
+      "age": 46,
+      "sex": "Masculino",
+      "setting": "Urgencias"
+    },
+    "chiefConcern": "Fiebre de semanas de evolución y dificultad súbita para hablar",
+    "presentation": "Paciente adulto con síndrome febril de varias semanas y déficit neurológico focal de instauración reciente, trasladado a urgencias por un familiar."
+  },
+  "assets": {
+    "directory": "assets/",
+    "status": "ready"
+  }
+}
