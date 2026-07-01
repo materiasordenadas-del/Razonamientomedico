@@ -36,6 +36,36 @@ function hcrFindingText(text) {
   return esc(text);
 }
 
+function hcrPatientInitials(patient) {
+  const explicit = patient?.initials || patient?.iniciales || '';
+  if (explicit) return esc(String(explicit).slice(0, 3).toUpperCase());
+  return esc(String(patient?.name || patient?.displayName || 'HC')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(part => part.charAt(0))
+    .join('')
+    .toUpperCase() || 'HC');
+}
+
+function hcrPatientAvatar() {
+  const metadata = window.HCR_CASE_ACTIVE_METADATA || {};
+  const patient = CASE_DATA.patient || {};
+  const visual = metadata.visual || metadata.paciente || {};
+  const fotoCircular = visual.fotoCircular || patient.fotoCircular || patient.photo || '';
+  const alt = patient.name ? `Foto de ${patient.name}` : 'Foto del paciente';
+  if (fotoCircular) {
+    return `<div class="hcr-patient-avatar" aria-hidden="true">
+      <img class="hcr-patient-avatar-img" src="${esc(fotoCircular)}" alt="${esc(alt)}"
+        onerror="this.hidden=true;this.nextElementSibling.hidden=false">
+      <span class="hcr-patient-avatar-fallback" hidden>${hcrPatientInitials(patient)}</span>
+    </div>`;
+  }
+  return `<div class="hcr-patient-avatar" aria-hidden="true">
+    <span class="hcr-patient-avatar-fallback">${hcrPatientInitials(patient)}</span>
+  </div>`;
+}
+
 function choice(id, source, text, termIds, showEye) {
   const sel = isSelected(id);
   const termButton = hcrTermButtons(termIds, text, showEye);
@@ -659,9 +689,11 @@ function renderM1() {
       <div class="triage-panel">
         <div class="card">
           <div class="section-title">${hcrModuleTitle('Triage', 'motivo_consulta')}</div>
-          <div class="patient-identity">
-            <b>${esc(CASE_DATA.patient.name)}</b> · ${esc(CASE_DATA.patient.age)} · ${esc(CASE_DATA.patient.sex)}<br>
-            <span class="patient-reason-line" style="color:var(--muted)">Motivo de consulta: ${esc(CASE_DATA.patient.reason)}</span>
+          <div class="patient-identity hcr-patient-identity">
+            ${hcrPatientAvatar()}
+            <div class="hcr-patient-identity-text">
+              <b>${esc(CASE_DATA.patient.name)}</b>
+            </div>
           </div>
           ${d.triage.map(f => findingItem(f, false)).join('')}
         </div>

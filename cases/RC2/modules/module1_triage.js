@@ -14,7 +14,8 @@ window.HCR_CASE_MODULES.RC2.module1 = {
   },
 
     triage: [
-      { id:'t01', source:'Triage', text:'Paciente femenina de 61 años' },
+      { id:'t01', source:'Triage', text:'Paciente femenina' },
+      { id:'t01_age', source:'Triage', text:'Edad 61 años' },
       { id:'t02', source:'Triage', text:'Procede de domicilio; llega acompañada por su esposo' },
       { id:'t03', source:'Triage', text:'Motivo de consulta: dolor torácico opresivo de inicio en reposo' },
       { id:'t04', source:'Triage', text:'Dolor actual 8/10, retroesternal, de 75 minutos de duración al llegar' },

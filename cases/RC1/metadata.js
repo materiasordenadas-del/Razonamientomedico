@@ -10,6 +10,9 @@ window.HCR_CASE_METADATA.RC1 = {
   tags: ["Fiebre", "Tos", "Disnea", "Sindrome respiratorio agudo", "Urgencias", "Adulto mayor", "Cuadro agudo"],
   author: "",
   lastUpdated: "2026-06-27",
+  visual: {
+    fotoCircular: ""
+  },
   supports: {
     images: false,
     audio: false,

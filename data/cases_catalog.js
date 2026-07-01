@@ -22,6 +22,7 @@ window.HCR_CASES_CATALOG = {
   cases: [
     {
       id: "RC1", route: "caso-RC1.html", availability: "Disponible", format: "Caso completo", modules: 8, difficulty: "Nivel 3", level: "Nivel III", collections: ["respiratorio", "infectologia", "urgencias"],
+      imagenPortada: "",
       patient: { displayName: "Jose Ramirez", initials: "JR", age: 68, sex: "Masculino", setting: "Urgencias" },
       chiefConcern: "Fiebre, tos y dificultad para respirar",
       publicPresentation: "Paciente adulto mayor con fiebre, tos y disnea de evolucion aguda. Acude al servicio de urgencias acompanado por un familiar.",
@@ -30,6 +31,7 @@ window.HCR_CASES_CATALOG = {
     },
     {
       id: "RC2", route: "caso-RC2.html", availability: "Disponible", format: "Caso completo", modules: 8, difficulty: "Nivel 3", level: "Nivel III", collections: ["cardiovascular", "urgencias"],
+      imagenPortada: "",
       patient: { displayName: "Elena M.", initials: "EM", age: 61, sex: "Femenino", setting: "Urgencias" },
       chiefConcern: "Dolor toracico opresivo con nauseas",
       publicPresentation: "Paciente con dolor retroesternal de inicio reciente, acompanado de nauseas y sudor frio. Refiere episodios similares de menor intensidad durante el esfuerzo en los ultimos dias.",

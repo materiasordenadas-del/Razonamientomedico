@@ -10,6 +10,9 @@ window.HCR_CASE_METADATA.RC2 = {
   tags: ["Dolor toracico", "Disnea", "Sindrome de dolor toracico agudo", "Urgencias", "Adulto", "Cuadro agudo"],
   author: "",
   lastUpdated: "2026-06-27",
+  visual: {
+    fotoCircular: ""
+  },
   supports: {
     images: false,
     audio: false,

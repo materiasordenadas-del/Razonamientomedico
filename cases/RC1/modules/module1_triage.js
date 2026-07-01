@@ -14,7 +14,8 @@ window.HCR_CASE_MODULES.RC1.module1 = {
   },
 
     triage: [
-      { id:'t01', source:'Triage', text:'Paciente masculino de 68 años' },
+      { id:'t01', source:'Triage', text:'Paciente masculino' },
+      { id:'t01_age', source:'Triage', text:'Edad 68 años' },
       { id:'t02', source:'Triage', text:'Procede de domicilio; llega acompañado por su hija' },
       { id:'t03', source:'Triage', text:'Motivo de consulta en admisión: “tos, fiebre y falta de aire”' },
       { id:'t04', source:'Triage', text:'Temperatura 38,9 °C' },

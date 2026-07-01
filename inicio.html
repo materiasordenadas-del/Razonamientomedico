@@ -9,167 +9,488 @@
 
     body {
       min-height: 100vh;
+      background: #f8faff;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: #1e293b;
       display: flex;
       flex-direction: column;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      height: 64px;
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+      box-shadow: 0 1px 6px rgba(0,0,0,.06);
+    }
+
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .topbar-logo-icon {
+      width: 36px;
+      height: 36px;
+      background: #2563eb;
+      border-radius: 9px;
+      display: flex;
       align-items: center;
       justify-content: center;
-      background: #0f1117;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      color: #e2e8f0;
-      padding: 2rem 1rem;
+      flex-shrink: 0;
     }
 
-    .container {
-      width: 100%;
-      max-width: 560px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2rem;
-    }
-
-    .brand {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .brand-mark {
-      font-size: 2.4rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      color: #a5b4fc;
-    }
-
-    .brand-divider {
-      width: 2rem;
-      height: 2px;
-      background: #2d3148;
-      border-radius: 2px;
-    }
-
-    .brand-title {
+    .topbar-logo {
       font-size: 1rem;
-      font-weight: 400;
-      color: #64748b;
-      letter-spacing: 0.04em;
-      text-align: center;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: #1e293b;
     }
 
-    .description {
-      font-size: 0.95rem;
-      line-height: 1.75;
+    .topbar-sub {
+      font-size: 0.72rem;
       color: #94a3b8;
-      text-align: center;
-      max-width: 480px;
+      font-weight: 400;
     }
 
-    .access-panel {
-      width: 100%;
-      background: #1a1d27;
-      border: 1px solid #2d3148;
-      border-radius: 10px;
-      padding: 2rem;
+    .topbar-nav {
       display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
+      align-items: center;
+      gap: 28px;
     }
 
-    .access-panel.hidden { display: none; }
+    .topbar-nav a {
+      font-size: 0.85rem;
+      color: #475569;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color .15s;
+    }
+
+    .topbar-nav a:hover { color: #2563eb; }
+
+    .topbar-auth {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topbar-session {
+      display: none;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topbar-session.visible { display: flex; }
+
+    .session-info {
+      font-size: 0.82rem;
+      color: #2563eb;
+      font-weight: 600;
+    }
 
     .btn {
-      display: block;
-      width: 100%;
-      padding: 0.75rem 1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.55rem 1.2rem;
       border: none;
-      border-radius: 7px;
-      font-size: 0.95rem;
-      font-weight: 500;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
       text-align: center;
       text-decoration: none;
       cursor: pointer;
-      transition: background 0.2s, opacity 0.2s;
-      letter-spacing: 0.02em;
+      transition: all 0.18s;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
     }
 
     .btn-primary {
-      background: #6366f1;
+      background: #2563eb;
       color: #fff;
+      box-shadow: 0 2px 8px rgba(37,99,235,.25);
     }
-    .btn-primary:hover { background: #4f46e5; }
+    .btn-primary:hover { background: #1d4ed8; box-shadow: 0 4px 12px rgba(37,99,235,.35); }
 
-    .btn-secondary {
-      background: #1e293b;
-      color: #a5b4fc;
-      border: 1px solid #2d3148;
-    }
-    .btn-secondary:hover { background: #263044; }
-
-    .secondary-text {
-      font-size: 0.8rem;
+    .btn-ghost {
+      background: transparent;
       color: #475569;
-      text-align: center;
-      line-height: 1.6;
+      border: 1px solid #cbd5e1;
     }
+    .btn-ghost:hover { border-color: #2563eb; color: #2563eb; background: #eff6ff; }
 
-    .session-panel {
-      width: 100%;
-      background: #1a1d27;
-      border: 1px solid #2d3148;
-      border-radius: 10px;
-      padding: 2rem;
-      display: none;
-      flex-direction: column;
-      gap: 0.75rem;
+    /* ── HERO ── */
+    .hero {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       align-items: center;
+      gap: 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 72px 48px 64px;
+      width: 100%;
     }
 
-    .session-panel.visible { display: flex; }
+    .hero-content {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
 
-    .session-label {
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      color: #2563eb;
+      text-transform: uppercase;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 999px;
+      padding: 4px 12px;
+      margin-bottom: 22px;
+    }
+
+    .hero-title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      color: #0f172a;
+      margin-bottom: 20px;
+    }
+
+    .hero-title span { color: #2563eb; }
+
+    .hero-description {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: #64748b;
+      max-width: 480px;
+      margin-bottom: 36px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .hero-actions .btn {
+      padding: 0.75rem 1.6rem;
+      font-size: 0.9rem;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 28px;
+      margin-top: 36px;
+      flex-wrap: wrap;
+    }
+
+    .hero-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .hero-stat-val {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .hero-stat-label {
+      font-size: 0.72rem;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    /* ── ILLUSTRATION ── */
+    .hero-illustration {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-illustration svg {
+      width: 100%;
+      max-width: 480px;
+      height: auto;
+      filter: drop-shadow(0 20px 48px rgba(37,99,235,.12));
+    }
+
+    /* ── FEATURES STRIP ── */
+    .features {
+      border-top: 1px solid #e2e8f0;
+      background: #fff;
+      display: flex;
+      justify-content: center;
+    }
+
+    .features-inner {
+      display: flex;
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    .feature {
+      flex: 1;
+      padding: 32px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border-right: 1px solid #e2e8f0;
+    }
+
+    .feature:last-child { border-right: none; }
+
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: #eff6ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 4px;
+    }
+
+    .feature-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .feature-desc {
       font-size: 0.78rem;
       color: #64748b;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
+      line-height: 1.65;
     }
 
-    .session-info {
-      font-size: 0.9rem;
-      color: #86efac;
+    /* ── FOOTER ── */
+    .footer {
+      text-align: center;
+      padding: 16px 24px;
+      font-size: 0.72rem;
+      color: #94a3b8;
+      border-top: 1px solid #e2e8f0;
+      background: #fff;
+    }
+
+    @media (max-width: 860px) {
+      .topbar { padding: 0 20px; }
+      .topbar-nav { display: none; }
+      .hero {
+        grid-template-columns: 1fr;
+        padding: 48px 20px 40px;
+        text-align: left;
+      }
+      .hero-illustration { order: -1; }
+      .hero-illustration svg { max-width: 320px; }
+      .feature { border-right: none; border-bottom: 1px solid #e2e8f0; }
+      .feature:last-child { border-bottom: none; }
+      .features-inner { flex-direction: column; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
 
-    <div class="brand">
-      <span class="brand-mark">H-CR</span>
-      <div class="brand-divider"></div>
-      <span class="brand-title">Razonamiento clínico estructurado</span>
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <a class="topbar-brand" href="#">
+      <div class="topbar-logo-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+        </svg>
+      </div>
+      <div>
+        <div class="topbar-logo">H-CR</div>
+        <div class="topbar-sub">Razonamiento clínico</div>
+      </div>
+    </a>
+
+    <nav class="topbar-nav">
+      <a href="#">Inicio</a>
+      <a href="index.html">Biblioteca</a>
+      <a href="#">Acerca de</a>
+    </nav>
+
+    <!-- Not logged in -->
+    <div class="topbar-auth" id="accessPanel">
+      <a class="btn btn-ghost" href="firebase-test.html?mode=login">Iniciar sesión</a>
+      <a class="btn btn-primary" href="firebase-test.html?mode=register">Crear cuenta</a>
     </div>
 
-    <p class="description">
-      H-CR es una plataforma de simulación clínica diseñada para entrenar la adquisición de datos,
-      la representación del problema, el diagnóstico diferencial y el manejo clínico mediante casos estructurados.
-    </p>
-
-    <div class="access-panel" id="accessPanel">
-      <a class="btn btn-primary" href="firebase-test.html?mode=login">Iniciar sesión</a>
-      <a class="btn btn-secondary" href="firebase-test.html?mode=register">Crear cuenta</a>
-    </div>
-
-    <div class="session-panel" id="sessionPanel">
-      <span class="session-label">Sesión activa</span>
+    <!-- Logged in -->
+    <div class="topbar-session" id="sessionPanel">
       <span class="session-info" id="sessionUser"></span>
-      <a class="btn btn-primary" href="index.html">Continuar a la biblioteca</a>
+      <a class="btn btn-primary" href="index.html">Ir a la biblioteca →</a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <main class="hero">
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="#2563eb"><circle cx="12" cy="12" r="10"/></svg>
+        Plataforma de aprendizaje clínico
+      </div>
+
+      <h1 class="hero-title">
+        Razonamiento<br>clínico <span>estructurado</span>
+      </h1>
+
+      <p class="hero-description">
+        H-CR entrena la adquisición de datos, el diagnóstico diferencial y el manejo clínico mediante casos progresivos y estructurados, diseñados para estudiantes de medicina.
+      </p>
+
+      <div class="hero-actions" id="heroActions">
+        <a class="btn btn-primary" href="firebase-test.html?mode=login">Iniciar sesión</a>
+        <a class="btn btn-ghost" href="firebase-test.html?mode=register">Crear cuenta gratis</a>
+      </div>
+      <div class="hero-actions" id="heroContinue" style="display:none">
+        <a class="btn btn-primary" href="index.html">Continuar a la biblioteca →</a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="hero-stat-val">10+</span>
+          <span class="hero-stat-label">Casos clínicos</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-val">5</span>
+          <span class="hero-stat-label">Sistemas médicos</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-val">7</span>
+          <span class="hero-stat-label">Módulos por caso</span>
+        </div>
+      </div>
     </div>
 
-    <p class="secondary-text">
-      La plataforma guarda tu progreso por caso para que puedas continuar tu razonamiento clínico donde lo dejaste.
-    </p>
+    <!-- Medical illustration (inline SVG) -->
+    <div class="hero-illustration">
+      <svg viewBox="0 0 480 400" xmlns="http://www.w3.org/2000/svg">
+        <!-- Background card -->
+        <rect x="40" y="20" width="400" height="360" rx="24" fill="#fff" stroke="#e2e8f0" stroke-width="1.5"/>
 
-  </div>
+        <!-- Header strip -->
+        <rect x="40" y="20" width="400" height="72" rx="24" fill="#2563eb"/>
+        <rect x="40" y="68" width="400" height="24" fill="#2563eb"/>
+
+        <!-- Avatar circle -->
+        <circle cx="120" cy="56" r="28" fill="#1d4ed8"/>
+        <circle cx="120" cy="48" r="12" fill="#bfdbfe"/>
+        <ellipse cx="120" cy="72" rx="18" ry="10" fill="#bfdbfe"/>
+
+        <!-- Doctor name text lines -->
+        <rect x="160" y="40" width="120" height="10" rx="5" fill="#bfdbfe" opacity=".8"/>
+        <rect x="160" y="58" width="80" height="8" rx="4" fill="#93c5fd" opacity=".6"/>
+
+        <!-- Stethoscope badge -->
+        <circle cx="392" cy="56" r="22" fill="#1d4ed8"/>
+        <path d="M384 50 Q385 60 392 62 Q399 60 400 50" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <circle cx="392" cy="64" r="4" fill="#fff"/>
+        <path d="M392 68 Q392 74 398 74" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <circle cx="400" cy="74" r="3" fill="none" stroke="#fff" stroke-width="1.5"/>
+
+        <!-- Content area -->
+        <!-- ECG line -->
+        <rect x="68" y="116" width="344" height="68" rx="12" fill="#f0f9ff"/>
+        <text x="84" y="132" font-family="Segoe UI,sans-serif" font-size="9" fill="#2563eb" font-weight="700" letter-spacing="1">ECG — MÓDULO 2</text>
+        <polyline points="84,158 100,158 108,138 116,172 124,148 132,158 148,158 160,158 168,144 176,165 182,158 200,158 216,158 224,145 232,168 238,158 260,158 276,158 284,143 292,168 298,158 344,158" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <!-- Vital signs row -->
+        <rect x="68" y="200" width="100" height="58" rx="10" fill="#f0fdf4"/>
+        <text x="84" y="218" font-family="Segoe UI,sans-serif" font-size="8" fill="#16a34a" font-weight="700">FC</text>
+        <text x="84" y="238" font-family="Segoe UI,sans-serif" font-size="20" fill="#15803d" font-weight="800">82</text>
+        <text x="84" y="252" font-family="Segoe UI,sans-serif" font-size="8" fill="#86efac">lpm</text>
+
+        <rect x="184" y="200" width="100" height="58" rx="10" fill="#fff7ed"/>
+        <text x="200" y="218" font-family="Segoe UI,sans-serif" font-size="8" fill="#ea580c" font-weight="700">PA</text>
+        <text x="196" y="238" font-family="Segoe UI,sans-serif" font-size="16" fill="#c2410c" font-weight="800">120/80</text>
+        <text x="200" y="252" font-family="Segoe UI,sans-serif" font-size="8" fill="#fdba74">mmHg</text>
+
+        <rect x="300" y="200" width="112" height="58" rx="10" fill="#fdf4ff"/>
+        <text x="316" y="218" font-family="Segoe UI,sans-serif" font-size="8" fill="#9333ea" font-weight="700">TEMP</text>
+        <text x="314" y="238" font-family="Segoe UI,sans-serif" font-size="20" fill="#7e22ce" font-weight="800">38.2</text>
+        <text x="316" y="252" font-family="Segoe UI,sans-serif" font-size="8" fill="#d8b4fe">°C</text>
+
+        <!-- Diagnosis section -->
+        <rect x="68" y="274" width="344" height="82" rx="12" fill="#fafafa" stroke="#e2e8f0" stroke-width="1"/>
+        <text x="84" y="292" font-family="Segoe UI,sans-serif" font-size="9" fill="#64748b" font-weight="700" letter-spacing=".5">DIAGNÓSTICO DIFERENCIAL</text>
+
+        <!-- Dx options -->
+        <rect x="84" y="300" width="180" height="14" rx="7" fill="#2563eb"/>
+        <text x="94" y="311" font-family="Segoe UI,sans-serif" font-size="8" fill="#fff" font-weight="600">Neumonía adquirida comunidad</text>
+
+        <rect x="84" y="320" width="130" height="14" rx="7" fill="#e2e8f0"/>
+        <text x="94" y="331" font-family="Segoe UI,sans-serif" font-size="8" fill="#64748b">Bronquitis aguda</text>
+
+        <rect x="84" y="340" width="100" height="14" rx="7" fill="#e2e8f0"/>
+        <text x="94" y="351" font-family="Segoe UI,sans-serif" font-size="8" fill="#64748b">Asma exacerbada</text>
+
+        <!-- Probability bars -->
+        <rect x="276" y="302" width="110" height="8" rx="4" fill="#dbeafe"/>
+        <rect x="276" y="302" width="88" height="8" rx="4" fill="#2563eb"/>
+        <text x="392" y="310" font-family="Segoe UI,sans-serif" font-size="7" fill="#2563eb" font-weight="700">80%</text>
+
+        <rect x="276" y="322" width="110" height="8" rx="4" fill="#e2e8f0"/>
+        <rect x="276" y="322" width="44" height="8" rx="4" fill="#94a3b8"/>
+        <text x="392" y="330" font-family="Segoe UI,sans-serif" font-size="7" fill="#64748b">40%</text>
+
+        <rect x="276" y="342" width="110" height="8" rx="4" fill="#e2e8f0"/>
+        <rect x="276" y="342" width="24" height="8" rx="4" fill="#94a3b8"/>
+        <text x="392" y="350" font-family="Segoe UI,sans-serif" font-size="7" fill="#64748b">22%</text>
+      </svg>
+    </div>
+  </main>
+
+  <!-- FEATURES STRIP -->
+  <section class="features">
+    <div class="features-inner">
+      <div class="feature">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        </div>
+        <div class="feature-title">Adquisición de datos</div>
+        <div class="feature-desc">Interrogatorio guiado con síntomas reales y respuestas contextualizadas por caso.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        </div>
+        <div class="feature-title">Diagnóstico diferencial</div>
+        <div class="feature-desc">Construye hipótesis y jerarquiza diagnósticos con retroalimentación estructurada.</div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="feature-title">Progreso guardado</div>
+        <div class="feature-desc">Continúa cada caso donde lo dejaste. Tu razonamiento queda registrado por módulo.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    Diseñado por <strong>Adriel Pereira</strong> · Estudiante de Medicina, Universidad del Zulia · H-CR v3
+  </footer>
 
   <script type="module">
     import { onAuthStateChangedHCR } from "./firebase/auth.js";
@@ -177,6 +498,8 @@
     const accessPanel  = document.getElementById("accessPanel");
     const sessionPanel = document.getElementById("sessionPanel");
     const sessionUser  = document.getElementById("sessionUser");
+    const heroActions  = document.getElementById("heroActions");
+    const heroContinue = document.getElementById("heroContinue");
 
     function escapeHtml(value) {
       return String(value ?? "").replace(/[&<>"']/g, (c) => ({
@@ -187,12 +510,16 @@
     onAuthStateChangedHCR(({ user, profile }) => {
       if (user) {
         const name = profile?.usernameNormalized || "";
-        sessionUser.textContent = name ? `@${escapeHtml(name)}` : "";
-        accessPanel.classList.add("hidden");
+        sessionUser.textContent = name ? `@${escapeHtml(name)}` : escapeHtml(user.email || "");
+        accessPanel.style.display = "none";
         sessionPanel.classList.add("visible");
+        heroActions.style.display = "none";
+        heroContinue.style.display = "flex";
       } else {
-        accessPanel.classList.remove("hidden");
+        accessPanel.style.display = "flex";
         sessionPanel.classList.remove("visible");
+        heroActions.style.display = "flex";
+        heroContinue.style.display = "none";
       }
     });
   </script>
