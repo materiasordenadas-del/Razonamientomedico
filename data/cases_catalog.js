@@ -1,5 +1,5 @@
 window.HCR_CASES_CATALOG = {
-  version: "1.1.2",
+  version: "1.1.3",
   settings: { defaultPageSize: 24, pageSizeOptions: [12, 24, 48], defaultSort: "recommended", diagnosisPolicy: "hidden_until_module_7_evaluation" },
   filters: {
     symptoms: ["Disnea", "Dolor toracico", "Fiebre", "Fatiga", "Cefalea", "Dolor abdominal", "Mareo / Sincope", "Edema"],
@@ -43,6 +43,14 @@ window.HCR_CASES_CATALOG = {
       publicPresentation: "Paciente adulto joven con cuadro febril agudo, cefalea intensa, vomitos y dificultad para responder con claridad.",
       publicTags: { symptoms: ["Fiebre", "Cefalea"], syndromes: ["Sindrome febril agudo"], systems: ["Infeccioso", "Neurologico"], context: ["Urgencias", "Adulto joven", "Cuadro agudo"], keywords: ["fiebre", "cefalea", "confusion", "vomitos", "fotofobia", "urgencias"] },
       sort: { recommendedRank: 3, publishedAt: "2026-06-30" }
+    },
+    {
+      id: "RC4", route: "caso-RC4.html", availability: "Disponible", format: "Caso completo", modules: 8, difficulty: "Nivel 4", level: "Nivel IV", collections: ["infectologia", "cardiovascular", "neurologia", "urgencias"],
+      patient: { displayName: "Pablo M.", initials: "PM", age: 46, sex: "Masculino", setting: "Urgencias" },
+      chiefConcern: "Fiebre de semanas de evolucion y dificultad subita para hablar",
+      publicPresentation: "Paciente adulto con sindrome febril de varias semanas y deficit neurologico focal de instauracion reciente, trasladado a urgencias por un familiar.",
+      publicTags: { symptoms: ["Fiebre", "Fatiga", "Mareo / Sincope"], syndromes: ["Sindrome febril subagudo", "Deficit neurologico focal agudo"], systems: ["Infeccioso", "Cardiovascular", "Neurologico"], context: ["Urgencias", "Adulto", "Cuadro tiempo-dependiente"], keywords: ["fiebre", "fatiga", "lenguaje", "debilidad", "urgencias", "deficit focal"] },
+      sort: { recommendedRank: 4, publishedAt: "2026-07-01" }
     }
   ]
 };
