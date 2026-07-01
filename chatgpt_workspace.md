@@ -6,32 +6,49 @@
 
 No modificar por iniciativa propia la app H-CR, Constructor, organizador de imágenes, Firebase, diseño global, navegación, wrappers ni arquitectura. Solo crear contenido compatible con la versión vigente. Cualquier cambio técnico requiere propuesta previa y aprobación explícita de Adriel.
 
-## 2. Regla de sincronización con GitHub
+## 2. Sincronización técnica obligatoria con GitHub
 
-**Antes de crear, convertir o empaquetar cualquier RC nuevo, ChatGPT debe revisar GitHub y usar como plantilla la implementación más reciente de la rama de trabajo activa.**
+Antes de crear, convertir o empaquetar cada RC nuevo, revisar GitHub y tomar como referencia el caso más reciente de la rama activa, no wrappers históricos de `main`.
 
 Verificar siempre:
 
-1. El wrapper HTML más reciente (`caso-RC##.html`): scripts, orden y versiones `?v=`.
-2. La estructura modular más reciente en `cases/RC##/`:
-   - `metadata.js`;
-   - `modules/module1_triage.js` a `module7_evaluation.js`;
-   - `expert/expert_comparison.js`;
-   - `case_data.js` ensamblador.
-3. `data/cases_catalog.js` vigente.
-4. Cambios recientes de Codex que afecten módulos, renderizadores, ayudas, términos clínicos o assets.
+1. `caso-RC##.html`: scripts, orden, botón de biblioteca y versiones `?v=`.
+2. `cases/RC##/`: `metadata.js`, M1–M7, `expert/expert_comparison.js` y `case_data.js` ensamblador.
+3. `data/cases_catalog.js` y su versión.
+4. Cambios recientes de Codex que afecten ayudas, términos, renderizadores o assets.
 
-Nunca reutilizar wrappers de casos antiguos solo porque existen en `main`. La referencia técnica es el caso más actualizado en la rama activa, actualmente `module7-layout`, salvo que Adriel indique otra.
+La rama de referencia actual es `module7-layout`, salvo indicación posterior de Adriel.
 
-## 3. Principio clínico
+## 3. Baseline actual del wrapper RC (2026-07-01)
+
+El wrapper debe incorporar el patrón técnico actual:
+
+- `app/styles.css?v=16`
+- `app/core.js?v=3`
+- `app/modules.js?v=14`
+- `app/bootstrap.js?v=2`
+- `data/ui_icons.js?v=1`
+- `data/module_help.js?v=2`
+- `data/clinical_terms.js?v=2`
+- `app/help_system.js?v=2`
+- metadata, módulos M1–M7, experto y `case_data.js` del RC correspondiente.
+- botón de topbar para volver a `index.html`.
+
+Estas versiones son una línea base. Antes de cada caso hay que comprobar si GitHub ya las cambió.
+
+Nunca generar el wrapper antiguo con solo `styles?v=2`, `core?v=2` y `modules?v=2`.
+
+El paquete debe traer una entrada lista para `window.HCR_CASES_CATALOG.cases`. Al integrar, actualizar `data/cases_catalog.js` e incrementar la versión conforme a la convención vigente.
+
+## 4. Principio clínico
 
 > El caso es el profesor.
 
-Todo caso debe seguir una cadena causal: contexto → estructura → fisiología → fisiopatología → síntoma/signo → prueba → hipótesis → decisión.
+Todo caso debe seguir: contexto → estructura → fisiología → fisiopatología → síntoma/signo → prueba → hipótesis → decisión.
 
-Cada dato debe expresar fisiopatología, modificar diferencial, definir gravedad/manejo o aportar realismo sin contradicción. Antes de redactar, construir internamente cronología y Ficha experta bloqueada.
+Cada dato debe expresar fisiopatología, modificar diferencial, definir gravedad/manejo o aportar realismo sin contradicción. Antes de redactar, construir cronología y Ficha experta bloqueada.
 
-## 4. Niveles H-CR
+## 5. Niveles H-CR
 
 - Nivel I: fisiopatología aplicada.
 - Nivel II: enfermedad y semiología explicadas.
@@ -39,7 +56,7 @@ Cada dato debe expresar fisiopatología, modificar diferencial, definir gravedad
 - Nivel IV: presentación atípica o fase de complicación.
 - Nivel V: hasta cinco procesos activos; separar dominante, concurrentes, complicaciones, comorbilidades y conflictos terapéuticos.
 
-## 5. Caso ciego
+## 6. Caso ciego
 
 Hasta que Adriel juegue el caso, no revelar diagnóstico, microorganismo, hallazgo pivote, laboratorios, imágenes clave, manejo, rúbrica ni fuentes específicas.
 
@@ -47,7 +64,7 @@ Al exportar: `Caso H-CR exportado. [Descargar archivo]`
 
 Al integrar: `Caso integrado en GitHub.`
 
-## 6. Contenido interno obligatorio
+## 7. Contenido interno obligatorio
 
 Definir antes del archivo:
 
@@ -68,22 +85,17 @@ M7: `{}` visible; evaluación real en experto.
 
 La foto circular solo se asigna mediante `metadata.visual.fotoCircular`.
 
-## 7. Flujo estándar
+## 8. Flujo estándar
 
 1. Adriel solicita RC## con área, nivel, entorno y módulos.
 2. ChatGPT diseña el caso completo internamente.
 3. ChatGPT selecciona imágenes válidas desde catálogo maestro.
-4. ChatGPT entrega un único archivo fuente:
-
-```text
-RC##_caso_fuente_constructor.json
-```
-
+4. ChatGPT entrega `RC##_caso_fuente_constructor.json`.
 5. Adriel lo ejecuta en HCR Case Builder.
-6. Adriel devuelve el ZIP/carpeta resultante con `case.json`, assets, manifests y logs.
+6. Adriel devuelve el ZIP/carpeta con `case.json`, assets, manifests y logs.
 7. ChatGPT verifica assets, aplica rutas, genera el paquete modular vigente y lo integra en GitHub.
 
-## 8. Imágenes: regla estricta
+## 9. Imágenes: regla estricta
 
 Para cada imagen:
 
@@ -91,67 +103,47 @@ Para cada imagen:
 2. Validar en `indice_maestro.csv` modalidad, órgano, estado, hash y formato.
 3. Seleccionar solo `id_imagen` exacto como cadena, preservando ceros iniciales.
 4. Permitir únicamente `estado = util_movida`.
-5. Incluir `hash_sha256_esperado`, rol, `destinos_hcr` y metadatos visibles neutrales.
+5. Incluir hash esperado, rol, destinos H-CR y metadatos visibles neutrales.
 
-Nunca usar `revision_manual`, `descarte_revisar`, `duplicado_omitido`, fuzzy matching, sustitución automática, rutas locales como referencia, ni una imagen “parecida”.
+Nunca usar revisión manual, descarte, duplicados, fuzzy matching, sustitución automática, rutas locales como referencia, ni imágenes parecidas.
 
-Si no existe una imagen válida:
+Si no existe una imagen válida: diagnóstica obligatoria = no exportar; portada/triage opcional = fallback neutral; examen físico opcional = omitir.
 
-- diagnóstica obligatoria: no exportar;
-- portada/triage opcional: avatar o fallback neutral;
-- examen físico opcional: omitir.
+## 10. Contrato fuente mínimo
 
-## 9. Contrato fuente mínimo
+El JSON contiene: `schema_version`, `constructor`, `case`, `catalogo_biblioteca`, `metadata_json`, `metadata`, `modulos`, `experto`, `case_data`, `imagenes` y `validacion_autor`.
 
-El JSON debe contener:
+`imagenes` contiene solicitud, ID exacto, hash, rol, obligatoriedad, estado, `asset_relativo`, resultado, destinos y textos neutrales.
 
-```json
-{
-  "schema_version": "hcr_caso_fuente_constructor_v2",
-  "constructor": {},
-  "case": {},
-  "catalogo_biblioteca": {},
-  "metadata_json": {},
-  "metadata": {},
-  "modulos": {},
-  "experto": {},
-  "case_data": {},
-  "imagenes": [],
-  "validacion_autor": {}
-}
-```
+## 11. Responsabilidad del Constructor
 
-`imagenes` contiene solicitudes con `solicitud_id`, `id_imagen`, hash, rol, obligatoriedad, `asset_relativo`, `resultado_resolucion`, `destinos_hcr`, textos neutrales y `selectable`.
+El Constructor solo resuelve assets: ID exacto, estado/hash, copia sin mover y anonimización. No crea contenido clínico, JS, HTML ni GitHub.
 
-## 10. Responsabilidad del Constructor
-
-El Constructor solo resuelve assets. Debe leer `imagenes`, resolver ID exacto, validar estado/hash, copiar sin mover, anonimizar assets y actualizar solo estado/ruta de resolución. No crea contenido clínico, JS, HTML ni GitHub.
-
-## 11. Integración final
+## 12. Integración final
 
 Después del Constructor, ChatGPT debe:
 
 - verificar assets obligatorios;
-- aplicar `asset_relativo` a cada destino;
-- usar la estructura y versiones vigentes verificadas en GitHub;
-- generar `metadata.js`, módulos separados, experto, `case_data.js` ensamblador y `caso-RC##.html` conforme a la plantilla vigente;
+- aplicar rutas a destinos;
+- generar archivos siguiendo la plantilla vigente de GitHub;
 - ubicar assets por modalidad;
-- actualizar `data/cases_catalog.js` con presentación pública no diagnóstica;
-- no publicar `locked/`, rutas locales, hashes ni contenido experto visible.
+- actualizar catálogo y versión;
+- excluir del repositorio final `INSTRUCCIONES_PARA_CODEX.md`, `README.md`, manifests temporales, JSON temporal de catálogo, `locked/`, rutas locales, hashes y archivos intermedios.
 
-## 12. Checklist final
+## 13. Checklist final
 
 - [ ] Caso clínicamente coherente y cronología completa.
 - [ ] Sin spoilers públicos.
 - [ ] Imagen por ID exacto validado o fallback neutral.
 - [ ] Assets obligatorios resueltos.
-- [ ] Plantilla técnica vigente revisada en GitHub antes de generar archivos.
-- [ ] Wrapper, scripts y módulos copian la versión actual, no una versión histórica.
-- [ ] Catálogo actualizado sin duplicar entrada.
-- [ ] Ningún archivo sensible publicado.
+- [ ] Plantilla técnica vigente revisada en GitHub.
+- [ ] Wrapper contiene scripts, orden, versiones y botón de biblioteca actuales.
+- [ ] Paquete incluye metadata, M1–M7, experto y ensamblador actuales.
+- [ ] Catálogo actualizado y versionado.
+- [ ] No se incluyen auxiliares ni archivos sensibles.
 
 ## Historial
 
 - 2026-06-29: workspace creado.
 - 2026-06-30: consolidación de flujo clínico, Constructor e imágenes.
-- 2026-07-01: añadida regla obligatoria de sincronización con GitHub antes de construir casos; la plantilla técnica se toma de la rama activa, no de casos antiguos.
+- 2026-07-01: regla de sincronización con GitHub y baseline actual del wrapper RC añadidos.
