@@ -1,159 +1,109 @@
-# Workspace H-CR — Protocolo Operativo Compacto
+# Workspace H-CR — Protocolo Operativo
 
-> **Uso exclusivo de ChatGPT en este proyecto.** Este archivo guía la creación, ensamblaje e integración de casos H-CR. No es contenido para estudiantes ni documentación pública de la app.
+> Uso exclusivo de ChatGPT en este proyecto. Regula autoría clínica, assets, empaquetado e integración de casos. No es documentación pública ni contenido para estudiantes.
 
----
+## 1. Regla de alcance
 
-## 1. Alcance y separación obligatoria
+No modificar por iniciativa propia la app H-CR, Constructor, organizador de imágenes, Firebase, diseño global, navegación, wrappers ni arquitectura. Solo crear contenido compatible con la versión vigente. Cualquier cambio técnico requiere propuesta previa y aprobación explícita de Adriel.
 
-Este workspace regula solo el **contenido clínico del caso** y su ensamblaje:
+## 2. Regla de sincronización con GitHub
 
-- autoría clínica y pedagógica;
-- módulos M1–M7;
-- experto bloqueado;
-- caso ciego;
-- selección de imágenes desde el catálogo maestro;
-- JSON fuente para el Constructor;
-- conversión a paquete RC##;
-- publicación del caso en GitHub.
+**Antes de crear, convertir o empaquetar cualquier RC nuevo, ChatGPT debe revisar GitHub y usar como plantilla la implementación más reciente de la rama de trabajo activa.**
 
-No regula ni debe modificar por defecto:
+Verificar siempre:
 
-- diseño global, Firebase, login, hosting o navegación de la app;
-- motor farmacológico global;
-- app de organización de imágenes;
-- cambios de arquitectura técnica no necesarios para un caso.
+1. El wrapper HTML más reciente (`caso-RC##.html`): scripts, orden y versiones `?v=`.
+2. La estructura modular más reciente en `cases/RC##/`:
+   - `metadata.js`;
+   - `modules/module1_triage.js` a `module7_evaluation.js`;
+   - `expert/expert_comparison.js`;
+   - `case_data.js` ensamblador.
+3. `data/cases_catalog.js` vigente.
+4. Cambios recientes de Codex que afecten módulos, renderizadores, ayudas, términos clínicos o assets.
 
-**Regla:** contenido clínico y desarrollo general de la app son líneas distintas.
+Nunca reutilizar wrappers de casos antiguos solo porque existen en `main`. La referencia técnica es el caso más actualizado en la rama activa, actualmente `module7-layout`, salvo que Adriel indique otra.
 
----
-
-## 2. Principio clínico H-CR
+## 3. Principio clínico
 
 > El caso es el profesor.
 
-El estudiante debe poder recorrer una cadena causal:
+Todo caso debe seguir una cadena causal: contexto → estructura → fisiología → fisiopatología → síntoma/signo → prueba → hipótesis → decisión.
 
-> contexto → anatomía/estructura → fisiología normal → fisiopatología → síntoma/signo → paraclínico → hipótesis → decisión.
+Cada dato debe expresar fisiopatología, modificar diferencial, definir gravedad/manejo o aportar realismo sin contradicción. Antes de redactar, construir internamente cronología y Ficha experta bloqueada.
 
-Cada dato del caso debe cumplir al menos una función:
+## 4. Niveles H-CR
 
-1. expresar fisiopatología;
-2. modificar diferencial;
-3. definir gravedad o manejo;
-4. aportar realismo sin contradicción.
+- Nivel I: fisiopatología aplicada.
+- Nivel II: enfermedad y semiología explicadas.
+- Nivel III: caso clínico completo.
+- Nivel IV: presentación atípica o fase de complicación.
+- Nivel V: hasta cinco procesos activos; separar dominante, concurrentes, complicaciones, comorbilidades y conflictos terapéuticos.
 
-Antes de redactar módulos, construir internamente una cronología completa y una Ficha experta bloqueada.
+## 5. Caso ciego
 
----
+Hasta que Adriel juegue el caso, no revelar diagnóstico, microorganismo, hallazgo pivote, laboratorios, imágenes clave, manejo, rúbrica ni fuentes específicas.
 
-## 3. Niveles de complejidad
+Al exportar: `Caso H-CR exportado. [Descargar archivo]`
 
-- **Nivel I:** fisiopatología aplicada; no requiere diagnóstico completo.
-- **Nivel II:** enfermedad y semiología explicadas; mecanismo → manifestación → prueba.
-- **Nivel III:** caso clínico completo y razonamiento estándar.
-- **Nivel IV:** presentación atípica **o** fase de complicación. No usar “presentación diferente”.
-- **Nivel V:** paciente complejo con hasta cinco procesos activos. Separar diagnóstico dominante, diagnósticos concurrentes, complicaciones, comorbilidades y conflictos terapéuticos.
+Al integrar: `Caso integrado en GitHub.`
 
-La complejidad se aumenta con incertidumbre, superposición, riesgo, atipia, priorización y conflicto terapéutico; nunca con datos aleatorios.
+## 6. Contenido interno obligatorio
 
----
+Definir antes del archivo:
 
-## 4. Política de caso ciego
+- diagnóstico principal, Top 3 y diagnóstico no perder;
+- síndrome dominante, cronología y gravedad;
+- positivos, negativos relevantes, distractores y pivotes;
+- sesgos cognitivos;
+- evaluación experta y manejo experto;
+- imágenes estrictamente necesarias.
 
-Mientras Adriel no haya jugado el caso, ChatGPT no debe revelar en el chat:
+M1: triage y motivo en lenguaje del paciente.  
+M2: historia cronológica y dirigida.  
+M3: examen físico dirigido.  
+M4: paraclínicos plausibles y assets reales congruentes.  
+M5: `{}` visible; razonamiento en experto.  
+M6: existe, visible y neutral; manejo correcto en experto.  
+M7: `{}` visible; evaluación real en experto.
 
-- diagnóstico, diferenciales o diagnóstico no perder;
-- signos vitales, laboratorios o hallazgo pivote;
-- microorganismos, interpretación de imagen, ECG, RX, TC u otra prueba clave;
-- manejo correcto, respuesta experta, rúbrica o fuentes del caso;
-- nombres de archivos que revelen patología.
+La foto circular solo se asigna mediante `metadata.visual.fotoCircular`.
 
-Al exportar el caso fuente, responder solo:
+## 7. Flujo estándar
 
-```text
-Caso H-CR exportado.
-[Descargar archivo]
-```
-
-Al publicar la versión final, responder solo:
-
-```text
-Caso integrado en GitHub.
-```
-
----
-
-## 5. Diseño clínico interno obligatorio
-
-Antes de crear cualquier archivo, ChatGPT debe definir internamente:
-
-- diagnóstico principal;
-- Top 3 y diagnóstico no perder;
-- nivel H-CR;
-- síndrome dominante;
-- cronología patobiológica;
-- datos positivos, negativos relevantes y distractores plausibles;
-- datos pivote;
-- gravedad y acciones no demorables;
-- sesgos/trampas cognitivas;
-- evaluación experta;
-- imágenes realmente necesarias.
-
-### Calidad por módulo
-
-- **M1:** contexto, urgencia, triage y motivo de consulta en lenguaje del paciente; sin diagnóstico.
-- **M2:** historia cronológica, antecedentes y revisión por sistemas dirigida; positivos y negativos con función.
-- **M3:** examen físico dirigido; hallazgos útiles, normales relevantes y signos de gravedad.
-- **M4:** pruebas solicitables, resultados plausibles, unidades/referencias y estudios visuales solo si existe asset real congruente.
-- **M5:** visible como `{}`; razonamiento experto queda en `experto.comparisonByModule.m5`.
-- **M6:** siempre existe, pero visible y neutral: campos de escritura sin pistas terapéuticas específicas; manejo correcto queda en experto.
-- **M7:** visible como `{}`; evaluación real queda en experto.
-
-La foto circular de triage solo puede provenir de `metadata.visual.fotoCircular`; no duplicarla dentro de M1.
-
----
-
-## 6. Flujo definitivo de un caso
-
-### Fase A — Autoría clínica ciega: ChatGPT
-
-1. Adriel solicita RC## con restricciones generales: área, nivel, escenario, complejidad y módulos.
-2. ChatGPT diseña el caso completo internamente según las secciones 2–5.
-3. ChatGPT consulta el catálogo maestro solo cuando el caso requiere un recurso visual.
-4. ChatGPT genera un único archivo fuente:
+1. Adriel solicita RC## con área, nivel, entorno y módulos.
+2. ChatGPT diseña el caso completo internamente.
+3. ChatGPT selecciona imágenes válidas desde catálogo maestro.
+4. ChatGPT entrega un único archivo fuente:
 
 ```text
 RC##_caso_fuente_constructor.json
 ```
 
-5. ChatGPT no entrega un ZIP final antes de que el Constructor resuelva los assets.
+5. Adriel lo ejecuta en HCR Case Builder.
+6. Adriel devuelve el ZIP/carpeta resultante con `case.json`, assets, manifests y logs.
+7. ChatGPT verifica assets, aplica rutas, genera el paquete modular vigente y lo integra en GitHub.
 
-### Fase B — Constructor de Casos H-CR: usuario
+## 8. Imágenes: regla estricta
 
-6. Adriel entrega ese JSON al Constructor local, junto con biblioteca, catálogo maestro e índice técnico.
-7. El Constructor resuelve únicamente las imágenes declaradas, las copia con nombre anónimo y devuelve el mismo JSON enriquecido con rutas relativas.
-8. Adriel sube aquí la carpeta final del Constructor o el ZIP completo.
+Para cada imagen:
 
-### Fase C — Conversión e integración: ChatGPT
+1. Consultar `catalogo_maestro.csv`.
+2. Validar en `indice_maestro.csv` modalidad, órgano, estado, hash y formato.
+3. Seleccionar solo `id_imagen` exacto como cadena, preservando ceros iniciales.
+4. Permitir únicamente `estado = util_movida`.
+5. Incluir `hash_sha256_esperado`, rol, `destinos_hcr` y metadatos visibles neutrales.
 
-9. ChatGPT verifica assets, integra rutas en destinos declarados y genera el paquete RC## real.
-10. ChatGPT crea/actualiza archivos del caso, catálogo global y página HTML.
-11. ChatGPT publica en GitHub y responde solo: `Caso integrado en GitHub.`
+Nunca usar `revision_manual`, `descarte_revisar`, `duplicado_omitido`, fuzzy matching, sustitución automática, rutas locales como referencia, ni una imagen “parecida”.
 
----
+Si no existe una imagen válida:
 
-## 7. Contrato del archivo fuente para el Constructor
+- diagnóstica obligatoria: no exportar;
+- portada/triage opcional: avatar o fallback neutral;
+- examen físico opcional: omitir.
 
-Nombre obligatorio:
+## 9. Contrato fuente mínimo
 
-```text
-RC##_caso_fuente_constructor.json
-```
-
-Debe ser JSON UTF-8 estricto: comillas dobles, sin comentarios, sin trailing commas, IDs como cadenas y sin rutas locales como fuente de verdad.
-
-Estructura superior mínima:
+El JSON debe contener:
 
 ```json
 {
@@ -163,15 +113,7 @@ Estructura superior mínima:
   "catalogo_biblioteca": {},
   "metadata_json": {},
   "metadata": {},
-  "modulos": {
-    "module1_triage": {},
-    "module2_history": {},
-    "module3_physical": {},
-    "module4_diagnostics": {},
-    "module5_pause": {},
-    "module6_management": {},
-    "module7_evaluation": {}
-  },
+  "modulos": {},
   "experto": {},
   "case_data": {},
   "imagenes": [],
@@ -179,264 +121,37 @@ Estructura superior mínima:
 }
 ```
 
-Correspondencia posterior:
+`imagenes` contiene solicitudes con `solicitud_id`, `id_imagen`, hash, rol, obligatoriedad, `asset_relativo`, `resultado_resolucion`, `destinos_hcr`, textos neutrales y `selectable`.
 
-| Bloque fuente | Destino H-CR |
-|---|---|
-| `case` | `cases/RC##/case.json` |
-| `catalogo_biblioteca` | entrada en `data/cases_catalog.js` |
-| `metadata_json` | `cases/RC##/metadata.json` |
-| `metadata` | `cases/RC##/metadata.js` |
-| `modulos.*` | `cases/RC##/modules/*.js` |
-| `experto` | `cases/RC##/expert/expert_comparison.js` |
-| `case_data` | configuración de `cases/RC##/case_data.js` |
-| `imagenes` | entrada/salida del Constructor |
-| `validacion_autor` | validación interna; no se publica |
+## 10. Responsabilidad del Constructor
 
----
+El Constructor solo resuelve assets. Debe leer `imagenes`, resolver ID exacto, validar estado/hash, copiar sin mover, anonimizar assets y actualizar solo estado/ruta de resolución. No crea contenido clínico, JS, HTML ni GitHub.
 
-## 8. Imágenes: selección exacta desde el catálogo maestro
+## 11. Integración final
 
-### 8.1 Regla absoluta
+Después del Constructor, ChatGPT debe:
 
-Antes de incluir una imagen, ChatGPT debe revisar:
+- verificar assets obligatorios;
+- aplicar `asset_relativo` a cada destino;
+- usar la estructura y versiones vigentes verificadas en GitHub;
+- generar `metadata.js`, módulos separados, experto, `case_data.js` ensamblador y `caso-RC##.html` conforme a la plantilla vigente;
+- ubicar assets por modalidad;
+- actualizar `data/cases_catalog.js` con presentación pública no diagnóstica;
+- no publicar `locked/`, rutas locales, hashes ni contenido experto visible.
 
-1. `catalogo_maestro.csv` para selección clínica;
-2. `indice_maestro.csv` para validación técnica;
-3. opcionalmente `catalogo_maestro.txt` como consulta rápida.
+## 12. Checklist final
 
-La única referencia autoritativa para el Constructor es:
+- [ ] Caso clínicamente coherente y cronología completa.
+- [ ] Sin spoilers públicos.
+- [ ] Imagen por ID exacto validado o fallback neutral.
+- [ ] Assets obligatorios resueltos.
+- [ ] Plantilla técnica vigente revisada en GitHub antes de generar archivos.
+- [ ] Wrapper, scripts y módulos copian la versión actual, no una versión histórica.
+- [ ] Catálogo actualizado sin duplicar entrada.
+- [ ] Ningún archivo sensible publicado.
 
-```text
-id_imagen
-```
-
-Debe conservar ceros a la izquierda. No usar como referencia nombre, ruta, página, descripción parcial o apariencia presunta.
-
-### 8.2 Secuencia por imagen
-
-1. Definir el rol clínico/visual exacto.
-2. Buscar candidato en catálogo maestro.
-3. Validar en índice técnico: modalidad, órgano/región, descripción, hash y formato.
-4. Confirmar estado permitido.
-5. Escribir `id_imagen` exacto y `hash_sha256_esperado` en el JSON fuente.
-6. Si no existe recurso válido, no inventar ni sustituir.
-
-Solo está permitido:
-
-```text
-estado = util_movida
-```
-
-Nunca seleccionar:
-
-```text
-revision_manual
-descarte_revisar
-duplicado_omitido
-estado no aprobado
-```
-
-### 8.3 Si no existe una imagen válida
-
-- Imagen diagnóstica imprescindible: no exportar el caso todavía.
-- Foto de triage o portada no imprescindible: omitir solicitud y usar avatar/fondo neutral.
-- Imagen opcional de examen físico: no añadirla.
-- Nunca usar coincidencia parecida, revisión manual, descarte, duplicado o imagen diagnóstica generada.
-
-### 8.4 Roles válidos
-
-```text
-portada
-triage
-examen_fisico
-diagnostica_ecg
-diagnostica_rx
-diagnostica_ecografia
-diagnostica_tc
-diagnostica_rmc
-diagnostica_angiografia
-diagnostica_histologia
-diagnostica_otra
-audio_auscultacion
-documento_apoyo
-```
-
-### 8.5 Contrato mínimo de cada solicitud
-
-```json
-{
-  "solicitud_id": "img_triage_01",
-  "id_imagen": "000000",
-  "hash_sha256_esperado": "",
-  "rol": "triage",
-  "obligatoria": false,
-  "estado": "pendiente_resolucion",
-  "asset_relativo": null,
-  "resultado_resolucion": null,
-  "destinos_hcr": ["/metadata/visual/fotoCircular"],
-  "titulo_visible": "",
-  "alt_estudiante": "Retrato clínico neutral del paciente.",
-  "descripcion_visible": "",
-  "selectable": false
-}
-```
-
-`destinos_hcr` es una lista de JSON Pointer. El Constructor no la interpreta; ChatGPT la aplica después al convertir el paquete final.
-
-### 8.6 Reglas visuales
-
-- **Portada:** contexto, nunca diagnóstico; puede estar ausente.
-- **Triage:** foto circular neutral, congruente con edad/sexo/entorno; sin hallazgo específico. Si falta, avatar neutro.
-- **Examen físico:** solo cuando existe hallazgo visual que el estudiante deba observar; no decorativa.
-- **Diagnóstica:** debe coincidir exactamente con M4, título y descripción neutrales, sin contradicción con tabla/informe. Si es clave, `selectable: true`.
-
----
-
-## 9. Responsabilidad del Constructor
-
-El Constructor debe:
-
-- leer solo `imagenes`;
-- resolver cada `id_imagen` como cadena exacta;
-- validar `estado = util_movida`;
-- validar hash si se proporciona;
-- copiar, nunca mover ni borrar;
-- crear assets anónimos y deterministas, por ejemplo `asset_001.webp`;
-- actualizar solo `asset_relativo`, `resultado_resolucion` y `estado` de cada solicitud;
-- conservar intacto el resto del JSON;
-- crear `manifest_student.json`, `locked/`, log y faltantes.
-
-El Constructor no debe:
-
-- crear o interpretar contenido clínico;
-- elegir imágenes;
-- usar ranking, fuzzy matching o sustitución automática;
-- crear módulos JS, `case_data.js`, HTML o GitHub;
-- exponer rutas, hash, fuente, libro o hallazgos internos en modo estudiante.
-
-### Estado técnico actual
-
-La versión actual del Constructor usa `imagenes_requeridas` y puntaje semántico. Antes de usar este protocolo para nuevos casos finales, debe actualizarse al contrato anterior. Esa modificación técnica es un pendiente explícito, no una licencia para usar el flujo viejo como definitivo.
-
----
-
-## 10. Resultado que devuelve el Constructor
-
-Carpeta esperada:
-
-```text
-RC##/
-  case.json
-  manifest_student.json
-  assets/
-    asset_001.ext
-  locked/
-    manifest_admin_locked.json
-    source_map_locked.json
-  README.md
-  build_log.txt
-  missing_assets.txt   # solo si aplica
-```
-
-`case.json` debe conservar el archivo fuente y contener las solicitudes de `imagenes` enriquecidas con `asset_relativo` y estado de resolución.
-
-Adriel debe devolver el ZIP completo o, como mínimo, `case.json`, manifests, logs y todos los assets.
-
----
-
-## 11. Conversión a paquete H-CR y GitHub
-
-Después de recibir la salida del Constructor, ChatGPT debe:
-
-1. Verificar que no falte ningún asset obligatorio.
-2. Aplicar cada `asset_relativo` a sus `destinos_hcr`.
-3. Ubicar/copiar assets bajo la modalidad final:
-
-```text
-portada/triage        → cases/RC##/assets/images/
-examen físico         → cases/RC##/assets/physical/
-ECG                   → cases/RC##/assets/ecg/
-RX                    → cases/RC##/assets/xray/
-audio                 → cases/RC##/assets/audio/
-documento             → cases/RC##/assets/documents/
-laboratorio adjunto   → cases/RC##/assets/labs/
-```
-
-4. Generar:
-
-```text
-cases/RC##/case.json
-cases/RC##/metadata.json
-cases/RC##/metadata.js
-cases/RC##/modules/module1_triage.js
-cases/RC##/modules/module2_history.js
-cases/RC##/modules/module3_physical.js
-cases/RC##/modules/module4_diagnostics.js
-cases/RC##/modules/module5_pause.js
-cases/RC##/modules/module6_management.js
-cases/RC##/modules/module7_evaluation.js
-cases/RC##/expert/expert_comparison.js
-cases/RC##/case_data.js
-caso-RC##.html
-```
-
-5. Actualizar `data/cases_catalog.js` con una entrada pública no diagnóstica.
-6. Confirmar que `metadata`, `metadata_json` y catálogo no se contradigan.
-7. Confirmar que M4 declare `module4Media = module4.diagnosticImages` cuando corresponda.
-8. Publicar en GitHub sin exponer información de `locked/`.
-
----
-
-## 12. Validación antes de exportar e integrar
-
-### Antes de exportar el JSON fuente
-
-- [ ] ID, rutas públicas y `caseId` son coherentes.
-- [ ] Ficha experta y cronología completas internamente.
-- [ ] M1 no revela diagnóstico.
-- [ ] M2 y M3 liberan datos de forma progresiva.
-- [ ] M4 es fisiopatológicamente congruente.
-- [ ] M5 = `{}`; M6 existe y es neutral; M7 = `{}`.
-- [ ] Todos los IDs usados por experto existen en módulos.
-- [ ] Datos públicos no incluyen diagnóstico, microorganismo, hallazgo decisivo ni fuente específica.
-- [ ] Todas las imágenes tienen ID exacto válido, estado `util_movida`, hash compatible y destino válido.
-- [ ] No hay rutas locales ni nombres diagnósticos expuestos.
-
-### Después del Constructor
-
-- [ ] `case.json` contiene cada asset obligatorio resuelto.
-- [ ] No hay sustituciones semánticas ni assets ambiguos.
-- [ ] Assets copiados existen y tienen ruta relativa válida.
-- [ ] Destinos H-CR reciben la ruta correcta.
-- [ ] El paquete RC## contiene todos los archivos obligatorios.
-- [ ] El HTML carga los scripts del caso en orden compatible.
-- [ ] El catálogo global contiene una sola entrada pública no diagnóstica.
-- [ ] No se publica `locked/`, rutas locales, hashes, fuentes o contenido experto visible.
-
----
-
-## 13. Próximo trabajo técnico autorizado
-
-Antes del próximo caso definitivo, solicitar/crear una actualización mínima de `hcr_case_builder` para que:
-
-1. acepte `RC##_caso_fuente_constructor.json`;
-2. lea únicamente la lista top-level `imagenes`;
-3. resuelva `id_imagen` exacto sin fuzzy matching;
-4. valide `util_movida` y hash;
-5. preserve todos los bloques clínicos byte a byte;
-6. actualice solo campos de resolución;
-7. detenga el build si falla una imagen obligatoria;
-8. mantenga información sensible exclusivamente en `locked/`.
-
-No implementar cambios de UI o arquitectura general sin solicitud explícita.
-
----
-
-## Historial de cambios
+## Historial
 
 - 2026-06-29: workspace creado.
-- 2026-06-29: primer Manual Maestro clínico añadido.
-- 2026-06-30: consolidación compacta de las reglas clínicas, flujo de caso ciego y Contrato Maestro v2.
-- 2026-06-30: se reemplaza el flujo provisional de búsqueda semántica por la regla definitiva de imágenes con `id_imagen` exacto validado en catálogo maestro + índice técnico.
-- 2026-06-30: se declara pendiente la actualización del Constructor para cumplir el contrato v2 antes de nuevos casos finales.
+- 2026-06-30: consolidación de flujo clínico, Constructor e imágenes.
+- 2026-07-01: añadida regla obligatoria de sincronización con GitHub antes de construir casos; la plantilla técnica se toma de la rama activa, no de casos antiguos.
