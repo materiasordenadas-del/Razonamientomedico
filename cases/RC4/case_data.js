@@ -14,9 +14,9 @@
 
   window.HCR_CASE_ACTIVE_METADATA = metadata;
   window.CASE_DATA = {
-    storage: "hcr_rc4_v1",
-    caseId: "rc4_001",
-    title: "Caso clínico — fiebre y déficit neurológico focal",
+    storage: 'hcr_rc4_v1',
+    caseId: 'rc4_001',
+    title: 'Caso clínico — opresión torácica en reposo y diaforesis',
     patient,
     m1: module1,
     m2: modules.module2,

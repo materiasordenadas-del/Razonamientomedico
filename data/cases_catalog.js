@@ -39,12 +39,12 @@ window.HCR_CASES_CATALOG = {
       sort: { recommendedRank: 2, publishedAt: "2026-06-27" }
     },
     {
-      id: "RC4", route: "caso-RC4.html", availability: "Disponible", format: "Caso completo", modules: 8, difficulty: "Nivel 4", level: "Nivel IV", collections: ["infectologia", "cardiovascular", "neurologia", "urgencias"],
+      id: "RC4", route: "caso-RC4.html", availability: "Disponible", format: "Caso completo", modules: 8, difficulty: "Nivel 3", level: "Nivel III", collections: ["cardiovascular", "urgencias", "medicina-interna"],
       imagenPortada: "",
-      patient: { displayName: "Pablo M.", initials: "PM", age: 46, sex: "Masculino", setting: "Urgencias" },
-      chiefConcern: "Fiebre de semanas de evolucion y dificultad subita para hablar",
-      publicPresentation: "Paciente adulto con sindrome febril de varias semanas y deficit neurologico focal de instauracion reciente, trasladado a urgencias por un familiar.",
-      publicTags: { symptoms: ["Fiebre", "Fatiga", "Mareo / Sincope"], syndromes: ["Sindrome febril subagudo", "Deficit neurologico focal agudo"], systems: ["Infeccioso", "Cardiovascular", "Neurologico"], context: ["Urgencias", "Adulto", "Cuadro tiempo-dependiente"], keywords: ["fiebre", "fatiga", "lenguaje", "debilidad", "urgencias", "deficit focal"] },
+      patient: { displayName: "Mariana R.", initials: "MR", age: 59, sex: "Femenino", setting: "Urgencias" },
+      chiefConcern: "Opresión torácica en reposo y diaforesis",
+      publicPresentation: "Paciente adulta con opresión torácica progresiva, síntomas autonómicos y factores de riesgo cardiovascular que requiere razonamiento diagnóstico y manejo urgente.",
+      publicTags: { symptoms: ["Dolor torácico", "Náuseas", "Diaforesis"], syndromes: ["Síndrome de dolor torácico agudo"], systems: ["Cardiovascular"], context: ["Urgencias", "Adulto", "Dolor en reposo"], keywords: ["dolor torácico", "opresión", "diaforesis", "troponina", "electrocardiograma", "urgencias"] },
       sort: { recommendedRank: 4, publishedAt: "2026-07-01" }
     }
   ]
