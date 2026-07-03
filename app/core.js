@@ -639,6 +639,14 @@ function previousPhase(phase) {
   return idx > 0 ? phases[idx - 1] : null;
 }
 
+function problemFieldLabel(phase) {
+  return phase === 'm1' ? 'enfermedad actual' : 'representación del problema';
+}
+
+function problemFieldTitle(phase) {
+  return phase === 'm1' ? 'Enfermedad actual' : 'Representación del problema';
+}
+
 function copyPreviousIllness(phase) {
   const prev = previousPhase(phase);
   if (!prev) return;
@@ -646,13 +654,15 @@ function copyPreviousIllness(phase) {
   const from = 'ill_' + prev;
   const to = 'ill_' + phase;
   const previousText = state.fields[from] || '';
+  const previousLabel = problemFieldLabel(prev);
+  const targetLabel = problemFieldLabel(phase);
 
   if (!previousText) {
-    alert('No hay una enfermedad actual previa para cargar.');
+    alert(`No hay contenido previo de ${previousLabel} para cargar.`);
     return;
   }
 
-  if (state.fields[to] && !confirm('Ya existe una enfermedad actual escrita en este módulo. ¿Quieres reemplazarla por la versión anterior?')) {
+  if (state.fields[to] && !confirm(`Ya existe contenido escrito en este módulo para ${targetLabel}. ¿Quieres reemplazarlo por la versión anterior?`)) {
     return;
   }
 
@@ -704,6 +714,11 @@ function copyPreviousTier(phase) {
 
 function currentIllness() {
   return state.fields.ill_m4 || state.fields.ill_m3 || state.fields.ill_m2 || state.fields.ill_m1 || '';
+}
+
+function currentProblemPhase() {
+  if (['m1', 'm2', 'm3', 'm4'].includes(state.current)) return state.current;
+  return ['m4', 'm3', 'm2', 'm1'].find(phase => state.fields['ill_' + phase]) || 'm1';
 }
 
 function currentSyndrome() {
@@ -759,7 +774,10 @@ function renderPad() {
     </details>`;
   }).join('');
 
-  document.getElementById('padIllness').textContent = currentIllness() || 'Pendiente';
+  const padIllness = document.getElementById('padIllness');
+  const padIllnessTitle = padIllness?.previousElementSibling;
+  if (padIllnessTitle) padIllnessTitle.textContent = problemFieldTitle(currentProblemPhase());
+  padIllness.textContent = currentIllness() || 'Pendiente';
   document.getElementById('padSyndrome').textContent = currentSyndrome() || 'Pendiente';
   document.getElementById('padTier').innerHTML      = currentTierHTML();
 }
@@ -771,6 +789,7 @@ function phaseData(phase) {
   };
   const [ill, prefix] = map[phase] || ['',''];
   return {
+    label:   problemFieldTitle(phase),
     illness: state.fields[ill] || '',
     tiers:   [1,2,3].map(i => diagnosisDisplay(`${prefix}_${i}`))
   };
@@ -786,7 +805,7 @@ function studentEvalRows() {
     `<div class="eval-row">
       <div class="eval-label">${title}</div>
       <div class="eval-value">
-        <b>Enfermedad actual:</b> ${esc(d.illness || 'Pendiente')}<br>
+        <b>${esc(d.label)}:</b> ${esc(d.illness || 'Pendiente')}<br>
         <b>Tier 3:</b> ${esc(d.tiers.filter(Boolean).join(' · ') || 'Pendiente')}
       </div>
     </div>`
@@ -859,8 +878,13 @@ function exportSummary() {
     const a = d.selectedFindings.filter(f => f.source === s);
     out += `\n${s.toUpperCase()} (${a.length})\n` + a.map(f => '• ' + f.text).join('\n') + '\n';
   });
-  out += '\nENFERMEDAD ACTUAL Y DIAGNÓSTICOS\n';
-  Object.entries(d.fields).forEach(([k, v]) => { if (v) out += `${k}: ${v}\n`; });
+  out += '\nENFERMEDAD ACTUAL / REPRESENTACIÓN DEL PROBLEMA Y DIAGNÓSTICOS\n';
+  Object.entries(d.fields).forEach(([k, v]) => {
+    if (!v) return;
+    const illnessMatch = /^ill_(m[1-4])$/.exec(k);
+    const label = illnessMatch ? `${problemFieldTitle(illnessMatch[1])} ${illnessMatch[1].toUpperCase()}` : k;
+    out += `${label}: ${v}\n`;
+  });
   out += '\nPAUSA DIAGNÓSTICA\n';
   Object.entries(d.venn.placed).forEach(([id, p]) => {
     const f = d.selectedFindings.find(x => x.id === id);

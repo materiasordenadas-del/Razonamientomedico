@@ -1,5 +1,6 @@
 function hcrModuleHelpKeyForTitle(title) {
   const text = String(title || '').toLowerCase();
+  if (text.includes('representaci')) return 'representacion_problema';
   if (text.includes('enfermedad actual')) return 'enfermedad_actual';
   if (text.includes('motivo')) return 'motivo_consulta';
   if (text.includes('diagnóstico principal') || text.includes('diagnostico principal')) return 'diagnostico_principal';
@@ -12,7 +13,8 @@ function hcrModuleHelpKeyForTitle(title) {
 }
 
 function hcrFieldHelpKey(key, title) {
-  if (/^ill_m[1-4]$/.test(key)) return 'enfermedad_actual';
+  if (key === 'ill_m1') return 'enfermedad_actual';
+  if (/^ill_m[2-4]$/.test(key)) return 'representacion_problema';
   return hcrModuleHelpKeyForTitle(title);
 }
 
@@ -343,10 +345,11 @@ function renderDiagnosticImages(d) {
     const category = diagnosticImageCategory(item);
     (groups[category] = groups[category] || []).push(item);
   });
+  const categories = order.concat(Object.keys(groups).filter(category => !order.includes(category)));
   return `<div class="card diagnostic-images-section help-on-open">
     <h2>Imágenes diagnósticas</h2>
     <div class="diagnostic-images-grid">
-      ${order.filter(category => (groups[category] || []).length).map(category => {
+      ${categories.filter(category => (groups[category] || []).length).map(category => {
         const firstItem = (groups[category] || [])[0] || {};
         return `<details class="diagnostic-image-category">
           <summary>${hcrModuleTitle(category, diagnosticImageHelpId(firstItem, category))}</summary>
@@ -425,14 +428,21 @@ function tier(phase) {
 
 function phaseClose(phase) {
   const canLoadPrevious = ['m2', 'm3', 'm4'].includes(phase);
+  const summaryTitle = phase === 'm1' ? 'ENFERMEDAD ACTUAL' : 'REPRESENTACIÓN DEL PROBLEMA';
+  const summaryPlaceholder = phase === 'm1'
+    ? 'Sintetiza la enfermedad actual en una frase...'
+    : 'Integra la información acumulada en una representación breve del problema...';
+  const previousButtonLabel = phase === 'm2'
+    ? 'Comenzar con enfermedad actual previa'
+    : 'Cargar representación del problema previa';
   return `<div class="card">
     <h2>Síntesis de fase</h2>
     ${canLoadPrevious
       ? `<div class="footer-actions" style="justify-content:flex-start;border:0;margin:0 0 8px">
-          <button class="action light" onclick="copyPreviousIllness('${phase}')">Cargar enfermedad actual</button>
+          <button class="action light" onclick="copyPreviousIllness('${phase}')">${previousButtonLabel}</button>
         </div>`
       : ''}
-    ${field('ill_' + phase, 'ENFERMEDAD ACTUAL', 'Sintetiza la enfermedad actual en una frase…')}
+    ${field('ill_' + phase, summaryTitle, summaryPlaceholder)}
     <h3>Hipótesis diagnósticas (Tier 3)</h3>
     ${tier(phase)}
   </div>`;
@@ -1775,8 +1785,9 @@ function module7RowsFromSourceComparison(moduleKey, moduleData) {
   Object.entries(sourceComparison).forEach(([groupKey, group]) => {
     const critical = new Set(group.criticalMisses || []);
     const expectedIds = [...new Set([...(group.expectedSelected || []), ...(group.criticalMisses || [])])];
-    const explanation = group.rationale
-      ? { title: groupKey, question: '¿Por qué era importante?', body: [group.rationale] }
+    const explanationBody = group.rationale || group.expertNote || '';
+    const explanation = explanationBody
+      ? { title: groupKey, question: '¿Por qué era importante?', body: [explanationBody] }
       : null;
 
     expectedIds.forEach(id => {
@@ -1822,8 +1833,11 @@ function module7DataFromComparisonByModule(comparison) {
     const moduleData = comparison?.[meta.key];
     if (!moduleData) return;
 
+    const problemTitle = meta.key === 'm1'
+      ? `Enfermedad actual ${meta.label}`
+      : `Representación del problema ${meta.label}`;
     pairedBlocks.push({
-      title: `Enfermedad actual ${meta.label}`,
+      title: problemTitle,
       student: state.fields[`ill_${meta.key}`] || '',
       expert: moduleData.illnessActual?.expected || ''
     });
@@ -2012,13 +2026,13 @@ function renderM7() {
   module7ExplanationStore = {};
   const data = module7Data();
   const pairedBlocks = data.pairedBlocks || [
-    { title: 'Enfermedad actual', student: data.illnessComparison?.student, expert: data.illnessComparison?.expert },
+    { title: 'Enfermedad actual / representación del problema', student: data.illnessComparison?.student, expert: data.illnessComparison?.expert },
     { title: 'Tier 3 / Representación del problema', student: data.tier3Comparison?.student, expert: data.tier3Comparison?.expert }
   ];
   return `<section class="module active">
     <div class="m7-header">
       <div class="m7-kicker">Módulo 7 · Evaluación experta</div>
-      <h1>Enfermedad actual y diagnósticos por etapa</h1>
+      <h1>Enfermedad actual, representación del problema y diagnósticos por etapa</h1>
       <p>Estudiante vs Experto</p>
     </div>
     <div class="m7-layout">
@@ -2043,7 +2057,7 @@ function renderM8() {
     </div>
     <div class="card">
       <h2>Archivo de desempeño</h2>
-      <p>El JSON contiene: hallazgos seleccionados, profundizaciones, enfermedad actual por fase, Tier 3, Venn, modalidad de manejo y manejo registrado.</p>
+      <p>El JSON contiene: hallazgos seleccionados, profundizaciones, enfermedad actual o representación del problema por fase, Tier 3, Venn, modalidad de manejo y manejo registrado.</p>
       <div class="footer-actions" style="justify-content:flex-start;border:0">
         <button class="action"           onclick="exportPerformance()">Descargar mi desempeño JSON</button>
         <button class="action secondary" onclick="exportSummary()">Descargar resumen TXT</button>

@@ -18,6 +18,13 @@ window.HCR_MODULE_HELP = {
     "Ordena los sintomas en el tiempo, separa datos positivos y negativos, y escribe solo lo que el paciente aporta.",
     ["Escribir diagnosticos antes de describir lo ocurrido.", "No ordenar los eventos en el tiempo.", "Omitir progresion, intensidad o sintomas negativos relevantes."]
   ),
+  representacion_problema: hcrHelpEntry(
+    "Representación del problema",
+    "Integra la informacion acumulada hasta este modulo en una formulacion clinica breve y priorizada.",
+    "Permite actualizar el razonamiento a medida que aparecen datos nuevos, sin reescribir toda la enfermedad actual.",
+    "Parte de la sintesis previa, incorpora solo los nuevos datos que cambian el problema y deja clara la prioridad clinica actual.",
+    ["Copiar la enfermedad actual sin integrarla con los datos nuevos.", "Convertirla en una lista larga de hallazgos.", "Cerrar el diagnostico sin explicar por que el problema cambio."]
+  ),
   motivo_consulta: hcrHelpEntry(
     "Motivo de consulta",
     "Es la razon principal por la que el paciente busca atencion, expresada de forma breve y cercana a sus palabras.",

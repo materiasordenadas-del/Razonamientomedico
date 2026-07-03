@@ -2,27 +2,28 @@ window.HCR_CASE_EXPERT = window.HCR_CASE_EXPERT || {};
 
 window.HCR_CASE_EXPERT.RC4 = {
   expertEvaluation: {
-    evaluationSchemaVersion:'2.0',
+    evaluationSchemaVersion:'3.0',
 
     findings: {
       selectedExpected:[
-        't03','t04','t05','t06','t08','t10','t11','t12',
-        'i01','i02','i03','i04','i05','i06','i07','i09','i10','i11','i12',
+        't03','t04','t05','t06','t07','t09','t10',
+        'i01','i02','i03','i04','i04a','i05','i06','i07','i08','i09','i10','i11','i12','i13','i14','i14a','i15','i16','i17',
         'h01','h02','h03','h04','h05','h06','h09','h10','h11','h12','h13','h14','h15','h16','h19','h21','h23',
         'ef01','ef03','ef11','ef14','ef15','ef16','ef17','ef18','ef19','ef20','ef21','ef23','ef27','ef28','ef29','ef30','ef31',
         'f01','f02','f22','f28','f29','f34','f36','f37','f38','f40','f41','f42','f43','f44','f45','f53','f55','f58','f59',
-        'p01','p04','p05','p07','p09','p10','p11','p12','p13','p14','p15','p16','p18','p19','p21','p22','p23','p24','p25','p26','p27'
+        'p01','p04','p05','p07','p09','p10','p11','p12','p13','p14','p15','p16','p18','p19',
+        'ecg_inicial','ecg_recurrencia','radiografia_torax'
       ],
       missedImportant:[
-        't03','t04','t05','t08','t10','t12',
-        'i01','i02','i03','i04','i05','i06','i07','i09','i10','i11','i12',
-        'h01','h02','h03','h11','h12','h13','h15','h16','h19','h23',
+        't03','t04','t07','t09','t10',
+        'i01','i02','i05','i06','i07','i08','i09','i11','i12','i13','i14','i14a','i15','i16','i17',
+        'h01','h02','h03','h11','h12','h13','h14','h15','h16','h19','h23',
         'ef17','ef18','ef20','ef21','ef23','ef27','ef28','ef29','ef30',
-        'f22','f29','f34','f36','f37','f38','f40','f41','f43','f44','f53','f55','f58','f59',
-        'p13','p14','p15','p21','p22','p23','p24','p25','p26','p27'
+        'f02','f22','f29','f34','f36','f37','f38','f40','f41','f43','f44','f53','f58','f59',
+        'p13','p14','p15','ecg_inicial','ecg_recurrencia','radiografia_torax'
       ],
       lowValueSelected:[
-        't09','ef05','ef06','ef09','ef10','ef12','ef13','ef24','ef25','ef26',
+        't08','ef05','ef06','ef09','ef10','ef12','ef13','ef24','ef25','ef26',
         'f10','f11','f12','f13','f14','f15','f19','f20','f21','f25','f26','f27',
         'f31','f32','f33','f46','f47','f48','f49','f50','f51'
       ]
@@ -31,97 +32,141 @@ window.HCR_CASE_EXPERT.RC4 = {
     comparisonByModule: {
       m1: {
         title:'Módulo 1 — Triage e interrogatorio',
+        studentBinding:{
+          illnessField:'ill_m1',
+          tierFields:['tier_m1_1','tier_m1_2','tier_m1_3'],
+          sources:['Triage','Interrogatorio']
+        },
         sourceComparison:{
           triage:{
-            expectedSelected:['t03','t04','t05','t06','t08','t10','t11','t12'],
-            criticalMisses:['t03','t04','t05','t08','t10','t12'],
-            lowValueIfSelected:['t09'],
-            rationale:'Dolor opresivo retroesternal en reposo, diaforesis, náuseas, hipertensión y glucemia elevada configuran un síndrome de dolor torácico agudo con alta preocupación isquémica. La estabilidad hemodinámica no excluye un síndrome coronario agudo ni permite postergar ECG y troponinas seriadas.'
+            expectedSelected:['t03','t04','t05','t06','t07','t09','t10'],
+            criticalMisses:['t03','t04','t07','t09','t10'],
+            lowValueIfSelected:['t08'],
+            expertFindingIds:['t03','t04','t05','t06','t07','t09','t10'],
+            expertText:'Dolor torácico; PA 168/94 mmHg; FC 92 lpm; FR 20 rpm; SatO₂ 98%; glucemia capilar 224 mg/dL; diaforesis visible.',
+            expertNote:'El triage debe reconocer un síndrome de dolor torácico potencialmente isquémico y, a la vez, clasificar estabilidad inicial. La hipertensión y la hiperglucemia aumentan el riesgo y condicionan decisiones posteriores, pero no explican por sí solas el dolor. La saturación normal y la ausencia de compromiso de conciencia no descartan isquemia aguda; indican que el manejo inicial puede continuar con ECG, troponinas seriadas y monitorización sin retrasar la evaluación.'
           },
           interrogatorio:{
-            expectedSelected:['i01','i02','i03','i04','i05','i06','i07','i09','i10','i11','i12'],
-            criticalMisses:['i01','i02','i03','i04','i05','i06','i07','i09','i10','i11','i12'],
-            lowValueIfSelected:['i08'],
-            rationale:'La cronología esfuerzo → reposo, el carácter opresivo, irradiación, equivalentes autonómicos y factores de riesgo elevan de forma sustancial la probabilidad preprueba de isquemia aguda. Las preguntas dirigidas sobre dolor pleurítico, dolor transfixiante, déficit neurológico, tromboembolismo, sangrado y estimulantes no son relleno: condicionan el diferencial y la seguridad antitrombótica.'
+            expectedSelected:['i01','i02','i03','i04','i04a','i05','i06','i07','i08','i09','i10','i11','i12','i13','i14','i14a','i15','i16','i17'],
+            criticalMisses:['i01','i02','i04a','i05','i06','i07','i08','i09','i11','i12','i13','i14','i14a','i15','i16','i17'],
+            lowValueIfSelected:[],
+            expertFindingIds:['i01','i02','i04a','i05','i06','i07','i08','i09','i10','i11','i12','i13','i14','i14a','i15','i16','i17'],
+            expertText:'Inicio en reposo; dolor opresivo central; duración aproximada de 40 min; angina de esfuerzo previa; irradiación a mandíbula y hombro; diaforesis, náuseas y disnea; sin rasgos pleuríticos, mecánicos ni aórticos mayores; factores de riesgo y seguridad antitrombótica identificados.',
+            expertNote:'La cronología es el dato organizador: síntomas de esfuerzo que cedían con reposo y progresan a un episodio prolongado en reposo. Ese cambio no se debe resumir como “dolor de pecho”; señala inestabilidad isquémica. Las preguntas sobre respiración, palpación, inicio abrupto, espalda, síncope, focalidad y tromboembolismo no son relleno: buscan causas alternativas que cambiarían el uso de antitrombóticos. Identificar medicamentos, sangrado y alergias es parte del interrogatorio de seguridad, no una tarea administrativa posterior.'
           }
         },
         illnessActual:{
-          expected:'Mujer de 59 años con hipertensión, diabetes tipo 2, dislipidemia sin estatina, obesidad central, antecedente de tabaquismo y fuerte historia familiar de enfermedad coronaria prematura. Durante tres semanas presentó opresión retroesternal inducida por esfuerzo que cedía con reposo; en las últimas 12 horas evolucionó a dos episodios más intensos en reposo, con irradiación a mandíbula y hombro izquierdo, diaforesis, náuseas y disnea breve. Está hipertensa pero perfundida, normoxémica, sin choque, síncope, focalidad neurológica ni datos clínicos fuertes de disección o embolia pulmonar.',
-          essentialElements:['59 años','dolor opresivo retroesternal','progresión de esfuerzo a reposo','irradiación','diaforesis/náuseas','factores de riesgo aterosclerótico','antecedente familiar prematuro','estabilidad hemodinámica','cribado de aorta y embolia','riesgo de sangrado']
+          studentField:'ill_m1',
+          expected:'Mujer de 59 años con dolor torácico opresivo central, de aproximadamente 40 minutos, iniciado en reposo y precedido por tres semanas de episodios similares al esfuerzo que cedían al detenerse. Se asocia a irradiación a mandíbula y hombro izquierdo, diaforesis, náuseas y disnea breve. Llega hipertensa, normoxémica, vigil y sin datos de choque. Por el patrón clínico y los factores de riesgo conocidos, requiere descartar isquemia miocárdica aguda sin perder de vista causas aórticas y tromboembólicas.',
+          essentialElements:['edad y contexto','dolor opresivo central','progresión esfuerzo → reposo','duración prolongada','irradiación','síntomas autonómicos','estabilidad inicial','factores de riesgo','cribado de aorta y embolia','seguridad para antitrombóticos']
         },
         tier3:{
-          leader:{ diagnosis:'Síndrome coronario agudo sin elevación persistente del ST — sospecha inicial', rationale:'El patrón de angina creciente, episodios en reposo, síntomas autonómicos y carga aterosclerótica requiere tratar primero la posibilidad de isquemia miocárdica aguda.' },
-          alternative:{ diagnosis:'Lesión miocárdica aguda o infarto tipo 2 asociado a hipertensión no controlada', rationale:'La hipertensión puede causar desequilibrio oferta-demanda y elevación de troponina, pero aún no explica por sí sola la cronología anginosa y los cambios isquémicos que deben buscarse.' },
-          cannotMiss:{ diagnosis:'Síndrome aórtico agudo', rationale:'Aunque la probabilidad clínica inicial es menor, administrar antitrombóticos a una disección no reconocida puede ser catastrófico; debe valorarse explícitamente antes de asumir que todo dolor torácico es coronario.' }
+          studentFields:['tier_m1_1','tier_m1_2','tier_m1_3'],
+          expertText:'Principal: síndrome coronario agudo sin elevación persistente del ST, sospecha inicial. Alternativo: lesión miocárdica aguda o infarto tipo 2 asociado a hipertensión no controlada. No perder: síndrome aórtico agudo.',
+          leader:{ diagnosis:'Síndrome coronario agudo sin elevación persistente del ST — sospecha inicial', rationale:'La progresión de angina de esfuerzo a dolor en reposo con síntomas autonómicos en una paciente de alto riesgo exige tratar la isquemia aguda como hipótesis dominante hasta obtener ECG y troponinas.' },
+          alternative:{ diagnosis:'Lesión miocárdica aguda o infarto tipo 2 asociado a hipertensión no controlada', rationale:'La presión arterial elevada puede aumentar la demanda miocárdica, pero todavía no explica por sí sola el patrón temporal de angina. Debe mantenerse como alternativa, no convertirse en atajo diagnóstico.' },
+          cannotMiss:{ diagnosis:'Síndrome aórtico agudo', rationale:'Su probabilidad clínica inicial es menor, pero su omisión tendría consecuencias graves si se administran antitrombóticos. El interrogatorio debe buscar el fenotipo aórtico antes de automatizar el manejo coronario.' }
         }
       },
 
       m2: {
-        title:'Módulo 2 — Historial y examen funcional',
+        title:'Módulo 2 — Historial y revisión por sistemas',
+        studentBinding:{
+          illnessField:'ill_m2',
+          tierFields:['tier_m2_1','tier_m2_2','tier_m2_3'],
+          sources:['Historial','Examen funcional']
+        },
         sourceComparison:{
           historial:{
             expectedSelected:['h01','h02','h03','h04','h05','h06','h09','h10','h11','h12','h13','h14','h15','h16','h19','h21','h23'],
             criticalMisses:['h01','h02','h03','h11','h12','h13','h14','h15','h16','h19','h23'],
-            lowValueIfSelected:['h17','h18','h20','h22'],
-            rationale:'Diabetes, hipertensión, dislipidemia sin tratamiento efectivo, tabaquismo previo e historia familiar prematura son datos causales, no una lista administrativa. La función renal, el antecedente hemorrágico, la medicación real y la exposición a estimulantes condicionan directamente la elección y seguridad del manejo agudo.'
+            lowValueIfSelected:['h17','h18','h18a','h20','h22'],
+            expertFindingIds:['h01','h02','h03','h11','h12','h13','h14','h15','h16','h19','h23'],
+            expertText:'Hipertensión, diabetes, dislipidemia sin estatina, ex tabaquismo y antecedente familiar coronario prematuro; adherencia irregular; sin anticoagulantes, AINE crónicos, sangrado digestivo, alergias ni estimulantes.',
+            expertNote:'Los antecedentes no se suman como una lista; construyen un mecanismo de riesgo aterosclerótico. Diabetes, hipertensión, LDL no tratado, tabaquismo previo y familiar de primer grado con enfermedad precoz aumentan de forma acumulativa la probabilidad preprueba. La adherencia irregular y la suspensión de estatina no son datos sociales periféricos: explican prevención insuficiente. La ausencia de sangrado, alergias, anticoagulantes y nefropatía es crítica porque determina seguridad de antiagregación, anticoagulación y contraste.'
           },
           examenFuncional:{
             expectedSelected:['ef01','ef03','ef11','ef14','ef15','ef16','ef17','ef18','ef19','ef20','ef21','ef23','ef27','ef28','ef29','ef30','ef31'],
             criticalMisses:['ef17','ef18','ef20','ef21','ef23','ef27','ef28','ef29','ef30'],
             lowValueIfSelected:['ef05','ef06','ef09','ef10','ef12','ef13','ef24','ef25','ef26'],
-            rationale:'La progresión a dolor en reposo, los equivalentes anginosos y la ausencia de características pleuríticas, posicionales, reproducibles o transfixiantes refinan el fenotipo isquémico. Los negativos no excluyen por sí solos aorta o embolia; disminuyen su probabilidad y determinan que la evaluación adicional sea selectiva, no automática.'
+            expertFindingIds:['ef03','ef11','ef14','ef15','ef16','ef17','ef18','ef20','ef21','ef23','ef27','ef28','ef29','ef30'],
+            expertText:'Disminución de tolerancia al esfuerzo; opresión que progresa a reposo; irradiación mandibular; disnea breve, diaforesis y náuseas; sin fenotipo pleurítico, posicional, musculoesquelético, aórtico o tromboembólico dominante.',
+            expertNote:'La revisión por sistemas debe refinar la hipótesis, no repetir el interrogatorio. Los equivalentes anginosos sostienen isquemia, mientras que la ausencia de fiebre, hemorragia, hipoxemia, infección importante, arritmia persistente o estimulantes reduce la explicación por desequilibrio aislado de oferta-demanda. Los negativos aórticos y tromboembólicos reducen probabilidad, pero no autorizan a convertir esos diagnósticos en imposibles si aparece un cambio del fenotipo clínico.'
           }
         },
         illnessActual:{
-          expected:'Mujer de 59 años con alto riesgo aterosclerótico acumulado y prevención secundaria inexistente, que describe angina de esfuerzo nueva en las semanas previas con evolución a dolor de mayor intensidad en reposo, acompañado de síntomas autonómicos. No hay fiebre, anemia, hemorragia, hipoxemia, sepsis, arritmia sostenida, estimulantes ni otro desencadenante de demanda suficientemente intenso para explicar por sí solo un posible daño miocárdico. Tampoco hay un fenotipo clínico fuerte de pericarditis, embolia pulmonar o síndrome aórtico agudo.',
-          essentialElements:['riesgo aterosclerótico acumulado','adherencia deficiente','angina de esfuerzo nueva','inestabilidad por dolor en reposo','equivalentes anginosos','sin disparador de tipo 2 evidente','sin fenotipo pleurítico/posicional','sin rasgos mayores de disección','riesgo hemorrágico bajo']
+          studentField:'ill_m2',
+          expected:'Mujer de 59 años con alto riesgo aterosclerótico acumulado, prevención farmacológica incompleta y adherencia irregular. Presenta angina de esfuerzo nueva que evolucionó a dolor opresivo en reposo con equivalentes autonómicos. No hay anemia, hemorragia, hipoxemia, sepsis, arritmia sostenida, estimulantes u otro desencadenante fisiológico importante que justifique por sí solo una lesión miocárdica de tipo 2. Tampoco predomina un fenotipo pleurítico, posicional, gastrointestinal, musculoesquelético o aórtico.',
+          essentialElements:['riesgo aterosclerótico acumulado','prevención insuficiente','angina de esfuerzo nueva','inestabilidad por dolor en reposo','equivalentes anginosos','ausencia de disparador tipo 2','negativos útiles para diferencial','riesgo hemorrágico bajo']
         },
         tier3:{
-          leader:{ diagnosis:'SCA sin elevación del ST, probable infarto agudo de miocardio tipo 1', rationale:'El cambio temporal de angina estable aparente a dolor en reposo con síntomas autonómicos en una paciente de alto riesgo es compatible con inestabilidad de placa hasta demostrar lo contrario.' },
-          alternative:{ diagnosis:'Infarto tipo 2 o lesión miocárdica aguda por desequilibrio oferta-demanda en hipertensión', rationale:'Debe mantenerse porque hay hipertensión y diabetes, pero necesita un desencadenante fisiológico demostrable y no debe usarse como explicación automática de toda troponina elevada.' },
-          cannotMiss:{ diagnosis:'Síndrome aórtico agudo', rationale:'La ausencia de datos clásicos reduce la probabilidad, pero la evaluación de aorta debe acompañar toda decisión de anticoagulación si el relato, examen o imagen cambian.' }
+          studentFields:['tier_m2_1','tier_m2_2','tier_m2_3'],
+          expertText:'Principal: síndrome coronario agudo sin elevación persistente del ST, probable infarto tipo 1. Alternativo: infarto tipo 2 o lesión miocárdica por desequilibrio oferta-demanda. No perder: síndrome aórtico agudo.',
+          leader:{ diagnosis:'Síndrome coronario agudo sin elevación del ST, probable infarto agudo de miocardio tipo 1', rationale:'La evolución temporal y el perfil de riesgo ya hacen probable un mecanismo aterotrombótico. Aún faltan biomarcadores e imagen para confirmar infarto, pero la hipótesis dominante debe guiar urgencia y pruebas.' },
+          alternative:{ diagnosis:'Infarto tipo 2 o lesión miocárdica aguda por desequilibrio oferta-demanda', rationale:'La hipertensión puede contribuir al desequilibrio, pero debe existir un desencadenante fisiológico convincente. No se debe usar “tipo 2” como explicación automática cuando el fenotipo es anginoso y el riesgo aterosclerótico es alto.' },
+          cannotMiss:{ diagnosis:'Síndrome aórtico agudo', rationale:'La historia reduce su probabilidad, pero no la elimina. Su evaluación debe mantenerse activa si el dolor se vuelve transfixiante, migratorio o se acompaña de pulso asimétrico, déficit neurológico o insuficiencia aórtica.' }
         }
       },
 
       m3: {
         title:'Módulo 3 — Examen físico',
+        studentBinding:{
+          illnessField:'ill_m3',
+          tierFields:['tier_m3_1','tier_m3_2','tier_m3_3'],
+          sources:['Examen físico']
+        },
         sourceComparison:{
           examenFisico:{
             expectedSelected:['f01','f02','f22','f28','f29','f34','f36','f37','f38','f40','f41','f42','f43','f44','f45','f53','f55','f58','f59'],
             criticalMisses:['f02','f22','f29','f34','f36','f37','f38','f40','f41','f43','f44','f53','f58','f59'],
             lowValueIfSelected:['f10','f11','f12','f13','f14','f15','f19','f20','f21','f25','f26','f27','f31','f32','f33','f46','f47','f48','f49','f50','f51'],
-            rationale:'El examen no confirma por sí solo un SCA, pero mide la gravedad fisiológica y explora alternativas que hacen peligroso el manejo antitrombótico. Pulmones limpios, yugulares no elevadas, perfusión preservada y ausencia de tercer ruido reducen la probabilidad de insuficiencia cardiaca aguda. Pulsos simétricos, PA bilateral equivalente, abdomen sin masa y examen neurológico normal reducen, sin anular, la probabilidad de disección.'
+            expertFindingIds:['f01','f02','f22','f29','f34','f36','f37','f38','f40','f41','f42','f43','f44','f53','f55','f58','f59'],
+            expertText:'Diaforesis leve con perfusión conservada; sin congestión, S3, soplo nuevo, roce pericárdico, dolor reproducible, asimetría de pulsos o PA, masa abdominal, signos de TVP ni focalidad neurológica.',
+            expertNote:'El examen físico no confirma ni excluye por sí solo un síndrome coronario agudo. Su función es responder tres preguntas: ¿hay inestabilidad?, ¿hay insuficiencia cardiaca o complicación mecánica?, ¿existe un diagnóstico alternativo que haga peligroso el tratamiento antitrombótico? Pulmones limpios, yugulares no elevadas, buena perfusión y ausencia de S3 reducen la probabilidad de edema pulmonar o bajo gasto. Pulsos simétricos, PA sin diferencia relevante, abdomen sin masa y examen neurológico normal reducen la probabilidad de disección manifiesta, pero no permiten ignorarla si el cuadro cambia.'
           }
         },
         illnessActual:{
-          expected:'Paciente hemodinámicamente estable, discretamente diaforética pero normoxémica y bien perfundida. No presenta congestión pulmonar o sistémica, soplo nuevo, roce pericárdico, arritmia, déficit neurológico, diferencia de pulsos, asimetría de presión arterial, masa abdominal pulsátil, signos de TVP ni dolor de pared torácica reproducible. Este examen no descarta enfermedad coronaria; establece que, en el momento evaluado, no hay evidencia clínica de choque, edema pulmonar, disección manifiesta, embolia pulmonar o causa musculoesquelética convincente.',
-          essentialElements:['perfusión conservada','sin congestión','sin S3 ni soplo nuevo','sin roce pericárdico','pulmones limpios','pulsos simétricos','PA bilateral equivalente','sin dolor reproducible','sin TVP','sin focalidad neurológica']
+          studentField:'ill_m3',
+          expected:'Paciente hemodinámicamente estable, discretamente diaforética, normoxémica y bien perfundida. No presenta congestión pulmonar o sistémica, arritmia clínicamente evidente, soplo nuevo, roce pericárdico, dolor de pared torácica reproducible, focalidad neurológica, diferencia de pulsos o presión arterial, masa abdominal pulsátil ni signos de trombosis venosa profunda. El examen establece estabilidad y reduce alternativas peligrosas, pero no descarta enfermedad coronaria.',
+          essentialElements:['perfusión conservada','sin congestión','sin S3/soplo nuevo/roce','pulmones limpios','sin dolor reproducible','pulsos y PA simétricos','sin TVP','sin focalidad neurológica','sin masa abdominal']
         },
         tier3:{
-          leader:{ diagnosis:'SCA sin elevación del ST de alto riesgo clínico', rationale:'La ausencia de signos físicos dramáticos no reduce el valor de una historia de isquemia en reposo; el examen define estabilidad y guía el destino hospitalario.' },
-          alternative:{ diagnosis:'Lesión miocárdica por hipertensión no controlada', rationale:'La PA elevada está presente, pero no hay edema pulmonar, crisis catecolaminérgica, arritmia ni otro factor claro que explique una gran isquemia de demanda.' },
-          cannotMiss:{ diagnosis:'Disección aórtica con presentación no clásica', rationale:'Los pulsos y la PA simétricos reducen probabilidad, pero deben reintegrarse con cronología, ECG, radiografía y evolución antes de antitrombóticos si surge discordancia.' }
+          studentFields:['tier_m3_1','tier_m3_2','tier_m3_3'],
+          expertText:'Principal: síndrome coronario agudo sin elevación persistente del ST de alto riesgo clínico. Alternativo: lesión miocárdica por hipertensión no controlada. No perder: disección aórtica con presentación no clásica.',
+          leader:{ diagnosis:'Síndrome coronario agudo sin elevación del ST de alto riesgo clínico', rationale:'La estabilidad del examen no reduce el valor de la historia isquémica en reposo. El examen define gravedad actual y destino monitorizado, no una causa benigna del dolor.' },
+          alternative:{ diagnosis:'Lesión miocárdica por hipertensión no controlada', rationale:'La PA está elevada, pero no hay edema pulmonar, arritmia sostenida, crisis catecolaminérgica ni otro factor de demanda demostrado que explique por sí solo el cuadro.' },
+          cannotMiss:{ diagnosis:'Disección aórtica con presentación no clásica', rationale:'Los pulsos y PA simétricos reducen probabilidad. El error sería abandonar la reevaluación si aparece dolor dorsal, migratorio, déficit neurológico, hipotensión o insuficiencia aórtica.' }
         }
       },
 
       m4: {
         title:'Módulo 4 — Paraclínicos',
+        studentBinding:{
+          illnessField:'ill_m4',
+          tierFields:['tier_m4_1','tier_m4_2','tier_m4_3'],
+          sources:['Paraclínicos']
+        },
         sourceComparison:{
           paraclinicos:{
-            expectedSelected:['p01','p04','p05','p07','p09','p10','p11','p12','p13','p14','p15','p16','p18','p19','p21','p22','p23','p24','p25','p26','p27'],
-            criticalMisses:['p13','p14','p15','p21','p22','p23','p24','p25','p26','p27'],
+            expectedSelected:['p01','p04','p05','p07','p09','p10','p11','p12','p13','p14','p15','p16','p18','p19','ecg_inicial','ecg_recurrencia','radiografia_torax'],
+            criticalMisses:['p13','p14','p15','ecg_inicial','ecg_recurrencia','radiografia_torax'],
             lowValueIfSelected:['p02','p03','p06','p08','p17','p20'],
-            rationale:'La elevación de troponina por encima del percentil 99 con ascenso marcado, en presencia de síntomas isquémicos, cambios dinámicos de ST-T y alteración segmentaria nueva, cumple el marco de lesión miocárdica aguda con evidencia clínica de isquemia: infarto agudo de miocardio. La ausencia de elevación persistente del ST lo ubica en el espectro sin elevación del ST, no en STEMI.'
+            expertFindingIds:['p01','p04','p05','p09','p10','p11','p12','p13','p14','p15','p16','p18','p19','ecg_inicial','ecg_recurrencia','radiografia_torax'],
+            expertText:'Troponina I de alta sensibilidad 68 → 286 → 1.420 ng/L; ECG con depresión horizontal del ST y cambios laterales de repolarización; radiografía sin edema ni mediastino ensanchado; creatinina, TFGe y hemostasia conservadas; glucosa, HbA1c, LDL y triglicéridos elevados.',
+            expertNote:'La troponina por encima del percentil 99 con ascenso claro demuestra lesión miocárdica aguda. Se convierte en infarto cuando se integra con síntomas isquémicos y cambios electrocardiográficos compatibles. El ECG no debe leerse como “sin STEMI, por tanto tranquilizador”: la depresión del ST y los cambios de repolarización son evidencia isquémica y exigen estratificación. La radiografía no diagnostica infarto, pero ayuda a valorar congestión, derrame y mediastino. Creatinina y hemostasia normales no confirman el diagnóstico, pero informan seguridad de contraste y tratamiento antitrombótico.'
           }
         },
         illnessActual:{
-          expected:'Mujer de 59 años con dolor anginoso creciente y riesgo aterosclerótico alto, creatinina y hemostasia normales, glucemia y HbA1c elevadas, LDL 164 mg/dL y troponina I de alta sensibilidad con incremento de 68 a 1.420 ng/L en seis horas. Presenta depresión dinámica del ST y ondas T negativas laterales, con hipocinesia inferolateral leve en ecocardiograma, sin edema pulmonar, disfunción ventricular grave, derrame pericárdico, sobrecarga derecha ni datos clínico-radiográficos fuertes de aorta aguda. La representación correcta es infarto agudo de miocardio sin elevación del ST, probablemente por mecanismo aterotrombótico tipo 1, actualmente sin choque ni insuficiencia cardiaca.',
-          essentialElements:['ascenso dinámico de troponina','síntomas de isquemia','cambios ST-T dinámicos','hipocinesia regional','sin elevación persistente del ST','función renal preservada','riesgo hemorrágico basal bajo','sin IC aguda','baja sospecha de aorta/TEP']
+          studentField:'ill_m4',
+          expected:'Mujer de 59 años con dolor anginoso creciente y alto riesgo aterosclerótico, con troponina I de alta sensibilidad en ascenso de 68 a 1.420 ng/L, descenso horizontal del ST y cambios de repolarización laterales en ECG, sin elevación persistente del ST. La radiografía de tórax no muestra edema pulmonar ni mediastino ensanchado. Creatinina, TFGe y pruebas de hemostasia son normales; glucosa, HbA1c, LDL y triglicéridos están elevados. La representación correcta es infarto agudo de miocardio sin elevación del ST, probablemente tipo 1, sin choque ni insuficiencia cardiaca aguda.',
+          essentialElements:['troponina dinámica','síntomas de isquemia','cambios ECG','sin elevación persistente del ST','radiografía sin congestión/mediastino ensanchado','función renal preservada','hemostasia basal normal','riesgo metabólico alto']
         },
         tier3:{
-          leader:{ diagnosis:'Infarto agudo de miocardio sin elevación del ST, probable tipo 1', rationale:'Troponina dinámica más evidencia clínica, electrocardiográfica y ecocardiográfica de isquemia establece infarto; el contexto favorece ruptura/erosión de placa sobre causa de demanda aislada.' },
-          alternative:{ diagnosis:'Infarto tipo 2 por hipertensión no controlada', rationale:'La hipertensión puede contribuir al desbalance, pero no explica de forma satisfactoria la angina de esfuerzo progresiva, la dinámica lateral ST-T y la alteración segmentaria en ausencia de otro desencadenante mayor.' },
-          cannotMiss:{ diagnosis:'Síndrome aórtico agudo', rationale:'La probabilidad es baja por historia, examen y radiografía, pero no debe etiquetarse como cero. Si el dolor cambia a transfixiante, se vuelve migratorio, aparece asimetría de pulsos, déficit neurológico o insuficiencia aórtica, se suspende la inercia antitrombótica y se reevalúa de inmediato.' }
+          studentFields:['tier_m4_1','tier_m4_2','tier_m4_3'],
+          expertText:'Principal: infarto agudo de miocardio sin elevación del ST, probable tipo 1. Alternativo: infarto tipo 2 por hipertensión no controlada. No perder: síndrome aórtico agudo.',
+          leader:{ diagnosis:'Infarto agudo de miocardio sin elevación del ST, probable tipo 1', rationale:'Troponina dinámica más síntomas isquémicos y cambios electrocardiográficos establecen infarto. El contexto favorece un mecanismo aterotrombótico tipo 1 sobre una causa aislada de demanda.' },
+          alternative:{ diagnosis:'Infarto tipo 2 por hipertensión no controlada', rationale:'La hipertensión puede contribuir al desbalance, pero no explica de forma satisfactoria la angina de esfuerzo progresiva ni los cambios isquémicos laterales en ausencia de un desencadenante sistémico mayor.' },
+          cannotMiss:{ diagnosis:'Síndrome aórtico agudo', rationale:'La probabilidad es baja con la historia, el examen y la radiografía disponibles, pero no es cero. Si aparece dolor dorsal transfixiante, migratorio, déficit de pulso, focalidad neurológica, insuficiencia aórtica o hipotensión, se debe detener la inercia antitrombótica y revaluar.' }
         }
       },
 
@@ -131,9 +176,9 @@ window.HCR_CASE_EXPERT.RC4 = {
           dx1:'Infarto agudo de miocardio sin elevación del ST, probable tipo 1',
           dx2:'Infarto tipo 2 o lesión miocárdica aguda por hipertensión no controlada',
           dx3:'Síndrome aórtico agudo',
-          pivotFinding:'Ascenso dinámico de troponina I de alta sensibilidad, acompañado de dolor isquémico, cambios laterales dinámicos de ST-T y alteración segmentaria inferolateral nueva.',
+          pivotFinding:'Ascenso dinámico de troponina I de alta sensibilidad, acompañado de dolor isquémico y cambios dinámicos de ST-T.',
           sharedFinding:'Dolor torácico y presión arterial elevada.',
-          decisiveAgainstDx2:'No existe anemia, hipoxemia, sepsis, arritmia sostenida, insuficiencia cardiaca aguda ni otro desencadenante fisiológico intenso que explique una demanda aislada; la evolución anginosa previa y los cambios regionales favorecen mecanismo coronario tipo 1.',
+          decisiveAgainstDx2:'No existe anemia, hipoxemia, sepsis, arritmia sostenida, insuficiencia cardiaca aguda ni otro desencadenante fisiológico intenso que explique una demanda aislada; la evolución anginosa previa y los cambios electrocardiográficos laterales favorecen mecanismo coronario tipo 1.',
           decisiveAgainstDx3:'No hay dolor abrupto máximo desde el inicio, irradiación dorsal transfixiante, dolor migratorio, déficit de pulso, PA asimétrica, focalidad neurológica, insuficiencia aórtica nueva, mediastino ensanchado ni hipotensión. Estos datos reducen, pero no abolieron, la necesidad de reevaluar si el fenotipo cambia.'
         }
       },
@@ -155,7 +200,7 @@ window.HCR_CASE_EXPERT.RC4 = {
           ],
           dangerousOmissions:[
             { label:'Administrar oxígeno rutinario con SatO₂ 98% al aire ambiente', reason:'No trata la isquemia y puede exponer a hiperoxia innecesaria; el oxígeno se reserva para hipoxemia o insuficiencia respiratoria.' },
-            { label:'Etiquetar la troponina como “hipertensión” sin integrar síntomas, ECG y ecocardiograma', reason:'Convertir toda elevación de troponina en lesión de demanda puede retrasar una estrategia coronaria necesaria.' },
+            { label:'Etiquetar la troponina como “hipertensión” sin integrar síntomas, ECG seriados y cinética de troponina', reason:'Convertir toda elevación de troponina en lesión de demanda puede retrasar una estrategia coronaria necesaria.' },
             { label:'Dar de alta por mejoría transitoria después de nitrato', reason:'El alivio sintomático no resuelve el infarto establecido ni sustituye monitorización, antiagregación, anticoagulación y evaluación invasiva.' },
             { label:'Usar AINE para dolor torácico sin considerar SCA', reason:'Los AINE no son analgésicos de rutina para isquemia aguda y pueden empeorar riesgo cardiovascular y renal.' },
             { label:'Anticoagular sin reevaluar si aparecen rasgos de síndrome aórtico agudo', reason:'El nuevo dolor transfixiante, déficit de pulso, focalidad neurológica, hipotensión o insuficiencia aórtica exige detener la inercia diagnóstica.' },
@@ -175,6 +220,324 @@ window.HCR_CASE_EXPERT.RC4 = {
           }
         }
       }
+    },
+
+    module7Evaluation: {
+      schemaVersion:'3.0',
+      phaseComparisons:[
+        {
+          id:'m7_rc4_phase_m1',
+          phase:'m1',
+          title:'Triage e interrogatorio',
+          studentBinding:{
+            illnessField:'ill_m1',
+            tierFields:['tier_m1_1','tier_m1_2','tier_m1_3'],
+            selectedSources:['Triage','Interrogatorio']
+          },
+          illnessComparison:{
+            student:'',
+            studentField:'ill_m1',
+            expert:'Dolor torácico opresivo de inicio en reposo, precedido por angina de esfuerzo; irradiación, diaforesis, náuseas y disnea breve en una paciente con factores de riesgo cardiovasculares. Estable al ingreso, pero con probabilidad clínica relevante de isquemia aguda.'
+          },
+          tier3Comparison:{
+            student:'',
+            studentFields:['tier_m1_1','tier_m1_2','tier_m1_3'],
+            expert:'Principal: síndrome coronario agudo sin elevación persistente del ST. Alternativo: lesión miocárdica aguda o infarto tipo 2 por hipertensión. No perder: síndrome aórtico agudo.'
+          },
+          sections:[
+            {
+              title:'Triage',
+              type:'findings',
+              rows:[
+                {
+                  id:'m7_rc4_m1_triage_01',
+                  severity:'red',
+                  studentText:'',
+                  studentFindingIds:['t03','t10'],
+                  expertText:'Dolor torácico con diaforesis visible.',
+                  expertNote:'El motivo de consulta debe mantenerse breve, pero la combinación de dolor torácico y diaforesis obliga a priorizar causas tiempo-dependientes. La diaforesis es un dato autonómico; no define por sí sola isquemia, pero aumenta su peso cuando acompaña a un dolor compatible.'
+                },
+                {
+                  id:'m7_rc4_m1_triage_02',
+                  severity:'yellow',
+                  studentText:'',
+                  studentFindingIds:['t04','t05','t06','t07'],
+                  expertText:'PA 168/94 mmHg; FC 92 lpm; FR 20 rpm; SatO₂ 98%.',
+                  expertNote:'Estos datos clasifican estabilidad inicial. La PA elevada contribuye a la carga miocárdica y debe tratarse con prudencia, pero no basta para atribuirle todo el dolor. Una saturación normal descarta la necesidad de oxígeno rutinario, no la necesidad de tratar un síndrome coronario agudo.'
+                },
+                {
+                  id:'m7_rc4_m1_triage_03',
+                  severity:'yellow',
+                  studentText:'',
+                  studentFindingIds:['t09'],
+                  expertText:'Glucemia capilar 224 mg/dL.',
+                  expertNote:'La hiperglucemia en el contexto agudo es un marcador de riesgo y puede reflejar diabetes mal controlada o respuesta de estrés. No confirma un diagnóstico cardiovascular, pero debe integrarse en la evaluación metabólica y en el plan de hospitalización.'
+                }
+              ]
+            },
+            {
+              title:'Interrogatorio',
+              type:'findings',
+              rows:[
+                {
+                  id:'m7_rc4_m1_interrogatorio_01',
+                  severity:'red',
+                  studentText:'',
+                  studentFindingIds:['i01','i02','i04a','i05','i06'],
+                  expertText:'Dolor en reposo, de 40 minutos, precedido por angina de esfuerzo.',
+                  expertNote:'La transición de síntomas inducidos por esfuerzo que ceden con reposo a un episodio prolongado en reposo es el cambio temporal que vuelve el cuadro inestable. No es solo una descripción del dolor: modifica urgencia, pruebas necesarias y disposición.'
+                },
+                {
+                  id:'m7_rc4_m1_interrogatorio_02',
+                  severity:'red',
+                  studentText:'',
+                  studentFindingIds:['i03','i04','i07','i08'],
+                  expertText:'Dolor opresivo central con irradiación, diaforesis, náuseas y disnea.',
+                  expertNote:'La calidad opresiva, la irradiación y los síntomas autonómicos forman un fenotipo anginoso. Ningún elemento aislado confirma infarto; la fuerza aparece al integrarlos con edad, riesgo cardiovascular, cronología y posteriormente ECG/troponina.'
+                },
+                {
+                  id:'m7_rc4_m1_interrogatorio_03',
+                  severity:'yellow',
+                  studentText:'',
+                  studentFindingIds:['i09','i10','i11','i12','i13','i14','i14a'],
+                  expertText:'Sin rasgos pleuríticos, mecánicos, aórticos mayores, neurológicos ni tromboembólicos dominantes.',
+                  expertNote:'Los hallazgos negativos no “descartan” por sí solos disección o embolia. Reducen su probabilidad y permiten que el clínico priorice. El error sería convertir una probabilidad menor en una probabilidad cero y dejar de revaluar si el patrón cambia.'
+                },
+                {
+                  id:'m7_rc4_m1_interrogatorio_04',
+                  severity:'yellow',
+                  studentText:'',
+                  studentFindingIds:['i15','i16','i17'],
+                  expertText:'Factores de riesgo presentes; sin alergia, sangrado o anticoagulación referidos.',
+                  expertNote:'El interrogatorio de medicamentos y sangrado es una intervención de seguridad. Antes de aspirina, anticoagulantes o contraste debe conocerse la exposición previa, alergias y riesgo hemorrágico. Retrasarlo hasta después de decidir tratamiento es una secuencia insegura.'
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id:'m7_rc4_phase_m2',
+          phase:'m2',
+          title:'Historial y revisión por sistemas',
+          studentBinding:{
+            illnessField:'ill_m2',
+            tierFields:['tier_m2_1','tier_m2_2','tier_m2_3'],
+            selectedSources:['Historial','Examen funcional']
+          },
+          illnessComparison:{
+            student:'',
+            studentField:'ill_m2',
+            expert:'Paciente con riesgo aterosclerótico acumulado, prevención insuficiente y síntomas anginosos progresivos. No hay un desencadenante sistémico mayor que explique un desbalance aislado de oferta-demanda ni un fenotipo dominante de pericarditis, embolia pulmonar, aorta, reflujo o dolor musculoesquelético.'
+          },
+          tier3Comparison:{
+            student:'',
+            studentFields:['tier_m2_1','tier_m2_2','tier_m2_3'],
+            expert:'Principal: síndrome coronario agudo sin elevación persistente del ST, probable tipo 1. Alternativo: infarto tipo 2 o lesión miocárdica por desequilibrio oferta-demanda. No perder: síndrome aórtico agudo.'
+          },
+          sections:[
+            {
+              title:'Antecedentes y medicamentos',
+              type:'findings',
+              rows:[
+                {
+                  id:'m7_rc4_m2_historial_01',
+                  severity:'red',
+                  studentText:'',
+                  studentFindingIds:['h01','h02','h03','h19','h15','h16'],
+                  expertText:'Hipertensión, diabetes, dislipidemia sin tratamiento efectivo, ex tabaquismo y enfermedad coronaria familiar prematura.',
+                  expertNote:'La probabilidad preprueba no depende de un único factor. El riesgo aterosclerótico se acumula: hipertensión, diabetes, LDL no tratado, tabaquismo previo y familiar de primer grado con enfermedad precoz hacen que un dolor compatible tenga más peso que el mismo dolor en una persona sin este perfil.'
+                },
+                {
+                  id:'m7_rc4_m2_historial_02',
+                  severity:'yellow',
+                  studentText:'',
+                  studentFindingIds:['h09','h10','h11','h23'],
+                  expertText:'Adherencia irregular y suspensión de estatina sin reevaluación.',
+                  expertNote:'No es un juicio moral sobre adherencia. Identificar el motivo permite construir prevención secundaria realista. Las mialgias atribuidas a estatinas deben caracterizarse y manejarse; abandonar toda reducción de LDL deja activo un mecanismo modificable del siguiente evento.'
+                },
+                {
+                  id:'m7_rc4_m2_historial_03',
+                  severity:'yellow',
+                  studentText:'',
+                  studentFindingIds:['h06','h12','h13','h14'],
+                  expertText:'Sin nefropatía, sangrado digestivo, anticoagulantes, alergias ni estimulantes.',
+                  expertNote:'Estos negativos son datos de seguridad terapéutica. Afectan la selección, dosificación y vigilancia de antitrombóticos, contrastes y fármacos antiisquémicos; no son detalles secundarios.'
+                }
+              ]
+            },
+            {
+              title:'Revisión por sistemas',
+              type:'findings',
+              rows:[
+                {
+                  id:'m7_rc4_m2_ros_01',
+                  severity:'red',
+                  studentText:'',
+                  studentFindingIds:['ef03','ef17','ef18'],
+                  expertText:'Angina de esfuerzo nueva con progresión a reposo; irradiación y equivalentes anginosos.',
+                  expertNote:'La evolución temporal aporta más que la etiqueta “dolor torácico”. El curso esfuerzo → reposo en una paciente con alto riesgo define inestabilidad y mantiene SCA como hipótesis prioritaria antes de que lleguen los biomarcadores.'
+                },
+                {
+                  id:'m7_rc4_m2_ros_02',
+                  severity:'yellow',
+                  studentText:'',
+                  studentFindingIds:['ef14','ef15','ef16','ef19'],
+                  expertText:'Disnea solo durante dolor; sin ortopnea, DPN, edema ni fenotipo respiratorio infeccioso.',
+                  expertNote:'La disnea breve puede ser equivalente isquémico o respuesta autonómica. La ausencia de ortopnea, DPN, edema y estertores posteriores reduce la probabilidad de insuficiencia cardiaca aguda al ingreso, pero no reemplaza la vigilancia seriada.'
+                },
+                {
+                  id:'m7_rc4_m2_ros_03',
+                  severity:'yellow',
+                  studentText:'',
+                  studentFindingIds:['ef20','ef21','ef23','ef27','ef28','ef29','ef30'],
+                  expertText:'Sin patrón aórtico, tromboembólico, gastrointestinal hemorrágico ni musculoesquelético convincente.',
+                  expertNote:'Estos datos cambian el orden de prioridades. No deben usarse para cerrar el diferencial prematuramente; sirven para decidir qué pruebas son proporcionadas ahora y qué señales obligarían a reabrir hipótesis peligrosas.'
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id:'m7_rc4_phase_m3',
+          phase:'m3',
+          title:'Examen físico',
+          studentBinding:{
+            illnessField:'ill_m3',
+            tierFields:['tier_m3_1','tier_m3_2','tier_m3_3'],
+            selectedSources:['Examen físico']
+          },
+          illnessComparison:{
+            student:'',
+            studentField:'ill_m3',
+            expert:'Paciente estable y bien perfundida, con diaforesis leve. Sin signos de insuficiencia cardiaca aguda, bajo gasto, causa musculoesquelética reproducible, embolia pulmonar clínica, síndrome aórtico manifiesto ni focalidad neurológica.'
+          },
+          tier3Comparison:{
+            student:'',
+            studentFields:['tier_m3_1','tier_m3_2','tier_m3_3'],
+            expert:'Principal: síndrome coronario agudo sin elevación persistente del ST de alto riesgo clínico. Alternativo: lesión miocárdica por hipertensión no controlada. No perder: disección aórtica con presentación no clásica.'
+          },
+          sections:[
+            {
+              title:'Estabilidad y congestión',
+              type:'findings',
+              rows:[
+                {
+                  id:'m7_rc4_m3_01',
+                  severity:'red',
+                  studentText:'',
+                  studentFindingIds:['f01','f02','f22','f34','f36','f55'],
+                  expertText:'Diaforesis leve con perfusión conservada; yugulares no elevadas; pulmones sin edema; sin edema periférico.',
+                  expertNote:'La exploración demuestra estabilidad fisiológica en ese momento. No hay evidencia clínica de choque o congestión, pero la estabilidad no hace ambulatorio a un posible SCA. Debe conducir a monitorización y reevaluación, no a falsa tranquilidad.'
+                },
+                {
+                  id:'m7_rc4_m3_02',
+                  severity:'yellow',
+                  studentText:'',
+                  studentFindingIds:['f37','f38','f39','f39a'],
+                  expertText:'Ritmo regular; sin S3, soplo nuevo, roce pericárdico ni frémito.',
+                  expertNote:'La ausencia de S3 o soplo nuevo disminuye la sospecha de insuficiencia cardiaca descompensada o complicación mecánica, pero no modifica por sí sola la necesidad de ECG seriado y biomarcadores en dolor isquémico.'
+                }
+              ]
+            },
+            {
+              title:'Alternativas peligrosas',
+              type:'findings',
+              rows:[
+                {
+                  id:'m7_rc4_m3_03',
+                  severity:'yellow',
+                  studentText:'',
+                  studentFindingIds:['f40','f41','f42','f43','f44'],
+                  expertText:'Pulsos y PA simétricos; sin isquemia periférica, masa abdominal pulsátil ni soplo abdominal.',
+                  expertNote:'La simetría de pulsos y de presión arterial reduce la probabilidad de disección con malperfusión, no elimina toda disección. Lo importante es reconocer qué cambio obligaría a detener antitrombóticos y revaluar.'
+                },
+                {
+                  id:'m7_rc4_m3_04',
+                  severity:'yellow',
+                  studentText:'',
+                  studentFindingIds:['f29','f53','f58','f59'],
+                  expertText:'Dolor no reproducible; pantorrillas sin signos de TVP; examen neurológico sin focalidad.',
+                  expertNote:'La falta de reproducibilidad hace menos probable una causa de pared torácica; la ausencia de signos de TVP o focalidad reduce diagnósticos alternativos. Ninguno de esos negativos sustituye el razonamiento probabilístico ni las pruebas indicadas.'
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id:'m7_rc4_phase_m4',
+          phase:'m4',
+          title:'Paraclínicos',
+          studentBinding:{
+            illnessField:'ill_m4',
+            tierFields:['tier_m4_1','tier_m4_2','tier_m4_3'],
+            selectedSources:['Paraclínicos']
+          },
+          illnessComparison:{
+            student:'',
+            studentField:'ill_m4',
+            expert:'Dolor anginoso progresivo con troponina en ascenso claro y cambios isquémicos de ST/repolarización sin elevación persistente del ST. Función renal y hemostasia conservadas; radiografía sin congestión ni mediastino ensanchado. Infarto agudo de miocardio sin elevación del ST, probable tipo 1, sin choque ni insuficiencia cardiaca aguda.'
+          },
+          tier3Comparison:{
+            student:'',
+            studentFields:['tier_m4_1','tier_m4_2','tier_m4_3'],
+            expert:'Principal: infarto agudo de miocardio sin elevación del ST, probable tipo 1. Alternativo: infarto tipo 2 por hipertensión no controlada. No perder: síndrome aórtico agudo.'
+          },
+          sections:[
+            {
+              title:'Lesión miocárdica e isquemia',
+              type:'findings',
+              rows:[
+                {
+                  id:'m7_rc4_m4_01',
+                  severity:'red',
+                  studentText:'',
+                  studentFindingIds:['p13','p14','p15'],
+                  expertText:'Troponina I de alta sensibilidad: 68 → 286 → 1.420 ng/L.',
+                  expertNote:'Una serie ascendente demuestra lesión miocárdica aguda. La troponina no identifica por sí sola el mecanismo. Aquí el diagnóstico de infarto se establece porque la lesión miocárdica se acompaña de síntomas y ECG compatibles con isquemia.'
+                },
+                {
+                  id:'m7_rc4_m4_02',
+                  severity:'red',
+                  studentText:'',
+                  studentFindingIds:['ecg_inicial','ecg_recurrencia'],
+                  expertText:'Descenso horizontal del ST y cambios laterales de repolarización, sin elevación persistente del ST.',
+                  expertNote:'El ECG es una prueba seriada, no una fotografía única. La ausencia de elevación persistente del ST no descarta infarto. Los cambios de ST/repolarización en un contexto de dolor y troponina dinámica sostienen isquemia y elevan el riesgo.'
+                }
+              ]
+            },
+            {
+              title:'Seguridad y diagnósticos alternativos',
+              type:'findings',
+              rows:[
+                {
+                  id:'m7_rc4_m4_03',
+                  severity:'yellow',
+                  studentText:'',
+                  studentFindingIds:['radiografia_torax'],
+                  expertText:'Radiografía sin edema pulmonar, derrame ni mediastino ensanchado.',
+                  expertNote:'La radiografía no confirma un SCA. Aporta contexto: congestión, edema y alteraciones mediastínicas pueden cambiar el diferencial, el sitio de atención y la necesidad de estudios adicionales.'
+                },
+                {
+                  id:'m7_rc4_m4_04',
+                  severity:'yellow',
+                  studentText:'',
+                  studentFindingIds:['p01','p04','p05','p09','p10'],
+                  expertText:'Hemoglobina, función renal y hemostasia dentro de rango de referencia.',
+                  expertNote:'Estos resultados hacen menos probable anemia o sangrado como explicaciones de desequilibrio de oferta-demanda y permiten planificar antitrombóticos y contraste con mayor seguridad. No son “normales irrelevantes”: cambian el margen terapéutico.'
+                },
+                {
+                  id:'m7_rc4_m4_05',
+                  severity:'yellow',
+                  studentText:'',
+                  studentFindingIds:['p11','p12','p18','p19'],
+                  expertText:'Glucosa y HbA1c elevadas; LDL y triglicéridos elevados.',
+                  expertNote:'Estos datos no explican por completo el evento agudo, pero identifican mecanismos de riesgo residual que deben abordarse desde el ingreso. La prevención secundaria eficaz no se deja para una recomendación vaga al alta.'
+                }
+              ]
+            }
+          ]
+        }
+      ]
     },
 
     management: {
@@ -200,345 +563,11 @@ window.HCR_CASE_EXPERT.RC4 = {
       }
     },
 
-    module7Evaluation: {
-      illnessComparison: {
-        student:'',
-        expert:'Mujer de 59 años con hipertensión arterial, diabetes mellitus tipo 2 mal controlada, dislipidemia sin tratamiento efectivo, obesidad central, antecedente de tabaquismo e historia familiar de enfermedad coronaria prematura. Durante tres semanas presentó opresión retroesternal al esfuerzo que cedía con reposo y, en las últimas 12 horas, evolucionó a episodios más intensos en reposo, con irradiación a mandíbula y hombro izquierdo, náuseas, diaforesis y disnea breve. La enfermedad actual debe explicitar esta cronología de inestabilidad, sus factores causales ateroscleróticos, la ausencia de un desencadenante claro de infarto tipo 2 y la estabilidad actual sin signos de choque, edema pulmonar, disección aórtica manifiesta o embolia pulmonar.'
-      },
-      tier3Comparison: {
-        student:'',
-        expert:'El diagnóstico principal es infarto agudo de miocardio sin elevación del ST, probablemente tipo 1 por un mecanismo aterotrombótico coronario. Se fundamenta en el ascenso dinámico de troponina, síntomas isquémicos, cambios laterales dinámicos de ST-T e hipocinesia inferolateral nueva. La alternativa razonable es infarto tipo 2 o lesión miocárdica por hipertensión no controlada, pero queda debilitada por no existir anemia, hipoxemia, sepsis, arritmia sostenida, insuficiencia cardiaca aguda u otro disparador de demanda suficiente. El diagnóstico que no se puede perder es síndrome aórtico agudo: es poco probable por los datos disponibles, pero debe reactivarse de inmediato si el fenotipo de dolor, pulsos, presión arterial, examen neurológico o ecocardiograma cambia.'
-      },
-      sections: [
-        {
-          title:'Triage e interrogatorio',
-          type:'findings',
-          rows:[
-            {
-              id:'m7_rc4_triage_01',
-              severity:'red',
-              studentText:'',
-              expertText:'Dolor opresivo retroesternal en reposo, irradiado y asociado a diaforesis/náuseas: debe tratarse como isquemia miocárdica aguda hasta demostrar lo contrario.',
-              expertNote:'La paciente está estable; eso modifica el lugar y la secuencia de manejo, no la prioridad diagnóstica.',
-              explanation:{
-                title:'De síntoma a síndrome: reconocer inestabilidad isquémica',
-                question:'¿Por qué era importante?',
-                body:[
-                  'El error inicial frecuente es fragmentar el cuadro: pecho, mandíbula, náuseas y ansiedad. En realidad, la combinación define un síndrome. La opresión retroesternal, la irradiación, la activación autonómica y la transición reciente a dolor en reposo son mecanismos clínicos de inestabilidad isquémica, no simples “síntomas atípicos”.',
-                  'La presión arterial elevada no protege contra infarto; puede ser respuesta al dolor, factor que agrava el desequilibrio de oxígeno o comorbilidad crónica. A la vez, una PA conservada, saturación normal y perfusión adecuada permiten obtener ECG, troponinas y una evaluación dirigida sin retrasar por maniobras de reanimación innecesarias.'
-                ],
-                bullets:[
-                  'La progresión de angina de esfuerzo a dolor en reposo pesa más que la intensidad aislada del dolor.',
-                  'Diaforesis y náuseas son equivalentes anginosos cuando acompañan un dolor compatible.',
-                  'Estabilidad no equivale a bajo riesgo cuando la historia es de isquemia en curso.'
-                ],
-                closing:'La primera decisión correcta no es “¿infarto sí o no?”; es reconocer que este fenotipo requiere una vía de síndrome coronario agudo.'
-              }
-            },
-            {
-              id:'m7_rc4_triage_02',
-              severity:'yellow',
-              studentText:'',
-              expertText:'La cronología esfuerzo → reposo y los factores de riesgo aterosclerótico aumentan marcadamente la probabilidad previa de enfermedad coronaria obstructiva.',
-              expertNote:'La diabetes, la dislipidemia no tratada y el antecedente familiar no son antecedentes de relleno: cambian la probabilidad antes del ECG.',
-              explanation:{
-                title:'Probabilidad preprueba: el contexto clínico sí cambia el significado de un ECG y una troponina',
-                question:'¿Por qué era importante?',
-                body:[
-                  'La aterosclerosis no aparece por un único dato. Diabetes mal controlada, hipertensión, LDL elevado por suspensión de estatina, tabaquismo previo, obesidad central y enfermedad coronaria prematura familiar configuran una carga de riesgo coherente con placa vulnerable. Cada dato aislado tiene valor limitado; el conjunto modifica de forma importante la probabilidad preprueba.',
-                  'No debe usarse el antecedente de “gastritis” ni una sensación de llenura previa para explicar por defecto un dolor nuevo que se hace de esfuerzo y luego de reposo. La fisiología de la angina es un desequilibrio entre entrega y demanda de oxígeno; la progresión temporal obliga a pensar que el problema dejó de ser estable.'
-                ],
-                bullets:[
-                  'La historia cardiovascular debe ser causal: identificar factores que favorecen aterosclerosis y factores que desencadenan demanda.',
-                  'La adherencia real importa más que la lista de fármacos prescritos.',
-                  'No llames “atípico” a un patrón que sí contiene elementos isquémicos específicos.'
-                ],
-                closing:'Los factores de riesgo no diagnostican un infarto; hacen que un síntoma compatible sea más peligroso y que una prueba positiva tenga mayor peso.'
-              }
-            },
-            {
-              id:'m7_rc4_triage_03',
-              severity:'red',
-              studentText:'',
-              expertText:'Antes de automatizar antiagregación y anticoagulación, hay que buscar activamente rasgos de síndrome aórtico agudo y otros diferenciales letales.',
-              expertNote:'La baja probabilidad no es una licencia para no preguntar; es el resultado de preguntar y explorar bien.',
-              explanation:{
-                title:'Seguridad diagnóstica: no todo dolor torácico con troponina elevada es coronario',
-                question:'¿Qué debía buscarse?',
-                body:[
-                  'En este caso se buscaron dolor abrupto y máximo desde el inicio, irradiación dorsal transfixiante, migración del dolor, síncope, déficit neurológico, asimetría de pulsos o presión arterial, soplo nuevo de insuficiencia aórtica y mediastino ensanchado. Ninguno está presente. Eso reduce sustancialmente la probabilidad de disección, pero la vigilancia continúa porque el cuadro puede evolucionar.',
-                  'También se revisaron rasgos de embolia pulmonar: dolor pleurítico, hipoxemia, hemoptisis, signos de TVP e inmovilización. La ausencia conjunta hace baja la probabilidad clínica y evita pruebas indiscriminadas que retrasen el manejo coronario.'
-                ],
-                bullets:[
-                  'La selección de antitrombóticos depende de que el diagnóstico alternativo peligroso sea razonablemente improbable.',
-                  'Un ECG anormal o troponina elevada pueden aparecer en disección, embolia pulmonar y otras enfermedades críticas.',
-                  'Si la historia cambia, se reinicia el razonamiento: no se protege una hipótesis por haber sido la primera.'
-                ],
-                closing:'La medicina segura no exige descartar toda posibilidad con una prueba; exige que la estrategia elegida sea coherente con la probabilidad y el daño potencial.'
-              }
-            }
-          ]
-        },
-        {
-          title:'Historial y examen funcional',
-          type:'findings',
-          rows:[
-            {
-              id:'m7_rc4_historia_01',
-              severity:'yellow',
-              studentText:'',
-              expertText:'Ausencia de anemia, hemorragia, sepsis, hipoxemia, arritmia sostenida o estimulantes: no existe un disparador de demanda convincente para atribuir de entrada la troponina a infarto tipo 2.',
-              expertNote:'Infarto tipo 2 no significa “troponina alta en paciente hipertensa”; requiere isquemia por desbalance oferta-demanda identificable.',
-              explanation:{
-                title:'Troponina elevada no es sinónimo automático de placa rota, pero tampoco autoriza una explicación cómoda',
-                question:'¿Por qué era importante?',
-                body:[
-                  'El infarto tipo 2 exige lesión miocárdica aguda por desbalance de oxígeno asociado a un proceso capaz de generar esa demanda o disminuir el suministro: anemia grave, sepsis, hipoxemia, taquiarritmia sostenida, hipotensión, vasoespasmo, hipertensión extrema con daño agudo u otras situaciones. La paciente está hipertensa, pero no muestra un proceso fisiológico dominante suficiente que haga innecesaria la hipótesis coronaria tipo 1.',
-                  'La clasificación no es semántica. Un error hacia tipo 2 puede retrasar angiografía y terapia antitrombótica en una lesión de placa; el error opuesto puede indicar antitrombóticos en una causa no coronaria. Por eso la decisión depende de la integración completa de síntomas, ECG, biomarcadores, ecocardiograma y contexto.'
-                ],
-                bullets:[
-                  'Primero confirma lesión miocárdica aguda por cambio de troponina.',
-                  'Después exige evidencia de isquemia para hablar de infarto.',
-                  'Finalmente define el mecanismo más probable; no inviertas el razonamiento.'
-                ],
-                closing:'La hipertensión es un dato relevante, no un diagnóstico explicativo suficiente.'
-              }
-            },
-            {
-              id:'m7_rc4_historia_02',
-              severity:'yellow',
-              studentText:'',
-              expertText:'Antecedentes de sangrado, función renal y medicamentos reales condicionan la seguridad de aspirina, anticoagulación, contraste y el plan de prevención secundaria.',
-              expertNote:'Preguntar por tratamiento prescrito sin verificar adherencia es una forma de no conocer el tratamiento real.',
-              explanation:{
-                title:'La historia también construye el plan terapéutico',
-                question:'¿Qué decisiones modifica?',
-                body:[
-                  'La ausencia de hemorragia digestiva previa, anticoagulantes, trombocitopenia o alergia conocida hace más factible usar terapia antitrombótica inicial, aunque el riesgo de sangrado siempre debe reevaluarse durante el ingreso. Creatinina normal y TFGe de 80 mL/min/1,73 m² permiten plantear anticoagulación y contraste con el ajuste habitual, no sin vigilancia.',
-                  'La estatina suspendida por mialgias muestra un problema de prevención secundaria ya existente. La respuesta correcta no es ignorar la experiencia de la paciente ni aceptar la suspensión definitiva: hay que caracterizar síntomas, revisar interacciones y causas reversibles, elegir intensidad o agente tolerable y documentar un plan verificable.'
-                ],
-                bullets:[
-                  'Riesgo isquémico y riesgo hemorrágico deben evaluarse simultáneamente.',
-                  'Función renal condiciona dosis, elección de anticoagulante y seguridad del contraste.',
-                  'La no adherencia es una variable clínica que hay que explicar y modificar, no una etiqueta moral.'
-                ],
-                closing:'Un manejo técnicamente correcto fracasa si no incorpora cómo la paciente realmente toma —o no toma— sus medicamentos.'
-              }
-            }
-          ]
-        },
-        {
-          title:'Examen físico',
-          type:'findings',
-          rows:[
-            {
-              id:'m7_rc4_examen_01',
-              severity:'red',
-              studentText:'',
-              expertText:'Pulmones limpios, yugulares no elevadas, sin S3 y perfusión conservada: no hay insuficiencia cardiaca aguda ni choque al momento del examen.',
-              expertNote:'Estos hallazgos definen gravedad actual; no reducen la necesidad de una estrategia invasiva por infarto documentado.',
-              explanation:{
-                title:'El examen cardiovascular mide la reserva fisiológica inmediata',
-                question:'¿Qué cambia?',
-                body:[
-                  'La presencia de estertores, hipoxemia, S3, presión venosa yugular elevada, frialdad periférica, oliguria, hipotensión o alteración mental habría cambiado el destino hacia mayor nivel de atención y sugerido isquemia extensa, disfunción ventricular o complicación mecánica. Su ausencia permite unidad monitorizada, pero no disminuye el diagnóstico de infarto.',
-                  'El error de semiología es buscar solo el “soplo del infarto”. En SCA, la mayoría de los hallazgos físicos tienen más valor para estratificar gravedad, complicaciones y diagnósticos alternativos que para confirmar la oclusión coronaria primaria.'
-                ],
-                bullets:[
-                  'La congestión identifica insuficiencia cardiaca; la perfusión identifica componente de choque.',
-                  'Un examen normal entre episodios no excluye isquemia dinámica.',
-                  'Repetir examen es esencial: el estado puede cambiar mientras se espera angiografía.'
-                ],
-                closing:'En dolor torácico, el examen físico responde primero: “¿qué tan inestable está la paciente ahora?”'
-              }
-            },
-            {
-              id:'m7_rc4_examen_02',
-              severity:'yellow',
-              studentText:'',
-              expertText:'Pulsos simétricos, presión arterial bilateral equivalente, sin masa abdominal pulsátil, sin déficit neurológico y sin dolor de pared reproducible reducen alternativas peligrosas y no isquémicas.',
-              expertNote:'Ningún hallazgo negativo aislado descarta disección; el patrón conjunto es el que modifica la probabilidad.',
-              explanation:{
-                title:'Anatomía aplicada al diagnóstico diferencial de dolor torácico',
-                question:'¿Por qué importan pulsos, PA, abdomen y neurología?',
-                body:[
-                  'Una disección que compromete ramas del arco puede producir déficit neurológico o desigualdad de pulsos; la extensión a subclavia puede generar diferencia de presión; la insuficiencia aórtica aguda puede producir un soplo nuevo y congestión; la extensión distal puede asociarse con dolor abdominal o isquemia. Nada de esto está presente, lo cual hace coherente continuar el protocolo coronario.',
-                  'La ausencia de dolor reproducible a la palpación disminuye una causa musculoesquelética, pero tampoco convierte automáticamente el dolor en cardiaco. La exploración debe interpretar probabilidades, no sustituir la fisiopatología.'
-                ],
-                bullets:[
-                  'Explorar ambos brazos no es un ritual: busca malperfusión de ramas arteriales.',
-                  'El examen neurológico breve es obligatorio cuando se contempla aorta.',
-                  'No uses un dato negativo para cerrar un diagnóstico; úsalo para redistribuir probabilidades.'
-                ],
-                closing:'La exploración dirigida convierte el diferencial de una lista en una comparación anatómica de hipótesis.'
-              }
-            }
-          ]
-        },
-        {
-          title:'Paraclínicos y pausa diagnóstica',
-          type:'findings',
-          rows:[
-            {
-              id:'m7_rc4_paraclinicos_01',
-              severity:'red',
-              studentText:'',
-              expertText:'La troponina de alta sensibilidad sube de 68 a 1.420 ng/L: hay lesión miocárdica aguda. Los síntomas, ECG y ecocardiograma aportan la evidencia de isquemia necesaria para llamarla infarto.',
-              expertNote:'Troponina alta sola significa lesión; infarto exige lesión aguda más contexto de isquemia.',
-              explanation:{
-                title:'Definición universal aplicada: separar lesión miocárdica de infarto',
-                question:'¿Cuál es la secuencia lógica?',
-                body:[
-                  'Primer paso: la troponina supera el percentil 99 y cambia en serie, por lo que existe lesión miocárdica aguda. Segundo paso: la paciente tiene síntomas compatibles con isquemia, depresión dinámica del ST/ondas T laterales nuevas y una anomalía regional inferolateral de contractilidad. Estas tres capas aportan evidencia de isquemia y permiten diagnosticar infarto agudo de miocardio.',
-                  'Tercer paso: se plantea el mecanismo. La historia de angina progresiva, el riesgo aterosclerótico y la falta de un desencadenante sistémico fuerte favorecen infarto tipo 1. La coronariografía definirá anatomía y estrategia; la clasificación clínica inicial no debe esperar a que la lesión evolucione.'
-                ],
-                bullets:[
-                  'Cambio seriado de troponina = lesión aguda, no necesariamente infarto.',
-                  'Síntomas o ECG o imagen isquémicos convierten la lesión en infarto.',
-                  'El tipo de infarto se infiere por mecanismo; no se decide solo por el valor numérico.'
-                ],
-                closing:'La troponina no reemplaza el razonamiento. Obliga a hacerlo con más precisión.'
-              }
-            },
-            {
-              id:'m7_rc4_paraclinicos_02',
-              severity:'red',
-              studentText:'',
-              expertText:'Depresión dinámica lateral del ST y T negativas nuevas sin elevación persistente del ST: el caso entra en el espectro de SCA sin elevación del ST, no en STEMI.',
-              expertNote:'No toda isquemia transmural muestra elevación del ST y no todo NSTEMI puede manejarse lentamente.',
-              explanation:{
-                title:'Leer el ECG como un proceso dinámico',
-                question:'¿Qué significan estos cambios?',
-                body:[
-                  'La depresión horizontal del ST en derivaciones laterales durante dolor refleja isquemia subendocárdica o una expresión electrocardiográfica de lesión isquémica no oclusiva completa. La mayor magnitud durante el dolor y el cambio posterior al nitrato muestran dinamismo, una información más valiosa que una toma aislada.',
-                  'La ausencia de elevación persistente del ST evita activar un algoritmo de STEMI clásico, pero no convierte el episodio en benigno. En NSTEMI, troponina dinámica, cambios de ST y dolor recurrente definen riesgo alto y sostienen una estrategia invasiva temprana.'
-                ],
-                bullets:[
-                  'Obtén ECG en el dolor y repítelo cuando cambia la clínica.',
-                  'Compara derivaciones contiguas y evolución temporal, no solo una frase de informe.',
-                  'No retrases tratamiento porque no hay elevación del ST.'
-                ],
-                closing:'El ECG es una película corta; leer una sola imagen puede hacerte perder la isquemia dinámica.'
-              }
-            },
-            {
-              id:'m7_rc4_paraclinicos_03',
-              severity:'yellow',
-              studentText:'',
-              expertText:'La hipocinesia inferolateral nueva refuerza que el proceso es regional y coronario; la FEVI preservada y ausencia de edema pulmonar delimitan la gravedad actual, no el riesgo futuro.',
-              expertNote:'Una FEVI de 55% no anula el diagnóstico ni la necesidad de coronariografía.',
-              explanation:{
-                title:'Ecocardiografía: anatomía funcional, no sustituto de angiografía',
-                question:'¿Qué añade al caso?',
-                body:[
-                  'La contractilidad segmentaria depende de perfusión regional. Una hipocinesia inferolateral en el contexto adecuado integra el ECG lateral y la troponina dinámica. Es una pieza de coherencia fisiopatológica: el miocardio muestra una alteración donde el síndrome eléctrico y clínico sugería isquemia.',
-                  'La ecocardiografía también busca derrame pericárdico, disfunción ventricular importante, complicaciones mecánicas, valvulopatía y sobrecarga de ventrículo derecho. Su normalidad parcial no descarta una lesión coronaria culpable; simplemente acota las complicaciones presentes.'
-                ],
-                bullets:[
-                  'Una anomalía regional aumenta la coherencia de isquemia miocárdica.',
-                  'FEVI preservada no equivale a miocardio ileso.',
-                  'El ecocardiograma ayuda a estratificar; la anatomía coronaria requiere otra técnica.'
-                ],
-                closing:'El ecocardiograma no decide por sí solo revascularización, pero muestra qué parte del miocardio ya está pagando el costo de la isquemia.'
-              }
-            },
-            {
-              id:'m7_rc4_pausa_01',
-              severity:'yellow',
-              studentText:'',
-              expertText:'El hallazgo pivote del Venn es la combinación —no un único número— de troponina dinámica, isquemia clínica, cambios ST-T y alteración regional.',
-              expertNote:'La pausa diagnóstica debe diferenciar mecanismo tipo 1, mecanismo tipo 2 y aorta; no duplicar tres nombres del mismo diagnóstico.',
-              explanation:{
-                title:'Cómo debe funcionar el Venn de este caso',
-                question:'¿Qué datos van en el centro y cuáles separan?',
-                body:[
-                  'Dolor torácico y presión arterial elevada pueden estar presentes en SCA, lesión de demanda y síndrome aórtico. Esos son datos compartidos. El ascenso pronunciado de troponina, los cambios dinámicos laterales y la hipocinesia regional favorecen el diagnóstico líder frente a una lesión por hipertensión aislada.',
-                  'El Venn no debe usar “troponina positiva” como argumento final. En aorta o embolia también puede haber troponina. La separación se logra por la narrativa del dolor, pulsos, PA bilateral, neurología, radiografía, exploración y evolución.'
-                ],
-                bullets:[
-                  'Centro: dolor torácico e hipertensión.',
-                  'A favor de tipo 1: angina progresiva, ECG dinámico, troponina y pared regional.',
-                  'Contra aorta: ausencia de fenotipo disecante y de signos de malperfusión, sin tratar esa ausencia como certeza absoluta.'
-                ],
-                closing:'La calidad de un diferencial se mide por los datos que lo separan, no por la cantidad de diagnósticos escritos.'
-              }
-            }
-          ]
-        },
-        {
-          title:'Manejo',
-          type:'management',
-          rows:[
-            {
-              id:'m7_rc4_manejo_01',
-              severity:'red',
-              studentText:'',
-              expertText:'El núcleo inicial es unidad monitorizada, aspirina, anticoagulación parenteral individualizada, estatina de alta intensidad, control de síntomas y coronariografía temprana.',
-              expertNote:'No se trata de enumerar fármacos: cada intervención debe responder a un mecanismo, riesgo o decisión de revascularización.',
-              explanation:{
-                title:'Manejo inicial: tratar la trombosis, proteger el miocardio y preparar la anatomía',
-                question:'¿Por qué este plan es coherente?',
-                body:[
-                  'La aspirina limita activación plaquetaria; la anticoagulación reduce extensión de trombo; la estatina de alta intensidad estabiliza placa y reduce riesgo recurrente; el nitrato puede aliviar dolor isquémico y reducir presión si no hay contraindicaciones. Ninguno reemplaza la decisión anatómica. La paciente requiere valoración invasiva temprana porque ya hay infarto, cambios dinámicos de ST y síntomas en reposo.',
-                  'El segundo antiagregante no debe colocarse como “cualquier P2Y12 para todos en triage”. Su selección y momento dependen de estrategia invasiva, riesgo de sangrado, necesidad eventual de cirugía, disponibilidad y protocolo. La regla es no retrasar la revascularización por una decisión farmacológica que debe tomarse en contexto.'
-                ],
-                bullets:[
-                  'Usa aspirina si no hay contraindicación real.',
-                  'Elige anticoagulante con función renal, sangrado y estrategia invasiva en mente.',
-                  'No administres oxígeno si la paciente está normoxémica.',
-                  'La respuesta al nitrato no confirma ni excluye SCA.'
-                ],
-                closing:'La farmacología inicial compra tiempo y reduce riesgo; la coronariografía define la vía definitiva de revascularización.'
-              }
-            },
-            {
-              id:'m7_rc4_manejo_02',
-              severity:'red',
-              studentText:'',
-              expertText:'No dar alta por alivio transitorio ni atribuir el cuadro a hipertensión o gastritis sin integrar la definición de infarto.',
-              expertNote:'El peligro no es solo omitir un medicamento; es detener el proceso diagnóstico cuando ya existen datos de alto riesgo.',
-              explanation:{
-                title:'Errores de manejo que cambian pronóstico',
-                question:'¿Qué no debía ocurrir?',
-                body:[
-                  'La mejoría parcial luego de nitrato no demuestra una causa benigna. En esta paciente el daño miocárdico ya está documentado. El alta o la observación sin estrategia invasiva expone a recurrencia, arritmia, extensión del infarto y muerte.',
-                  'Tampoco se debe etiquetar de forma reflexiva como “crisis hipertensiva”. La hipertensión puede coexistir, agravar isquemia y requerir tratamiento, pero la lógica diagnóstica exige explicar el conjunto. Si se usa como un cajón de sastre, se pierde el mecanismo aterotrombótico que requiere prevención secundaria y posible revascularización.'
-                ],
-                bullets:[
-                  'No sustituyas un diagnóstico sindromático por un valor aislado de PA.',
-                  'No uses AINE como tratamiento del dolor isquémico.',
-                  'No demores hemodinamia por pruebas no indicadas cuando el fenotipo de aorta y embolia es bajo.',
-                  'Reabre el diagnóstico diferencial si la evolución deja de ser coherente.'
-                ],
-                closing:'La omisión más grave no es olvidar una dosis; es no reconocer que el proceso activo requiere una estrategia hospitalaria completa.'
-              }
-            },
-            {
-              id:'m7_rc4_manejo_03',
-              severity:'yellow',
-              studentText:'',
-              expertText:'La prevención secundaria empieza en urgencias: LDL, diabetes, PA, actividad física, alimentación, rehabilitación cardíaca y adherencia son parte del mecanismo del próximo evento.',
-              expertNote:'La paciente no necesita solo indicaciones; necesita un plan verificable que resuelva las razones de su falta de adherencia previa.',
-              explanation:{
-                title:'Del evento agudo a la enfermedad crónica',
-                question:'¿Qué debe quedar preparado antes del alta?',
-                body:[
-                  'El episodio no es un accidente aislado: es la manifestación clínica de una enfermedad aterosclerótica acumulada. La meta de LDL en muy alto riesgo, el control de glucosa, el manejo de presión arterial y el abandono sostenido de tabaco reducen eventos futuros. La rehabilitación cardíaca y la educación sobre síntomas de alarma son intervenciones con valor clínico, no anexos administrativos.',
-                  'La paciente suspendió estatina por mialgias y omite medicación por rutina laboral. Un plan real pregunta qué ocurrió, ofrece alternativas, simplifica horarios cuando sea posible, incluye a la hija si la paciente lo desea y fija seguimiento concreto. Sin esa ingeniería práctica, el alta repite las condiciones que produjeron el evento.'
-                ],
-                bullets:[
-                  'Caracteriza mialgias antes de declarar intolerancia definitiva.',
-                  'Define objetivos de LDL, PA y diabetes con seguimiento programado.',
-                  'Indica rehabilitación cardíaca y educación de alarma.',
-                  'Comprueba comprensión y factibilidad antes de finalizar el ingreso.'
-                ],
-                closing:'La revascularización puede resolver una lesión; la prevención secundaria decide si la enfermedad vuelve a expresarse.'
-              }
-            }
-          ]
-        }
-      ]
-    },
+    // Módulo 7: usar comparisonByModule como fuente única para hallazgos, enfermedad actual y Tier 3 por etapa.
+    // No declarar secciones manuales aquí: esos cuadros deben generarse desde los hallazgos seleccionados.
+
+
+
 
     clinicalReferences:[
       {

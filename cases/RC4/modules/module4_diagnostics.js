@@ -32,26 +32,7 @@ window.HCR_CASE_MODULES.RC4.module4 = {
         { id:'p17', source:'Paraclínicos', label:'Proteína C reactiva', value:'4,2', unit:'mg/L', ref:'<5', termIds:['proteina_c_reactiva'] },
         { id:'p18', source:'Paraclínicos', label:'Colesterol LDL', value:'164', unit:'mg/dL', ref:'Meta según riesgo; muy alto riesgo <55', termIds:['ldl_colesterol'] },
         { id:'p19', source:'Paraclínicos', label:'Triglicéridos', value:'218', unit:'mg/dL', ref:'<150', termIds:['dislipidemia'] },
-        { id:'p20', source:'Paraclínicos', label:'AST, ALT y bilirrubinas', value:'Dentro de rango de referencia', unit:'', ref:'Sin alteraciones', termIds:[] }
-      ]
-    },
-    {
-      title:'Electrocardiogramas seriados',
-      helpId:'electrocardiograma',
-      rows:[
-        { id:'p21', source:'Paraclínicos', label:'ECG inicial — 06:28', value:'Ritmo sinusal a 92 lpm; depresión horizontal del ST de aproximadamente 1 mm en I, aVL y V4–V6; sin elevación persistente del ST ni bloqueo de rama nuevo', unit:'', ref:'Sin desviación isquémica del ST', termIds:['electrocardiograma','segmento_st'] },
-        { id:'p22', source:'Paraclínicos', label:'ECG durante recurrencia de dolor — 07:54', value:'Ritmo sinusal a 98 lpm; depresión horizontal del ST de 1,5 mm en V4–V6 y ondas T negativas nuevas en I y aVL; sin elevación del ST', unit:'', ref:'Sin cambios dinámicos isquémicos', termIds:['electrocardiograma','segmento_st'] },
-        { id:'p23', source:'Paraclínicos', label:'ECG posterior a nitrato sublingual — 08:18', value:'Dolor disminuye; persiste depresión de ST de aproximadamente 0,5 mm en V4–V6, sin arritmia ni trastorno de conducción', unit:'', ref:'No aplica', termIds:['electrocardiograma'] }
-      ]
-    },
-    {
-      title:'Imágenes y evaluación estructural',
-      helpId:'ecocardiografia',
-      rows:[
-        { id:'p24', source:'Paraclínicos', label:'Radiografía de tórax', value:'Silueta cardiaca no aumentada; campos pulmonares sin edema, consolidación ni derrame; mediastino no ensanchado', unit:'', ref:'Sin alteraciones agudas', termIds:['radiografia_torax'] },
-        { id:'p25', source:'Paraclínicos', label:'Ecocardiograma transtorácico urgente', value:'FEVI 55%; hipocinesia leve de segmentos basal y medio inferolaterales; sin derrame pericárdico, insuficiencia valvular significativa ni datos ecográficos de sobrecarga derecha', unit:'', ref:'Sin alteraciones segmentarias nuevas', termIds:['ecocardiograma','insuficiencia_cardiaca'] },
-        { id:'p26', source:'Paraclínicos', label:'Evaluación clínica para disección aórtica', value:'Sin dolor transfixiante o migratorio, déficit neurológico, déficit de pulso, insuficiencia aórtica nueva, hipotensión ni mediastino ensanchado; la sospecha clínica actual es baja', unit:'', ref:'No aplica', termIds:['dolor_toracico','pulsos_perifericos','presion_arterial'] },
-        { id:'p27', source:'Paraclínicos', label:'Evaluación clínica para embolia pulmonar', value:'Sin hipoxemia, taquicardia marcada, dolor pleurítico, hemoptisis, signos de TVP ni factor precipitante mayor; probabilidad clínica baja', unit:'', ref:'No aplica', termIds:['disnea','hemoptisis','dolor_pleuritico','hipoxemia'] }
+        { id:'p20', source:'Paraclínicos', label:'AST, ALT y bilirrubinas', value:'Dentro de rango de referencia', unit:'', ref:'Sin alteraciones', termIds:['ast','alt','bilirrubina'] }
       ]
     }
   ]
@@ -62,10 +43,38 @@ window.HCR_CASE_MODULES.RC4.module4.diagnosticImages = [
     id: 'ecg_inicial',
     type: 'ecg',
     category: 'Electrocardiograma',
+    categoryHelpId: 'electrocardiograma',
+    termIds: ['electrocardiograma','segmento_st','ritmo_sinusal'],
     title: 'Electrocardiograma inicial',
     image: 'cases/RC4/assets/ecg/ecg_inicial.webp',
-    description: 'Electrocardiograma de 12 derivaciones incorporado como recurso visual del caso.',
-    selectable: true
+    description: 'Registro de 12 derivaciones con ritmo sinusal y descenso horizontal del segmento ST. No se observa elevación persistente del ST.',
+    selectable: true,
+    zoomable: true
+  },
+  {
+    id: 'ecg_recurrencia',
+    type: 'ecg',
+    category: 'Electrocardiograma',
+    categoryHelpId: 'electrocardiograma',
+    termIds: ['electrocardiograma','segmento_st'],
+    title: 'Electrocardiograma durante recurrencia de dolor',
+    image: 'cases/RC4/assets/ecg/ecg_recurrencia.webp',
+    description: 'Registro de 12 derivaciones con cambios de repolarización en derivaciones laterales. No se observa elevación persistente del ST.',
+    selectable: true,
+    zoomable: true
+  },
+  {
+    id: 'radiografia_torax',
+    type: 'xray',
+    category: 'Radiografía de tórax',
+    categoryHelpId: 'radiografia_torax',
+    termIds: ['radiografia_torax'],
+    title: 'Radiografía de tórax',
+    image: 'cases/RC4/assets/rx/radiografia_torax.webp',
+    description: 'Radiografía de tórax en dos proyecciones: silueta cardiomediastínica sin aumento evidente; campos pulmonares sin consolidación, edema ni derrame; mediastino no ensanchado.',
+    selectable: true,
+    zoomable: true
   }
 ];
+
 window.HCR_CASE_MODULES.RC4.module4Media = window.HCR_CASE_MODULES.RC4.module4.diagnosticImages;

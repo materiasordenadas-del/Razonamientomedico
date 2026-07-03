@@ -5,8 +5,8 @@
 - `case_data.js`: integración del caso.
 - `metadata.json`: metadatos públicos de biblioteca.
 - `modules/`: datos por módulo.
-- `expert/expert_comparison.js`: ficha experta, manejo esperado, evaluación enriquecida del Módulo 7 y referencias.
-- `assets/`: vacío en esta versión porque no se declaró ningún activo sin catálogo maestro verificable.
+- `expert/expert_comparison.js`: ficha experta, comparación por fases, manejo esperado, evaluación enriquecida del Módulo 7 y referencias.
+- `assets/`: recursos diagnósticos declarados en `HCR_ASSETS`.
 
 ## Marco clínico usado
 
@@ -17,18 +17,15 @@ Caso ficticio de una mujer de 59 años con factores de riesgo aterosclerótico a
 3. síndrome coronario agudo versus síndrome aórtico agudo como diagnóstico que no se puede perder antes de automatizar antitrombóticos;
 4. estabilidad hemodinámica actual versus riesgo isquémico alto.
 
-## Recursos pendientes
+## Recursos declarados
 
-No se declararon recursos en `HCR_ASSETS` porque el catálogo maestro no fue accesible durante la elaboración.
+Los activos de M4 se definen dentro de `HCR_ASSETS` y se vinculan exclusivamente desde `module4.diagnosticImages`.
 
-Cuando exista catálogo maestro, seleccionar únicamente activos reales y aprobados para:
+- ECG inicial: descenso horizontal del segmento ST.
+- ECG durante recurrencia de dolor: cambios laterales de repolarización.
+- Radiografía de tórax: estudio en dos proyecciones sin hallazgos agudos descritos.
 
-- imagen tipo carnet no diagnóstica de la paciente en portada/triaje;
-- ECG real compatible con depresión lateral dinámica del ST y ondas T negativas, sin incluir interpretación dentro de la imagen;
-- radiografía de tórax normal o sin hallazgos agudos;
-- imagen ecocardiográfica compatible con hipocinesia inferolateral, si existe una imagen apropiada y con descripción objetiva.
-
-No usar recursos protegidos, identificables o que revelen el diagnóstico antes del Módulo 4.
+No se declaró imagen tipo carnet porque el catálogo disponible no contenía un recurso no diagnóstico, verificable y apropiado para representar a esta paciente sin revelar hallazgos del caso.
 
 ## Referencias de diseño clínico
 
