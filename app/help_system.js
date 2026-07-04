@@ -76,16 +76,85 @@ function renderHcrIcon(iconRole, ariaLabel) {
   </span><span class="sr-only">${safeLabel}</span>`;
 }
 
+const HCR_MODULE_HELP_ALIASES = {
+  antecedentes_personales_y_patologicos: 'antecedentes_personales_patologicos',
+  medicamentos_alergias_y_exposicion_farmacologica: 'medicamentos_actuales',
+  habitos_psicosociobiologicos_y_contexto: 'habitos_psicosociobiologicos_contexto',
+  general: 'revision_general',
+  piel: 'revision_piel',
+  cabeza_y_ojos: 'revision_cabeza_ojos',
+  oidos_nariz_boca_y_garganta: 'revision_orl',
+  respiratorio: 'revision_respiratorio',
+  cardiovascular: 'revision_cardiovascular',
+  gastrointestinal: 'revision_gastrointestinal',
+  genitourinario: 'revision_genitourinario',
+  osteomuscular: 'revision_osteomuscular',
+  nervioso_y_mental: 'revision_neurologico_mental',
+  examen_fisico_general: 'estado_general',
+  cabeza: 'examen_cabeza',
+  ojos: 'examen_ojos',
+  oidos: 'examen_oidos',
+  nariz_y_senos_paranasales: 'examen_nariz_senos',
+  boca: 'examen_boca_faringe',
+  faringe: 'examen_boca_faringe',
+  cuello: 'examen_cuello',
+  ganglios_linfaticos: 'examen_ganglios_linfaticos',
+  torax: 'examen_torax',
+  senos: 'examen_senos',
+  pulmones: 'examen_respiratorio',
+  corazon: 'examen_cardiovascular',
+  vasos_sanguineos: 'examen_cardiovascular',
+  abdomen: 'examen_abdominal',
+  genitales_femeninos: 'examen_genitourinario',
+  recto: 'examen_rectal',
+  huesos_articulaciones_y_musculos: 'examen_osteomuscular',
+  extremidades: 'examen_extremidades_perifericas',
+  neurologico_y_psiquico: 'examen_neurologico',
+  hematologia_bioquimica_y_hemostasia: 'laboratorio',
+  perfil_lipidico: 'bioquimica_sanguinea',
+  diagnostico_urinario_y_acido_base: 'laboratorio',
+  inflamacion_microbiologia_e_inmunologia: 'laboratorio',
+  electrocardiograma_de_12_derivaciones: 'electrocardiograma',
+  ecocardiografia_doppler_transtoracica: 'ecogramas'
+};
+
+function hcrModuleHelpKey(key) {
+  const raw = String(key || '').trim();
+  if (!raw) return '';
+  if (window.HCR_MODULE_HELP?.[raw]) return raw;
+  const alias = HCR_MODULE_HELP_ALIASES[raw] || '';
+  return window.HCR_MODULE_HELP?.[alias] ? alias : '';
+}
+
 function renderHcrModuleHelpButton(key) {
-  if (!window.HCR_MODULE_HELP?.[key]) return '';
+  const resolvedKey = hcrModuleHelpKey(key);
+  if (!resolvedKey) return '';
   return `<button type="button" class="hcr-icon-btn hcr-help-btn" aria-label="Abrir ayuda"
-    onclick="event.preventDefault();event.stopPropagation();openHcrModuleHelp('${hcrJsArg(key)}')">
+    onclick="event.preventDefault();event.stopPropagation();openHcrModuleHelp('${hcrJsArg(resolvedKey)}')">
     ${renderHcrIcon('ayudaModulo', 'Abrir ayuda')}
   </button>`;
 }
 
+function hcrGeneratedClinicalTermData(key) {
+  const text = String(key || '')
+    .replace(/_/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!text) return null;
+  const title = text
+    .split(' ')
+    .slice(0, 6)
+    .join(' ');
+  return {
+    title: title.charAt(0).toUpperCase() + title.slice(1),
+    definition: text,
+    relevance: '',
+    keyPoints: []
+  };
+}
+
 function hcrClinicalTermData(key) {
-  return window.HCR_CLINICAL_TERMS?.[key] || null;
+  return window.HCR_CLINICAL_TERMS?.[key] || hcrGeneratedClinicalTermData(key);
 }
 
 function hcrClinicalTermTitle(data) {

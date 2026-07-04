@@ -1871,17 +1871,28 @@ function module7LegacyData() {
   };
 }
 
-function module7Data() {
-  const comparison = module7ExpertSource();
-  if (comparison) return module7DataFromComparisonByModule(comparison);
-
-  const direct = CASE_DATA.module7Evaluation || expertData().module7Evaluation || null;
-  if (!direct) return module7LegacyData();
+function module7DirectData(direct) {
   return {
     illnessComparison: direct.illnessComparison || {},
     tier3Comparison: direct.tier3Comparison || {},
     sections: Array.isArray(direct.sections) ? direct.sections : []
   };
+}
+
+function module7Data() {
+  const comparison = module7ExpertSource();
+  const direct = CASE_DATA.module7Evaluation || expertData().module7Evaluation || null;
+  if (comparison) {
+    const comparisonData = module7DataFromComparisonByModule(comparison);
+    const hasFindingRows = (comparisonData.sections || []).some(section =>
+      section.id !== 'management' && Array.isArray(section.rows) && section.rows.length
+    );
+    const hasDirectSections = Array.isArray(direct?.sections) && direct.sections.length;
+    return (!hasFindingRows && hasDirectSections) ? module7DirectData(direct) : comparisonData;
+  }
+
+  if (!direct) return module7LegacyData();
+  return module7DirectData(direct);
 }
 
 function module7RegisterExplanation(row) {
