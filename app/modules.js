@@ -220,8 +220,7 @@ function renderPhysicalExamSections(sections) {
 
 function labRow(item) {
   const txt = item.label + ': ' + item.value
-    + (item.unit ? ' ' + item.unit : '')
-    + (item.ref  ? ' (VR: ' + item.ref + ')' : '');
+    + (item.unit ? ' ' + item.unit : '');
   const sel = isSelected(item.id);
   return `<tr class="${sel ? 'selected' : ''}">
     <td><input class="lab-check finding-check" type="checkbox"
@@ -231,7 +230,6 @@ function labRow(item) {
     <td class="lab-eye-cell">${hcrTermButtons(item.termIds, txt, true)}</td>
     <td>${esc(item.value)}</td>
     <td>${esc(item.unit)}</td>
-    <td><span class="lab-ref-text">${esc(item.ref)}</span></td>
   </tr>`;
 }
 
@@ -779,7 +777,7 @@ function renderM4() {
       <summary>${hcrModuleTitle(title, table.helpId || '')}</summary>
       <div class="accordion-body">
         <table class="lab-table">
-          <thead><tr><th></th><th>Prueba</th><th></th><th>Valor</th><th>Unidad</th><th>Referencia</th></tr></thead>
+          <thead><tr><th></th><th>Prueba</th><th></th><th>Valor</th><th>Unidad</th></tr></thead>
           <tbody>${rows.map(r => labRow(r)).join('')}</tbody>
         </table>
       </div>
@@ -1484,7 +1482,7 @@ function allCaseFindings() {
   (CASE_DATA.m4?.tables || []).forEach(table => (table.rows || []).forEach(row => out.push({
     id: row.id,
     source: row.source,
-    text: `${row.label}: ${row.value}${row.unit ? ' ' + row.unit : ''}${row.ref ? ' (VR: ' + row.ref + ')' : ''}`
+    text: `${row.label}: ${row.value}${row.unit ? ' ' + row.unit : ''}`
   })));
   return out;
 }
