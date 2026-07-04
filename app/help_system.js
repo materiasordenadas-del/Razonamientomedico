@@ -135,26 +135,8 @@ function renderHcrModuleHelpButton(key) {
   </button>`;
 }
 
-function hcrGeneratedClinicalTermData(key) {
-  const text = String(key || '')
-    .replace(/_/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-  if (!text) return null;
-  const title = text
-    .split(' ')
-    .slice(0, 6)
-    .join(' ');
-  return {
-    title: title.charAt(0).toUpperCase() + title.slice(1),
-    definition: text,
-    relevance: '',
-    keyPoints: []
-  };
-}
-
 function hcrClinicalTermData(key) {
-  return window.HCR_CLINICAL_TERMS?.[key] || hcrGeneratedClinicalTermData(key);
+  return window.HCR_CLINICAL_TERMS?.[key] || null;
 }
 
 function hcrClinicalTermTitle(data) {
@@ -179,6 +161,18 @@ function hcrValidTermIds(termIds) {
     .filter((id, idx, list) => id && list.indexOf(id) === idx && hcrClinicalTermData(id));
 }
 
+function hcrCaseTermTexts(termIds) {
+  return (Array.isArray(termIds) ? termIds : [termIds])
+    .map(id => String(id || '').trim())
+    .filter((id, idx, list) => {
+      const normalized = hcrNormalize(id).replace(/_/g, ' ');
+      return id
+        && list.indexOf(id) === idx
+        && !normalized.includes('no aplica')
+        && !normalized.includes('no lleva ojito');
+    });
+}
+
 function renderHcrClinicalTermButtonForIds(termIds) {
   const ids = hcrValidTermIds(termIds);
   if (!ids.length) return '';
@@ -189,9 +183,14 @@ function renderHcrClinicalTermButtonForIds(termIds) {
 }
 
 function renderHcrFindingEyeButton(termIds, findingText) {
-  const ids = hcrValidTermIds(termIds);
-  if (!ids.length) return '';
-  return renderHcrClinicalTermButtonForIds(ids);
+  const caseTexts = hcrCaseTermTexts(termIds);
+  if (caseTexts.length) {
+    return `<button type="button" class="hcr-icon-btn hcr-term-btn" aria-label="Abrir ojito del caso"
+      onclick="event.preventDefault();event.stopPropagation();openHcrCaseTermHelp('${hcrJsArg(caseTexts.join('|||'))}','${hcrJsArg(findingText || '')}')">
+      ${renderHcrIcon('terminoClinico', 'Abrir ojito del caso')}
+    </button>`;
+  }
+  return renderHcrClinicalTermButtonForIds(termIds);
 }
 
 function findHcrClinicalTerm(text) {
@@ -280,6 +279,34 @@ function openHcrFindingDetail(findingText) {
         <section class="hcr-term-section">
           <h4>Dato seleccionado</h4>
           <p>${hcrEscape(findingText || '')}</p>
+        </section>
+      </div>
+    </div>`;
+  root.hidden = false;
+}
+
+function openHcrCaseTermHelp(encodedTerms, findingText) {
+  const terms = String(encodedTerms || '')
+    .split('|||')
+    .map(item => item.trim())
+    .filter(Boolean);
+  if (!terms.length) return;
+  const root = hcrModalRoot();
+  root.className = 'hcr-help-modal hcr-term-modal';
+  root.innerHTML = `<div class="hcr-help-backdrop" onclick="closeHcrHelpModal()"></div>
+    <div class="hcr-help-panel hcr-term-panel" role="dialog" aria-modal="true" aria-labelledby="hcrCaseTermTitle">
+      <div class="hcr-help-header">
+        <h2 id="hcrCaseTermTitle">Ojito del caso</h2>
+        <button type="button" class="hcr-help-close" onclick="closeHcrHelpModal()" aria-label="Cerrar">Cerrar</button>
+      </div>
+      <div class="hcr-term-content">
+        ${findingText ? `<section class="hcr-term-section">
+          <h4>Dato</h4>
+          <p>${hcrEscape(findingText)}</p>
+        </section>` : ''}
+        <section class="hcr-term-section">
+          <h4>Lectura clínica</h4>
+          <ul>${terms.map(item => `<li>${hcrEscape(item.replace(/_/g, ' '))}</li>`).join('')}</ul>
         </section>
       </div>
     </div>`;
