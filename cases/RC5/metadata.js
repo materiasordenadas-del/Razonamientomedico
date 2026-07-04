@@ -1,0 +1,33 @@
+window.HCR_CASE_METADATA = window.HCR_CASE_METADATA || {};
+
+window.HCR_CASE_METADATA.RC5 = {
+  "system": "Cardiovascular e inmunoinflamatorio",
+  "subsystem": "Afectación valvular inflamatoria postinfecciosa",
+  "difficulty": 3,
+  "difficultyLabel": "Nivel III",
+  "estimatedMinutes": "45",
+  "caseType": "complete",
+  "learningObjectives": [
+    "Integrar tempo, migración articular, inflamación y compromiso cardíaco en una cadena causal única.",
+    "Evitar atribuir fiebre y dolor articular a un proceso viral o articular aislado sin reevaluar la seguridad cardiovascular.",
+    "Priorizar documentación objetiva de compromiso cardíaco y de infección antecedente sin omitir la amenaza endovascular infecciosa.",
+    "Actualizar un Top 3 competitivo a partir de distribución, cronología, serología, conducción y ecocardiografía."
+  ],
+  "tags": [
+    "artritis migratoria",
+    "antecedente faríngeo",
+    "compromiso valvular"
+  ],
+  "author": "Case Builder / IA",
+  "lastUpdated": "2026-07-04",
+  "visual": {
+    "fotoCircular": ""
+  },
+  "supports": {
+    "images": true,
+    "audio": false,
+    "ecg": true,
+    "xray": false,
+    "labs": true
+  }
+};

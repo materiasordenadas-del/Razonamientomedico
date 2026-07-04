@@ -46,6 +46,49 @@ window.HCR_CASES_CATALOG = {
       publicPresentation: "Paciente adulta con opresión torácica progresiva, síntomas autonómicos y factores de riesgo cardiovascular que requiere razonamiento diagnóstico y manejo urgente.",
       publicTags: { symptoms: ["Dolor torácico", "Náuseas", "Diaforesis"], syndromes: ["Síndrome de dolor torácico agudo"], systems: ["Cardiovascular"], context: ["Urgencias", "Adulto", "Dolor en reposo"], keywords: ["dolor torácico", "opresión", "diaforesis", "troponina", "electrocardiograma", "urgencias"] },
       sort: { recommendedRank: 4, publishedAt: "2026-07-01" }
+    },
+    {
+          "id": "RC5",
+          "route": "caso-RC5.html",
+          "availability": "Disponible",
+          "format": "Caso completo",
+          "modules": 8,
+          "difficulty": "Nivel 3",
+          "level": "Nivel III",
+          "collections": [
+                "urgencias"
+          ],
+          "imagenPortada": "",
+          "patient": {
+                "displayName": "Camila R.",
+                "initials": "CR",
+                "age": 12,
+                "sex": "femenino",
+                "setting": "Urgencias pediátricas"
+          },
+          "chiefConcern": "Fiebre y dolor cambiante en articulaciones grandes.",
+          "publicPresentation": "Paciente escolar con fiebre, deterioro funcional y dolor que cambia de articulación. El caso entrena cómo convertir una cronología aparentemente dispersa en un problema clínico integrado y seguro.",
+          "publicTags": {
+                "symptoms": [
+                      "Fiebre, dolor articular, fatiga de esfuerzo"
+                ],
+                "syndromes": [
+                      "Síndrome inflamatorio agudo"
+                ],
+                "systems": [
+                      "Osteomuscular y cardiovascular"
+                ],
+                "context": [
+                      "Urgencias pediátricas"
+                ],
+                "keywords": [
+                      "migración articular; cronología; seguridad cardiovascular"
+                ]
+          },
+          "sort": {
+                "recommendedRank": 5,
+                "publishedAt": "2026-07-04"
+          }
     }
   ]
 };

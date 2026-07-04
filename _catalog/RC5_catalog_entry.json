@@ -1,0 +1,34 @@
+{
+  "id": "RC5",
+  "patient": {
+    "displayName": "Camila R.",
+    "initials": "CR",
+    "age": 12,
+    "sex": "femenino"
+  },
+  "setting": "Urgencias pediátricas",
+  "chiefConcern": "Fiebre y dolor cambiante en articulaciones grandes.",
+  "publicPresentation": "Paciente escolar con fiebre, deterioro funcional y dolor que cambia de articulación. El caso entrena cómo convertir una cronología aparentemente dispersa en un problema clínico integrado y seguro.",
+  "system": "Pediatría / medicina interna",
+  "difficulty": "Nivel 3",
+  "modules": 8,
+  "route": "caso-RC5.html",
+  "imagenPortada": "Sin imagen de portada.",
+  "publicTags": {
+    "symptoms": [
+      "Fiebre, dolor articular, fatiga de esfuerzo"
+    ],
+    "syndromes": [
+      "Síndrome inflamatorio agudo"
+    ],
+    "systems": [
+      "Osteomuscular y cardiovascular"
+    ],
+    "context": [
+      "Urgencias pediátricas"
+    ],
+    "keywords": [
+      "migración articular; cronología; seguridad cardiovascular"
+    ]
+  }
+}
