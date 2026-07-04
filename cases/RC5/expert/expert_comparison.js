@@ -300,7 +300,225 @@ window.HCR_CASE_EXPERT.RC5 = {
       "student": "",
       "expert": "Principal: Fiebre reumática aguda con carditis.\nAlternativo: Artritis reactiva postestreptocócica.\nNo se puede perder: Endocarditis infecciosa con afectación valvular."
     },
-    "sections": [
+    "phaseComparisons": [
+      {
+        "id": "m7_rc5_phase_m1",
+        "phase": "m1",
+        "title": "Triage e interrogatorio",
+        "studentBinding": {
+          "illnessField": "ill_m1",
+          "tierFields": [
+            "tier_m1_1",
+            "tier_m1_2",
+            "tier_m1_3"
+          ],
+          "selectedSources": [
+            "Triage",
+            "Interrogatorio"
+          ]
+        },
+        "illnessComparison": {
+          "student": "",
+          "studentField": "ill_m1",
+          "expert": "Camila, escolar de 12 años, inició seis días antes con dolor e hinchazón en el tobillo izquierdo, que mejoraron aproximadamente 24 horas después. Posteriormente presentó dolor e inflamación en la rodilla derecha y, tras mejorar esta, se instaló en la rodilla izquierda, con dificultad para caminar. Durante el mismo período ha tenido fiebre y cansancio; desde el día previo nota palpitaciones y necesidad de detenerse al subir escaleras. Tres semanas antes tuvo dolor de garganta con fiebre varios días y no recibió antibiótico. Como negativos pertinentes, niega síncope, dolor torácico, falta de aire en reposo, tos persistente, movimientos involuntarios y lesiones cutáneas nuevas."
+        },
+        "tier3Comparison": {
+          "student": "",
+          "studentFields": [
+            "tier_m1_1",
+            "tier_m1_2",
+            "tier_m1_3"
+          ],
+          "expert": "Principal: Fiebre reumática aguda con posible compromiso cardíaco.\nAlternativo: Artritis reactiva postestreptocócica.\nNo se puede perder: Proceso infeccioso con potencial compromiso cardiovascular por definir."
+        },
+        "sections": [
+          {
+            "title": "Triage",
+            "type": "findings",
+            "rows": [
+              {
+                "id": "m7_rc5_m1_triage_01",
+                "severity": "yellow",
+                "studentText": "",
+                "expertText": "El ingreso muestra fiebre y taquicardia con perfusión y oxigenación conservadas; el motivo de cansancio obliga a ampliar la historia sin convertir el triage en diagnóstico.",
+                "expertNote": "El ingreso muestra fiebre y taquicardia con perfusión y oxigenación conservadas; el motivo de cansancio obliga a ampliar la historia sin convertir el triage en diagnóstico."
+              }
+            ]
+          },
+          {
+            "title": "Interrogatorio",
+            "type": "findings",
+            "rows": [
+              {
+                "id": "m7_rc5_m1_interrogatorio_01",
+                "severity": "yellow",
+                "studentText": "",
+                "expertText": "La secuencia de alivio en una articulación y aparición en otra, junto con el antecedente faríngeo y un cambio funcional de esfuerzo, organiza el problema mejor que la fiebre o el dolor aislados.",
+                "expertNote": "La secuencia de alivio en una articulación y aparición en otra, junto con el antecedente faríngeo y un cambio funcional de esfuerzo, organiza el problema mejor que la fiebre o el dolor aislados."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "m7_rc5_phase_m2",
+        "phase": "m2",
+        "title": "Historial y examen funcional",
+        "studentBinding": {
+          "illnessField": "ill_m2",
+          "tierFields": [
+            "tier_m2_1",
+            "tier_m2_2",
+            "tier_m2_3"
+          ],
+          "selectedSources": [
+            "Historial",
+            "Examen funcional"
+          ]
+        },
+        "illnessComparison": {
+          "student": "",
+          "studentField": "ill_m2",
+          "expert": "Paciente de 12 años previamente funcional, con síndrome febril inflamatorio de seis días y dolor migratorio de grandes articulaciones tras episodio faríngeo no tratado, en contexto de exposición estrecha, con palpitaciones y menor tolerancia al esfuerzo, sin falta de aire en reposo ni síntomas congestivos referidos."
+        },
+        "tier3Comparison": {
+          "student": "",
+          "studentFields": [
+            "tier_m2_1",
+            "tier_m2_2",
+            "tier_m2_3"
+          ],
+          "expert": "Principal: Fiebre reumática aguda con posible carditis.\nAlternativo: Artritis reactiva postestreptocócica.\nNo se puede perder: Proceso endovascular infeccioso con potencial lesión valvular."
+        },
+        "sections": [
+          {
+            "title": "Hallazgos integradores",
+            "type": "findings",
+            "rows": [
+              {
+                "id": "m7_rc5_m2_essential_01",
+                "severity": "red",
+                "studentText": "",
+                "expertText": "Basal articular y cardiovascular previamente conservado, exposición domiciliaria y escolar, y episodio faríngeo remoto no tratado.",
+                "expertNote": "La historia basal sin artritis persistente ni cardiopatía conocida se conecta con una exposición faríngea no tratada y la transición migratoria de grandes articulaciones. El deterioro de esfuerzo no demuestra todavía lesión cardíaca, pero obliga a buscarla. El límite continúa siendo la ausencia de signos físicos y pruebas objetivas. El siguiente puente es la exploración articular y cardiovascular."
+              },
+              {
+                "id": "m7_rc5_m2_essential_02",
+                "severity": "yellow",
+                "studentText": "",
+                "expertText": "Patrón migratorio con fiebre y cambio funcional de esfuerzo; persiste incertidumbre anatómica y no se incorporan signos físicos ni pruebas futuras.",
+                "expertNote": "Sigue explicando una artritis inflamatoria tras infección faríngea y por eso compite. Pierde coherencia relativa si la exploración demuestra una lesión valvular nueva o hallazgos de conducción; esos datos todavía no están disponibles en M2."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "m7_rc5_phase_m3",
+        "phase": "m3",
+        "title": "Examen físico",
+        "studentBinding": {
+          "illnessField": "ill_m3",
+          "tierFields": [
+            "tier_m3_1",
+            "tier_m3_2",
+            "tier_m3_3"
+          ],
+          "selectedSources": [
+            "Examen físico"
+          ]
+        },
+        "illnessComparison": {
+          "student": "",
+          "studentField": "ill_m3",
+          "expert": "Paciente de 12 años con síndrome febril inflamatorio y artritis migratoria de grandes articulaciones, ahora con sinovitis objetiva en la articulación activa y soplo apical pansistólico de nueva detección, sin hallazgos clínicos de congestión ni hipoperfusión."
+        },
+        "tier3Comparison": {
+          "student": "",
+          "studentFields": [
+            "tier_m3_1",
+            "tier_m3_2",
+            "tier_m3_3"
+          ],
+          "expert": "Principal: Fiebre reumática aguda con carditis.\nAlternativo: Artritis reactiva postestreptocócica.\nNo se puede perder: Endocarditis infecciosa con afectación valvular."
+        },
+        "sections": [
+          {
+            "title": "Hallazgos del examen físico",
+            "type": "findings",
+            "rows": [
+              {
+                "id": "m7_rc5_m3_essential_01",
+                "severity": "red",
+                "studentText": "",
+                "expertText": "Hallazgo articular objetivo en la articulación activa y ausencia de sinovitis en una articulación previamente comprometida, compatibles con la trayectoria migratoria ya conocida.",
+                "expertNote": "La migración referida ahora se corresponde con una articulación activa y otra previamente afectada sin sinovitis actual. El soplo pansistólico apical crea una conexión cardíaca objetiva que permite que una sola cadena explique articulaciones, fiebre y repercusión de esfuerzo. Aún requiere confirmar exposición antecedente y caracterizar la válvula; el puente es serología, ECG y ecocardiografía Doppler."
+              },
+              {
+                "id": "m7_rc5_m3_essential_02",
+                "severity": "yellow",
+                "studentText": "",
+                "expertText": "Hallazgo auscultatorio nuevo que obliga a caracterizar anatomía y conducción, manteniendo evaluación microbiológica de seguridad sin anticipar resultados.",
+                "expertNote": "Mantiene peso por la infección antecedente y la artritis. Su tensión central es que el hallazgo valvular nuevo no queda bien explicado por una artritis reactiva aislada. La ecocardiografía y la integración de criterios serán los discriminadores decisivos."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "m7_rc5_phase_m4",
+        "phase": "m4",
+        "title": "Paraclínicos",
+        "studentBinding": {
+          "illnessField": "ill_m4",
+          "tierFields": [
+            "tier_m4_1",
+            "tier_m4_2",
+            "tier_m4_3"
+          ],
+          "selectedSources": [
+            "Paraclínicos"
+          ]
+        },
+        "illnessComparison": {
+          "student": "",
+          "studentField": "ill_m4",
+          "expert": "Paciente de 12 años con síndrome inflamatorio migratorio, evidencia serológica de exposición estreptocócica previa, alteración de conducción y regurgitación valvular documentada; la evaluación microbiológica de seguridad ya fue iniciada, pero sus resultados definitivos no están disponibles en esta etapa."
+        },
+        "tier3Comparison": {
+          "student": "",
+          "studentFields": [
+            "tier_m4_1",
+            "tier_m4_2",
+            "tier_m4_3"
+          ],
+          "expert": "Principal: Fiebre reumática aguda con carditis.\nAlternativo: Artritis reactiva postestreptocócica.\nNo se puede perder: Endocarditis infecciosa con afectación valvular."
+        },
+        "sections": [
+          {
+            "title": "Hallazgos paraclínicos",
+            "type": "findings",
+            "rows": [
+              {
+                "id": "m7_rc5_m4_essential_01",
+                "severity": "red",
+                "studentText": "",
+                "expertText": "Reactantes inflamatorios, títulos serológicos por encima de límites locales, alteración de conducción y regurgitación mitral documentada como elementos disponibles en M4.",
+                "expertNote": "Una misma red conecta artritis migratoria, latencia faríngea, inflamación objetiva, evidencia serológica de exposición estreptocócica previa, alteración de conducción y regurgitación mitral documentada. La ecocardiografía añade un hallazgo estructural que cambia la jerarquía clínica. El límite operativo es que la evaluación microbiológica de seguridad está en curso, no resuelta. La decisión consecuente es mantener vigilancia hospitalaria y valoración especializada mientras se completa la información diferida."
+              },
+              {
+                "id": "m7_rc5_m4_essential_02",
+                "severity": "yellow",
+                "studentText": "",
+                "expertText": "Muestras microbiológicas seriadas obtenidas antes de antimicrobianos, con disponibilidad definitiva diferida; no se usan para cerrar ni reducir una amenaza durante esta etapa.",
+                "expertNote": "La exposición previa y artritis siguen siendo compatibles, pero la alteración de conducción y la regurgitación mitral objetiva reducen la capacidad de esta alternativa para explicar la totalidad del síndrome. Permanece como alternativa si los componentes cardíacos se reinterpretaran o fueran no concluyentes, escenario que no describe el expediente actual."
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "legacySections": [
       {
         "id": "m1_triage_interrogatorio",
         "title": "M1 — triage/interrogatorio",

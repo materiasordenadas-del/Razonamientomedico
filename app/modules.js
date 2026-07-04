@@ -1851,6 +1851,115 @@ function module7DataFromComparisonByModule(comparison) {
   return { pairedBlocks, sections };
 }
 
+function module7StudentTextFromIds(ids) {
+  return (Array.isArray(ids) ? ids : [])
+    .map(id => state.selected?.[id]?.text || '')
+    .filter(Boolean)
+    .join('\n');
+}
+
+function module7NormalizeSource(source) {
+  return String(source || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+}
+
+function module7SelectedRowsForSources(sources, explanationSource = {}) {
+  const wanted = new Set((Array.isArray(sources) ? sources : [])
+    .map(module7NormalizeSource)
+    .filter(Boolean));
+  const explanationBody = explanationSource.expertNote || explanationSource.rationale || '';
+  return Object.values(state.selected || {})
+    .filter(item => wanted.has(module7NormalizeSource(item.source)))
+    .map(item => ({
+      id: `selected-${item.id}`,
+      severity: 'neutral',
+      studentText: item.text || findingTextById(item.id),
+      expertText: item.text || findingTextById(item.id),
+      explanation: explanationBody ? {
+        title: explanationSource.title || 'Explicación experta',
+        question: '¿Por qué era importante?',
+        body: [explanationBody]
+      } : null
+    }));
+}
+
+function module7StudentTierTextFromFields(fields) {
+  return (Array.isArray(fields) ? fields : [])
+    .map((key, idx) => {
+      const labels = ['Diagnóstico principal', 'Diagnóstico secundario', 'Diagnóstico fatal'];
+      const diagnosis = diagnosisData(key);
+      return diagnosis?.name ? `${labels[idx] || 'Diagnóstico'}: ${diagnosis.name}` : '';
+    })
+    .filter(Boolean)
+    .join('\n');
+}
+
+function module7SectionsFromPhase(phase) {
+  const phaseSections = phase.sections || [];
+  const hasBoundRows = phaseSections.some(section =>
+    (section.rows || []).some(row => Array.isArray(row.studentFindingIds) && row.studentFindingIds.length)
+  );
+  if (!hasBoundRows) {
+    const sources = phase.studentBinding?.selectedSources || [];
+    return sources.map((source, sourceIdx) => {
+      const matchingSection = phaseSections.find(section =>
+        module7NormalizeSource(section.title) === module7NormalizeSource(source)
+      ) || phaseSections[sourceIdx] || {};
+      const explanationRow = (matchingSection.rows || [])[0] || {};
+      return {
+        id: `${phase.phase || phase.id || 'phase'}-${sourceIdx}-selected-findings`,
+        title: `${phase.title || phase.phase || 'Etapa'} · ${source}`,
+        type: 'hallazgos',
+        rows: module7SelectedRowsForSources([source], {
+          title: matchingSection.title || source,
+          expertNote: explanationRow.expertNote || explanationRow.explanation?.body?.join('\n')
+        })
+      };
+    });
+  }
+
+  return phaseSections.map((section, sectionIdx) => ({
+    id: section.id || `${phase.phase || phase.id || 'phase'}-${sectionIdx}`,
+    title: `${phase.title || phase.phase || ''}${section.title ? ' · ' + section.title : ''}`.trim(),
+    type: section.type || 'findings',
+    rows: (section.rows || []).map(row => ({
+      ...row,
+      studentText: row.studentText || module7StudentTextFromIds(row.studentFindingIds),
+      explanation: row.explanation || (row.expertNote ? {
+        title: row.expertText || section.title || phase.title || 'Explicación experta',
+        question: '¿Por qué era importante?',
+        body: [row.expertNote]
+      } : null)
+    }))
+  }));
+}
+
+function module7DataFromPhaseComparisons(phaseComparisons) {
+  const pairedBlocks = [];
+  const sections = [];
+
+  (phaseComparisons || []).forEach(phase => {
+    const illness = phase.illnessComparison || {};
+    const tier = phase.tier3Comparison || {};
+    const phaseTitle = phase.title || phase.phase || 'Etapa';
+    pairedBlocks.push({
+      title: `${phaseTitle} · Enfermedad actual / representación del problema`,
+      student: illness.student || state.fields[illness.studentField || phase.studentBinding?.illnessField] || '',
+      expert: illness.expert || illness.expected || ''
+    });
+    pairedBlocks.push({
+      title: `${phaseTitle} · Diagnósticos Tier 3`,
+      student: tier.student || module7StudentTierTextFromFields(tier.studentFields || phase.studentBinding?.tierFields),
+      expert: tier.expert || ''
+    });
+    sections.push(...module7SectionsFromPhase(phase));
+  });
+
+  return { pairedBlocks, sections };
+}
+
 function module7LegacyData() {
   const latest = module7LatestExpertModule();
   return {
@@ -1870,6 +1979,9 @@ function module7LegacyData() {
 }
 
 function module7DirectData(direct) {
+  if (Array.isArray(direct.phaseComparisons) && direct.phaseComparisons.length) {
+    return module7DataFromPhaseComparisons(direct.phaseComparisons);
+  }
   return {
     illnessComparison: direct.illnessComparison || {},
     tier3Comparison: direct.tier3Comparison || {},
@@ -1880,6 +1992,9 @@ function module7DirectData(direct) {
 function module7Data() {
   const comparison = module7ExpertSource();
   const direct = CASE_DATA.module7Evaluation || expertData().module7Evaluation || null;
+  if (Array.isArray(direct?.phaseComparisons) && direct.phaseComparisons.length) {
+    return module7DataFromPhaseComparisons(direct.phaseComparisons);
+  }
   if (comparison) {
     const comparisonData = module7DataFromComparisonByModule(comparison);
     const hasFindingRows = (comparisonData.sections || []).some(section =>
