@@ -58,7 +58,7 @@ window.HCR_CASES_CATALOG = {
           "collections": [
                 "urgencias"
           ],
-          "imagenPortada": "",
+          "imagenPortada": "cases/RC5/assets/patient/rc5_portada_index_1200x792.webp",
           "patient": {
                 "displayName": "Camila R.",
                 "initials": "CR",

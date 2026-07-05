@@ -13,7 +13,7 @@
   "difficulty": "Nivel 3",
   "modules": 8,
   "route": "caso-RC5.html",
-  "imagenPortada": "Sin imagen de portada.",
+  "imagenPortada": "cases/RC5/assets/patient/rc5_portada_index_1200x792.webp",
   "publicTags": {
     "symptoms": [
       "Fiebre, dolor articular, fatiga de esfuerzo"

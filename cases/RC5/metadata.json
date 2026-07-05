@@ -19,7 +19,8 @@
   "author": "Case Builder / IA",
   "lastUpdated": "2026-07-04",
   "visual": {
-    "fotoCircular": ""
+    "imagenPortada": "cases/RC5/assets/patient/rc5_portada_index_1200x792.webp",
+    "fotoCircular": "cases/RC5/assets/patient/rc5_triaje_avatar_360x360.webp"
   },
   "supports": {
     "images": true,
