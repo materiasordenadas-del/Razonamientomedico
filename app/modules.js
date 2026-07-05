@@ -1936,7 +1936,14 @@ function module7SectionsFromPhase(phase) {
   }));
 }
 
-function module7DataFromPhaseComparisons(phaseComparisons) {
+function module7ExtraDirectSections(direct) {
+  return [
+    ...(Array.isArray(direct?.sections) ? direct.sections : []),
+    ...(Array.isArray(direct?.legacySections) ? direct.legacySections : [])
+  ];
+}
+
+function module7DataFromPhaseComparisons(phaseComparisons, extraSections = []) {
   const pairedBlocks = [];
   const sections = [];
 
@@ -1957,6 +1964,7 @@ function module7DataFromPhaseComparisons(phaseComparisons) {
     sections.push(...module7SectionsFromPhase(phase));
   });
 
+  sections.push(...extraSections);
   return { pairedBlocks, sections };
 }
 
@@ -1980,12 +1988,12 @@ function module7LegacyData() {
 
 function module7DirectData(direct) {
   if (Array.isArray(direct.phaseComparisons) && direct.phaseComparisons.length) {
-    return module7DataFromPhaseComparisons(direct.phaseComparisons);
+    return module7DataFromPhaseComparisons(direct.phaseComparisons, module7ExtraDirectSections(direct));
   }
   return {
     illnessComparison: direct.illnessComparison || {},
     tier3Comparison: direct.tier3Comparison || {},
-    sections: Array.isArray(direct.sections) ? direct.sections : []
+    sections: module7ExtraDirectSections(direct)
   };
 }
 
@@ -1993,7 +2001,7 @@ function module7Data() {
   const comparison = module7ExpertSource();
   const direct = CASE_DATA.module7Evaluation || expertData().module7Evaluation || null;
   if (Array.isArray(direct?.phaseComparisons) && direct.phaseComparisons.length) {
-    return module7DataFromPhaseComparisons(direct.phaseComparisons);
+    return module7DataFromPhaseComparisons(direct.phaseComparisons, module7ExtraDirectSections(direct));
   }
   if (comparison) {
     const comparisonData = module7DataFromComparisonByModule(comparison);
