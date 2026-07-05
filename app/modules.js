@@ -1729,41 +1729,57 @@ function module7RowsFromLegacyFindings() {
 
 function module7RowsFromLegacyManagement() {
   const management = expertData().management || {};
+  const cleanLabel = value => String(value || '').replace(/^ACT-\d+\s*[—-]\s*/i, '').trim();
+  const cleanReason = value => String(value || '')
+    .replace(/\s*\[[^\]]*REF-[^\]]*\]/g, '')
+    .replace(/\s*10\.\d+\s+[A-ZÁÉÍÓÚÑ ]+(?:\s+[A-ZÁÉÍÓÚÑ]+)?\s*$/g, '')
+    .trim();
+  const row = (prefix, item, index, severity) => {
+    const label = cleanLabel(item?.label);
+    const reason = cleanReason(item?.reason);
+    return {
+      id: `${prefix}-${index}`,
+      severity,
+      studentText: '',
+      expertText: label,
+      expertNote: reason,
+      explanation: reason ? { title: label, body: [reason] } : null
+    };
+  };
   const rows = [];
-  (management.expected || []).forEach((item, index) => rows.push({
-    id: `management-expected-${index}`,
-    severity: 'yellow',
-    studentText: '',
-    expertText: item.label || '',
-    expertNote: item.reason || '',
-    explanation: item.reason ? { title: item.label, body: [item.reason] } : null
-  }));
-  (management.dangerousOmissions || []).forEach((item, index) => rows.push({
-    id: `management-omission-${index}`,
-    severity: 'red',
-    studentText: '',
-    expertText: item.label || '',
-    expertNote: item.reason || '',
-    explanation: item.reason ? { title: item.label, body: [item.reason] } : null
-  }));
-  (management.monitoringOmitted || []).forEach((item, index) => rows.push({
-    id: `management-monitoring-${index}`,
-    severity: 'yellow',
-    studentText: '',
-    expertText: item.label || '',
-    expertNote: item.reason || '',
-    explanation: item.reason ? { title: item.label, body: [item.reason] } : null
-  }));
+  const addGroup = title => rows.push({
+    id: `management-group-${title.toLowerCase().replace(/\s+/g, '-')}`,
+    type: 'subheading',
+    title
+  });
+  const expectedRows = (management.expected || []).map((item, index) => row('management-expected', item, index, 'yellow'));
+  if (expectedRows.length) {
+    addGroup('ACCIONES ESPERADAS');
+    rows.push(...expectedRows);
+  }
+  const omissionRows = (management.dangerousOmissions || []).map((item, index) => row('management-omission', item, index, 'red'));
+  if (omissionRows.length) {
+    addGroup('OMISIONES O ACCIONES PELIGROSAS');
+    rows.push(...omissionRows);
+  }
+  const monitoringRows = (management.monitoringOmitted || []).map((item, index) => row('management-monitoring', item, index, 'yellow'));
+  if (monitoringRows.length) {
+    addGroup('MONITORIZACION OMITIDA');
+    rows.push(...monitoringRows);
+  }
   if (management.destination) {
+    const label = cleanLabel(management.destination.label);
+    const reason = cleanReason(management.destination.reason);
+    addGroup('DESTINO');
     rows.push({
       id: 'management-destination',
       severity: 'neutral',
       studentText: '',
-      expertText: management.destination.label || '',
-      expertNote: management.destination.reason || '',
-      explanation: management.destination.reason ? {
-        title: management.destination.label,
-        body: [management.destination.reason]
+      expertText: label,
+      expertNote: reason,
+      explanation: reason ? {
+        title: label,
+        body: [reason]
       } : null
     });
   }
@@ -1779,15 +1795,37 @@ function module7RowsFromSourceComparison(moduleKey, moduleData) {
   const selectedIds = new Set(Object.keys(state.selected || {}));
   const sourceComparison = moduleData?.sourceComparison || {};
   const rows = [];
+  const module7Findings = Array.isArray(moduleData?.module7Findings) ? moduleData.module7Findings : [];
+  const criticalIds = new Set(Object.values(sourceComparison)
+    .flatMap(group => group?.criticalMisses || []));
+
+  if (module7Findings.length) {
+    module7Findings.forEach(item => {
+      const findingId = String(item.findingId || '').toLowerCase();
+      const selected = state.selected?.[findingId];
+      const text = item.text || selected?.text || findingTextById(findingId);
+      const selectedByStudent = selectedIds.has(findingId);
+      rows.push({
+        id: item.id || `${moduleKey}-${findingId || rows.length}`,
+        severity: selectedByStudent ? 'yellow' : (criticalIds.has(findingId) ? 'red' : 'yellow'),
+        studentText: selectedByStudent ? (selected?.text || text) : '',
+        expertText: text,
+        explanation: item.explanation || null
+      });
+    });
+
+    const meta = module7ModuleOrder.find(item => item.key === moduleKey);
+    return [{
+      id: `${moduleKey}-findings`,
+      title: meta?.title || moduleData?.title || moduleKey,
+      type: 'hallazgos',
+      rows
+    }];
+  }
 
   Object.entries(sourceComparison).forEach(([groupKey, group]) => {
     const critical = new Set(group.criticalMisses || []);
     const expectedIds = [...new Set([...(group.expectedSelected || []), ...(group.criticalMisses || [])])];
-    const explanationBody = group.rationale || group.expertNote || '';
-    const explanation = explanationBody
-      ? { title: groupKey, question: '¿Por qué era importante?', body: [explanationBody] }
-      : null;
-
     expectedIds.forEach(id => {
       const selected = state.selected?.[id];
       const text = selected?.text || findingTextById(id);
@@ -1795,23 +1833,10 @@ function module7RowsFromSourceComparison(moduleKey, moduleData) {
         id: `${moduleKey}-${groupKey}-${id}`,
         severity: critical.has(id) ? 'red' : 'yellow',
         studentText: selectedIds.has(id) ? text : '',
-        expertText: text,
-        explanation
+        expertText: text
       });
     });
 
-    (group.lowValueIfSelected || []).forEach(id => {
-      if (!selectedIds.has(id)) return;
-      const selected = state.selected?.[id];
-      const text = selected?.text || findingTextById(id);
-      rows.push({
-        id: `${moduleKey}-${groupKey}-${id}-low`,
-        severity: 'green',
-        studentText: text,
-        expertText: `No prioritario: ${text}`,
-        explanation
-      });
-    });
   });
 
   const meta = module7ModuleOrder.find(item => item.key === moduleKey);
@@ -1865,17 +1890,24 @@ function module7NormalizeSource(source) {
     .toLowerCase();
 }
 
-function module7SelectedRowsForSources(sources, explanationSource = {}) {
+function module7CaseFindingRowsForSources(sources, explanationSource = {}) {
   const wanted = new Set((Array.isArray(sources) ? sources : [])
     .map(module7NormalizeSource)
     .filter(Boolean));
   const explanationBody = explanationSource.expertNote || explanationSource.rationale || '';
-  return Object.values(state.selected || {})
+  const selectedIds = new Set(Object.keys(state.selected || {}));
+  const seen = new Set();
+  return allCaseFindings()
     .filter(item => wanted.has(module7NormalizeSource(item.source)))
+    .filter(item => {
+      if (!item.id || seen.has(item.id)) return false;
+      seen.add(item.id);
+      return true;
+    })
     .map(item => ({
-      id: `selected-${item.id}`,
-      severity: 'neutral',
-      studentText: item.text || findingTextById(item.id),
+      id: `case-${item.id}`,
+      severity: selectedIds.has(item.id) ? 'yellow' : 'neutral',
+      studentText: selectedIds.has(item.id) ? (state.selected[item.id]?.text || item.text || findingTextById(item.id)) : '',
       expertText: item.text || findingTextById(item.id),
       explanation: explanationBody ? {
         title: explanationSource.title || 'Explicación experta',
@@ -1911,8 +1943,9 @@ function module7SectionsFromPhase(phase) {
       return {
         id: `${phase.phase || phase.id || 'phase'}-${sourceIdx}-selected-findings`,
         title: `${phase.title || phase.phase || 'Etapa'} · ${source}`,
+        title: source,
         type: 'hallazgos',
-        rows: module7SelectedRowsForSources([source], {
+        rows: module7CaseFindingRowsForSources([source], {
           title: matchingSection.title || source,
           expertNote: explanationRow.expertNote || explanationRow.explanation?.body?.join('\n')
         })
@@ -1937,10 +1970,7 @@ function module7SectionsFromPhase(phase) {
 }
 
 function module7ExtraDirectSections(direct) {
-  return [
-    ...(Array.isArray(direct?.sections) ? direct.sections : []),
-    ...(Array.isArray(direct?.legacySections) ? direct.legacySections : [])
-  ];
+  return Array.isArray(direct?.sections) ? direct.sections : [];
 }
 
 function module7DataFromPhaseComparisons(phaseComparisons, extraSections = []) {
@@ -1965,6 +1995,7 @@ function module7DataFromPhaseComparisons(phaseComparisons, extraSections = []) {
   });
 
   sections.push(...extraSections);
+  sections.push(...module7RowsFromLegacyManagement());
   return { pairedBlocks, sections };
 }
 
@@ -2000,6 +2031,13 @@ function module7DirectData(direct) {
 function module7Data() {
   const comparison = module7ExpertSource();
   const direct = CASE_DATA.module7Evaluation || expertData().module7Evaluation || null;
+  if (comparison) {
+    const comparisonData = module7DataFromComparisonByModule(comparison);
+    const hasFindingRows = (comparisonData.sections || []).some(section =>
+      section.id !== 'management' && Array.isArray(section.rows) && section.rows.length
+    );
+    if (hasFindingRows) return comparisonData;
+  }
   if (Array.isArray(direct?.phaseComparisons) && direct.phaseComparisons.length) {
     return module7DataFromPhaseComparisons(direct.phaseComparisons, module7ExtraDirectSections(direct));
   }
@@ -2081,6 +2119,12 @@ function renderModule7DiagnosisCards(value) {
 }
 
 function renderModule7Row(row) {
+  if (row.type === 'subheading') {
+    return `<div class="m7-table-row m7-subheading-row">
+      <div class="m7-table-cell student"></div>
+      <div class="m7-table-cell expert"><strong>${esc(row.title || '')}</strong></div>
+    </div>`;
+  }
   const severity = module7Severity(row.severity);
   const explanationId = module7RegisterExplanation(row);
   const studentText = module7Text(row.studentText, '—');

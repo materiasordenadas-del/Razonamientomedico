@@ -135,8 +135,8 @@ window.HCR_CASE_MODULES.RC5.module1 = {
       ]
     },
     {
-      "id": "dato-int-14",
-      "source": "Interrogatorio",
+      "id": "dato-tri-16",
+      "source": "Triage",
       "text": "Glucemia capilar: 97 mg/dL.",
       "termIds": [
         "no_aplica_en_m1"
