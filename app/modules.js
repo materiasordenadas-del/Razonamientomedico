@@ -1697,6 +1697,7 @@ function module7RowsFromLegacyFindings() {
   const lowValue = new Set(expert.lowValueSelected || []);
   const selectedIds = new Set(Object.keys(state.selected || {}));
   const ids = [...new Set([...expected, ...lowValue])];
+  const usedIds = module7IdSet(ids);
   const groups = {};
 
   ids.forEach(id => {
@@ -1711,12 +1712,25 @@ function module7RowsFromLegacyFindings() {
     const row = {
       id,
       severity,
-      studentText: selectedIds.has(id) ? text : '',
+      studentText: selectedIds.has(id) ? text : 'MISSED',
+      studentMissed: !selectedIds.has(id),
       expertText: lowValue.has(id) ? `${text} (No prioritaria)` : text,
       expertNote: ''
     };
     const title = module7SourceTitle(source);
     (groups[title] = groups[title] || []).push(row);
+  });
+
+  Object.values(state.selected || {}).forEach(item => {
+    if (!item.id || usedIds.has(module7Id(item.id))) return;
+    const title = module7SourceTitle(item.source);
+    (groups[title] = groups[title] || []).push({
+      id: `student-selected-${item.id}`,
+      severity: 'neutral',
+      studentText: item.text || findingTextById(item.id),
+      expertText: '',
+      expertBlank: true
+    });
   });
 
   return Object.entries(groups).map(([title, rows]) => ({
@@ -1737,10 +1751,12 @@ function module7RowsFromLegacyManagement() {
   const row = (prefix, item, index, severity) => {
     const label = cleanLabel(item?.label);
     const reason = cleanReason(item?.reason);
+    const studentMatch = module7StudentManagementMatch(label);
     return {
       id: `${prefix}-${index}`,
       severity,
-      studentText: '',
+      studentText: studentMatch || 'MISSED',
+      studentMissed: !studentMatch,
       expertText: label,
       expertNote: reason,
       explanation: reason ? { title: label, body: [reason] } : null
@@ -1770,11 +1786,13 @@ function module7RowsFromLegacyManagement() {
   if (management.destination) {
     const label = cleanLabel(management.destination.label);
     const reason = cleanReason(management.destination.reason);
+    const studentMatch = module7StudentManagementMatch(label);
     addGroup('DESTINO');
     rows.push({
       id: 'management-destination',
       severity: 'neutral',
-      studentText: '',
+      studentText: studentMatch || 'MISSED',
+      studentMissed: !studentMatch,
       expertText: label,
       expertNote: reason,
       explanation: reason ? {
@@ -1783,6 +1801,21 @@ function module7RowsFromLegacyManagement() {
       } : null
     });
   }
+  const expertLabels = [
+    ...(management.expected || []).map(item => cleanLabel(item?.label)),
+    ...(management.dangerousOmissions || []).map(item => cleanLabel(item?.label)),
+    ...(management.monitoringOmitted || []).map(item => cleanLabel(item?.label)),
+    management.destination ? cleanLabel(management.destination.label) : ''
+  ].filter(Boolean);
+  module7StudentManagementItems()
+    .filter(item => !expertLabels.some(label => module7TextsLikelyMatch(label, item)))
+    .forEach((item, index) => rows.push({
+      id: `management-student-selected-${index}`,
+      severity: 'neutral',
+      studentText: item,
+      expertText: '',
+      expertBlank: true
+    }));
   return rows.length ? [{
     id: 'management',
     title: 'Manejo',
@@ -1796,23 +1829,27 @@ function module7RowsFromSourceComparison(moduleKey, moduleData) {
   const sourceComparison = moduleData?.sourceComparison || {};
   const rows = [];
   const module7Findings = Array.isArray(moduleData?.module7Findings) ? moduleData.module7Findings : [];
-  const criticalIds = new Set(Object.values(sourceComparison)
+  const criticalIds = module7IdSet(Object.values(sourceComparison)
     .flatMap(group => group?.criticalMisses || []));
+  const usedIds = new Set();
 
   if (module7Findings.length) {
     module7Findings.forEach(item => {
-      const findingId = String(item.findingId || '').toLowerCase();
+      const findingId = module7Id(item.findingId);
       const selected = state.selected?.[findingId];
       const text = item.text || selected?.text || findingTextById(findingId);
       const selectedByStudent = selectedIds.has(findingId);
+      if (findingId) usedIds.add(findingId);
       rows.push({
         id: item.id || `${moduleKey}-${findingId || rows.length}`,
         severity: selectedByStudent ? 'yellow' : (criticalIds.has(findingId) ? 'red' : 'yellow'),
-        studentText: selectedByStudent ? (selected?.text || text) : '',
+        studentText: selectedByStudent ? (selected?.text || text) : 'MISSED',
+        studentMissed: !selectedByStudent,
         expertText: text,
         explanation: item.explanation || null
       });
     });
+    rows.push(...module7StudentOnlyRowsForModule(moduleKey, usedIds));
 
     const meta = module7ModuleOrder.find(item => item.key === moduleKey);
     return [{
@@ -1824,20 +1861,24 @@ function module7RowsFromSourceComparison(moduleKey, moduleData) {
   }
 
   Object.entries(sourceComparison).forEach(([groupKey, group]) => {
-    const critical = new Set(group.criticalMisses || []);
+    const critical = module7IdSet(group.criticalMisses || []);
     const expectedIds = [...new Set([...(group.expectedSelected || []), ...(group.criticalMisses || [])])];
     expectedIds.forEach(id => {
-      const selected = state.selected?.[id];
-      const text = selected?.text || findingTextById(id);
+      const findingId = module7Id(id);
+      const selected = state.selected?.[findingId];
+      const text = selected?.text || findingTextById(findingId);
+      usedIds.add(findingId);
       rows.push({
-        id: `${moduleKey}-${groupKey}-${id}`,
-        severity: critical.has(id) ? 'red' : 'yellow',
-        studentText: selectedIds.has(id) ? text : '',
+        id: `${moduleKey}-${groupKey}-${findingId}`,
+        severity: critical.has(findingId) ? 'red' : 'yellow',
+        studentText: selectedIds.has(findingId) ? text : 'MISSED',
+        studentMissed: !selectedIds.has(findingId),
         expertText: text
       });
     });
 
   });
+  rows.push(...module7StudentOnlyRowsForModule(moduleKey, usedIds));
 
   const meta = module7ModuleOrder.find(item => item.key === moduleKey);
   return rows.length ? [{
@@ -1888,6 +1929,93 @@ function module7NormalizeSource(source) {
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase();
+}
+
+function module7Id(value) {
+  return String(value || '').toLowerCase();
+}
+
+function module7IdSet(values) {
+  return new Set((Array.isArray(values) ? values : []).map(module7Id).filter(Boolean));
+}
+
+function module7SourcesForModule(moduleKey) {
+  return {
+    m1: ['Triage', 'Interrogatorio'],
+    m2: ['Historial', 'Examen funcional'],
+    m3: ['Examen físico', 'Examen fisico'],
+    m4: ['Paraclínicos', 'Paraclinicos']
+  }[moduleKey] || [];
+}
+
+function module7SelectedFindingsForModule(moduleKey) {
+  const wanted = new Set(module7SourcesForModule(moduleKey).map(module7NormalizeSource));
+  return Object.values(state.selected || {})
+    .filter(item => wanted.has(module7NormalizeSource(item.source)));
+}
+
+function module7StudentOnlyRowsForModule(moduleKey, usedIds) {
+  return module7SelectedFindingsForModule(moduleKey)
+    .filter(item => item.id && !usedIds.has(module7Id(item.id)))
+    .map(item => ({
+      id: `${moduleKey}-student-selected-${item.id}`,
+      severity: 'neutral',
+      studentText: item.text || findingTextById(item.id),
+      expertText: '',
+      expertBlank: true
+    }));
+}
+
+function module7StudentManagementItems() {
+  if (state.managementMode === 'manual') {
+    return manualManagementFields
+      .filter(({ key }) => (state.manualManagement[key] || '').trim())
+      .map(({ title, key }) => `${title}: ${state.manualManagement[key]}`);
+  }
+
+  const gm = state.guidedManagement || defaultGuidedManagement();
+  const general = Object.entries(gm.general || {}).filter(([, value]) => !!value).map(([id, value]) => {
+    const label = optionLabel(guidedGeneralOptions, id);
+    if (id !== 'oxygen') return label;
+    const d = value.details || {};
+    const details = [d.device, d.flow, d.target, d.indication].filter(Boolean).join(' · ');
+    return details ? `${label}: ${details}` : label;
+  });
+  const drugs = Object.keys(gm.drugs || {}).map(id => {
+    const drug = findDrugById(id);
+    const selected = gm.drugs[id] || {};
+    const details = [selected.presentation, selected.route, selected.frequency, selected.duration, selected.indication, selected.precautions].filter(Boolean).join(' · ');
+    return details ? `${drug?.name || selected.name || id}: ${details}` : (drug?.name || selected.name || id);
+  });
+  const procedures = Object.keys(gm.procedures || {}).map(id => optionLabel(guidedProcedureOptions, id));
+  const monitoring = Object.entries(gm.monitoring || {}).filter(([, value]) => !!value).map(([id]) => optionLabel(guidedMonitoringOptions, id));
+  const consults = (gm.consults || []).map(c => c.service || c.id).filter(Boolean);
+  const destination = gm.destination ? [gm.destination] : [];
+  const precautions = gm.precautions ? [gm.precautions] : [];
+  return [...general, ...drugs, ...procedures, ...monitoring, ...consults, ...destination, ...precautions].filter(Boolean);
+}
+
+function module7NormalizeText(value) {
+  return String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function module7TextsLikelyMatch(a, b) {
+  const left = module7NormalizeText(a);
+  const right = module7NormalizeText(b);
+  if (!left || !right) return false;
+  if (left.includes(right) || right.includes(left)) return true;
+  const leftWords = new Set(left.split(/\s+/).filter(word => word.length > 4));
+  const rightWords = right.split(/\s+/).filter(word => word.length > 4);
+  return rightWords.filter(word => leftWords.has(word)).length >= 2;
+}
+
+function module7StudentManagementMatch(label) {
+  return module7StudentManagementItems().find(item => module7TextsLikelyMatch(label, item)) || '';
 }
 
 function module7CaseFindingRowsForSources(sources, explanationSource = {}) {
@@ -2127,21 +2255,21 @@ function renderModule7Row(row) {
   }
   const severity = module7Severity(row.severity);
   const explanationId = module7RegisterExplanation(row);
-  const studentText = module7Text(row.studentText, '—');
-  const expertText = module7Text(row.expertText, 'Pendiente experto');
+  const studentText = row.studentMissed ? 'MISSED' : module7Text(row.studentText, '—');
+  const expertText = row.expertBlank ? '' : module7Text(row.expertText, 'Pendiente experto');
   return `<div class="m7-table-row">
     <div class="m7-table-cell student">
       <span class="m7-severity ${severity}" aria-hidden="true"></span>
-      <span class="m7-row-text ${studentText === '—' ? 'muted' : ''}">${esc(studentText)}</span>
+      <span class="m7-row-text ${studentText === '—' ? 'muted' : ''} ${row.studentMissed ? 'missed' : ''}">${esc(studentText)}</span>
     </div>
     <div class="m7-table-cell expert">
       <span class="m7-severity ${severity}" aria-hidden="true"></span>
       <span class="m7-row-main">
-        <span class="m7-row-text">${esc(expertText)}</span>
+        <span class="m7-row-text ${row.expertBlank ? 'muted' : ''}">${esc(expertText)}</span>
       </span>
-      <button class="m7-book-btn" type="button" onclick="openModule7Explanation('${explanationId}')" aria-label="Abrir explicación experta">
+      ${row.expertBlank ? '' : `<button class="m7-book-btn" type="button" onclick="openModule7Explanation('${explanationId}')" aria-label="Abrir explicación experta">
         ${module7BookIcon()}
-      </button>
+      </button>`}
     </div>
   </div>`;
 }
