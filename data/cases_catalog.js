@@ -92,7 +92,7 @@ window.HCR_CASES_CATALOG = {
     },
     {
       id: "CR7", route: "caso-CR7.html", availability: "Disponible", format: "Caso completo", modules: 8, difficulty: "Nivel 3", level: "Nivel III", collections: ["neurologia", "urgencias"],
-      imagenPortada: "",
+      imagenPortada: "cases/CR7/assets/index/index.webp",
       patient: { displayName: "Caso CR7", initials: "CR7", age: "", sex: "", setting: "Urgencias" },
       chiefConcern: "Una conversacion que se detiene",
       publicPresentation: "Caso neurologico de urgencias centrado en adquisicion de datos, razonamiento por etapas y decisiones iniciales seguras.",

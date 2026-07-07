@@ -19,11 +19,11 @@ window.HCR_CASE_METADATA.CR7 = {
   "author": "Case Builder / IA",
   "lastUpdated": "2026-07-06",
   "visual": {
-    "imagenPortada": "",
-    "fotoCircular": ""
+    "imagenPortada": "cases/CR7/assets/index/index.webp",
+    "fotoCircular": "cases/CR7/assets/triaje/triaje.webp"
   },
   "supports": {
-    "images": false,
+    "images": true,
     "audio": false,
     "ecg": true,
     "xray": true,
