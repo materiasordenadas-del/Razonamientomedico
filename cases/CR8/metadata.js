@@ -18,11 +18,11 @@ window.HCR_CASE_METADATA.CR8 = {
   "author": "Case Builder / IA",
   "lastUpdated": "2026-07-06",
   "visual": {
-    "imagenPortada": "",
-    "fotoCircular": ""
+    "imagenPortada": "cases/CR8/assets/index/rc8_portada_index_1200x792.webp.webp",
+    "fotoCircular": "cases/CR8/assets/triaje/rc8_triaje_avatar_360x360.webp.webp"
   },
   "supports": {
-    "images": false,
+    "images": true,
     "audio": false,
     "ecg": true,
     "xray": true,

@@ -101,7 +101,7 @@ window.HCR_CASES_CATALOG = {
     },
     {
       id: "CR8", route: "caso-CR8.html", availability: "Disponible", format: "Caso completo", modules: 8, difficulty: "Nivel 3", level: "Nivel III", collections: ["neurologia", "urgencias"],
-      imagenPortada: "",
+      imagenPortada: "cases/CR8/assets/index/rc8_portada_index_1200x792.webp.webp",
       patient: { displayName: "Caso CR8", initials: "CR8", age: "", sex: "", setting: "Urgencias" },
       chiefConcern: "Cuando las palabras no salen",
       publicPresentation: "Caso neurologico de urgencias centrado en integracion clinica, paraclinicos y manejo inicial seguro.",
