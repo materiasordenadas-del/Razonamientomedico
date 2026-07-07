@@ -89,6 +89,24 @@ window.HCR_CASES_CATALOG = {
                 "recommendedRank": 5,
                 "publishedAt": "2026-07-04"
           }
+    },
+    {
+      id: "CR7", route: "caso-CR7.html", availability: "Disponible", format: "Caso completo", modules: 8, difficulty: "Nivel 3", level: "Nivel III", collections: ["neurologia", "urgencias"],
+      imagenPortada: "",
+      patient: { displayName: "Caso CR7", initials: "CR7", age: "", sex: "", setting: "Urgencias" },
+      chiefConcern: "Una conversacion que se detiene",
+      publicPresentation: "Caso neurologico de urgencias centrado en adquisicion de datos, razonamiento por etapas y decisiones iniciales seguras.",
+      publicTags: { symptoms: ["Cefalea", "Mareo / Sincope"], syndromes: ["Sindrome neurologico agudo"], systems: ["Neurologico"], context: ["Urgencias"], keywords: ["neurologia", "urgencias", "deficit focal", "razonamiento clinico"] },
+      sort: { recommendedRank: 7, publishedAt: "2026-07-06" }
+    },
+    {
+      id: "CR8", route: "caso-CR8.html", availability: "Disponible", format: "Caso completo", modules: 8, difficulty: "Nivel 3", level: "Nivel III", collections: ["neurologia", "urgencias"],
+      imagenPortada: "",
+      patient: { displayName: "Caso CR8", initials: "CR8", age: "", sex: "", setting: "Urgencias" },
+      chiefConcern: "Cuando las palabras no salen",
+      publicPresentation: "Caso neurologico de urgencias centrado en integracion clinica, paraclinicos y manejo inicial seguro.",
+      publicTags: { symptoms: ["Cefalea", "Mareo / Sincope"], syndromes: ["Sindrome neurologico agudo"], systems: ["Neurologico"], context: ["Urgencias"], keywords: ["neurologia", "urgencias", "lenguaje", "neuroimagen"] },
+      sort: { recommendedRank: 8, publishedAt: "2026-07-06" }
     }
   ]
 };
