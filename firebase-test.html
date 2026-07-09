@@ -1,9 +1,9 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>H-CR — Acceso</title>
+  <title>H-CR â€” Acceso</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -210,18 +210,18 @@
     </div>
 
     <div class="field">
-      <label for="password">Contraseña</label>
-      <input id="password" type="password" autocomplete="current-password" placeholder="••••••••">
+      <label for="password">ContraseÃ±a</label>
+      <input id="password" type="password" autocomplete="current-password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢">
     </div>
 
     <div class="remember-row">
       <input type="checkbox" id="rememberMe" checked>
-      <label for="rememberMe">Mantener sesión iniciada en este dispositivo</label>
+      <label for="rememberMe">Mantener sesiÃ³n iniciada en este dispositivo</label>
     </div>
     <p class="remember-hint">No la uses en equipos compartidos.</p>
 
     <div class="actions">
-      <button id="login" type="button">Iniciar sesión</button>
+      <button id="login" type="button">Iniciar sesiÃ³n</button>
       <button id="createAccount" type="button">Crear cuenta</button>
     </div>
 
@@ -230,7 +230,7 @@
     <div id="status">No autenticado</div>
 
     <div class="actions" style="margin-top:0.8rem">
-      <button id="logout" type="button">Cerrar sesión</button>
+      <button id="logout" type="button">Cerrar sesiÃ³n</button>
     </div>
   </div>
 
@@ -280,20 +280,20 @@
     }
 
     function goToLibrary() {
-      window.location.replace("index.html");
+      window.location.replace("biblioteca.html");
     }
 
     createAccount.addEventListener("click", async () => {
       const { username, password, remember } = credentials();
       createAccount.disabled = true;
       login.disabled = true;
-      setStatus("Creando cuenta…", "info");
+      setStatus("Creando cuentaâ€¦", "info");
       try {
         await registerUser(username, password, remember);
-        setStatus("Cuenta creada. Abriendo biblioteca…", "ok");
+        setStatus("Cuenta creada. Abriendo bibliotecaâ€¦", "ok");
         goToLibrary();
       } catch {
-        setStatus("No se pudo crear la cuenta. Revisa el usuario o la contraseña.", "error");
+        setStatus("No se pudo crear la cuenta. Revisa el usuario o la contraseÃ±a.", "error");
         createAccount.disabled = false;
         login.disabled = false;
       }
@@ -303,13 +303,13 @@
       const { username, password, remember } = credentials();
       login.disabled = true;
       createAccount.disabled = true;
-      setStatus("Iniciando sesión…", "info");
+      setStatus("Iniciando sesiÃ³nâ€¦", "info");
       try {
         await loginUser(username, password, remember);
-        setStatus("Sesión iniciada. Abriendo biblioteca…", "ok");
+        setStatus("SesiÃ³n iniciada. Abriendo bibliotecaâ€¦", "ok");
         goToLibrary();
       } catch {
-        setStatus("No se pudo iniciar sesión. Verifica tus credenciales.", "error");
+        setStatus("No se pudo iniciar sesiÃ³n. Verifica tus credenciales.", "error");
         login.disabled = false;
         createAccount.disabled = false;
       }
@@ -319,9 +319,9 @@
       logout.disabled = true;
       try {
         await logoutUser();
-        setStatus("Sesión cerrada.", "");
+        setStatus("SesiÃ³n cerrada.", "");
       } catch {
-        setStatus("No se pudo cerrar la sesión.", "error");
+        setStatus("No se pudo cerrar la sesiÃ³n.", "error");
       }
       logout.disabled = false;
     });
@@ -334,10 +334,11 @@
         return;
       }
       setStatus(
-        `Autenticado — ${escapeHtml(profile?.usernameNormalized || user.uid.slice(0, 8))}`,
+        `Autenticado â€” ${escapeHtml(profile?.usernameNormalized || user.uid.slice(0, 8))}`,
         "ok"
       );
     });
   </script>
 </body>
 </html>
+
