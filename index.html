@@ -1,9 +1,9 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>H-CR â€” Razonamiento clÃ­nico estructurado</title>
+  <title>H-CR — Razonamiento clínico estructurado</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -16,7 +16,7 @@
       flex-direction: column;
     }
 
-    /* â”€â”€ TOPBAR â”€â”€ */
+    /* ── TOPBAR ── */
     .topbar {
       position: sticky;
       top: 0;
@@ -130,7 +130,7 @@
     }
     .btn-ghost:hover { border-color: #2563eb; color: #2563eb; background: #eff6ff; }
 
-    /* â”€â”€ HERO â”€â”€ */
+    /* ── HERO ── */
     .hero {
       flex: 1;
       display: grid;
@@ -220,7 +220,7 @@
       font-weight: 500;
     }
 
-    /* â”€â”€ ILLUSTRATION â”€â”€ */
+    /* ── ILLUSTRATION ── */
     .hero-illustration {
       display: flex;
       align-items: center;
@@ -234,7 +234,7 @@
       filter: drop-shadow(0 20px 48px rgba(37,99,235,.12));
     }
 
-    /* â”€â”€ FEATURES STRIP â”€â”€ */
+    /* ── FEATURES STRIP ── */
     .features {
       border-top: 1px solid #e2e8f0;
       background: #fff;
@@ -282,7 +282,7 @@
       line-height: 1.65;
     }
 
-    /* â”€â”€ FOOTER â”€â”€ */
+    /* ── FOOTER ── */
     .footer {
       text-align: center;
       padding: 16px 24px;
@@ -320,7 +320,7 @@
       </div>
       <div>
         <div class="topbar-logo">H-CR</div>
-        <div class="topbar-sub">Razonamiento clÃ­nico</div>
+        <div class="topbar-sub">Razonamiento clínico</div>
       </div>
     </a>
 
@@ -332,14 +332,14 @@
 
     <!-- Not logged in -->
     <div class="topbar-auth" id="accessPanel">
-      <a class="btn btn-ghost" href="firebase-test.html?mode=login">Iniciar sesiÃ³n</a>
+      <a class="btn btn-ghost" href="firebase-test.html?mode=login">Iniciar sesión</a>
       <a class="btn btn-primary" href="firebase-test.html?mode=register">Crear cuenta</a>
     </div>
 
     <!-- Logged in -->
     <div class="topbar-session" id="sessionPanel">
       <span class="session-info" id="sessionUser"></span>
-      <a class="btn btn-primary" href="biblioteca.html">Ir a la biblioteca â†’</a>
+      <a class="btn btn-primary" href="biblioteca.html">Ir a la biblioteca →</a>
     </div>
   </header>
 
@@ -348,37 +348,37 @@
     <div class="hero-content">
       <div class="hero-eyebrow">
         <svg width="10" height="10" viewBox="0 0 24 24" fill="#2563eb"><circle cx="12" cy="12" r="10"/></svg>
-        Plataforma de aprendizaje clÃ­nico
+        Plataforma de aprendizaje clínico
       </div>
 
       <h1 class="hero-title">
-        Razonamiento<br>clÃ­nico <span>estructurado</span>
+        Razonamiento<br>clínico <span>estructurado</span>
       </h1>
 
       <p class="hero-description">
-        H-CR entrena la adquisiciÃ³n de datos, el diagnÃ³stico diferencial y el manejo clÃ­nico mediante casos progresivos y estructurados, diseÃ±ados para estudiantes de medicina.
+        H-CR entrena la adquisición de datos, el diagnóstico diferencial y el manejo clínico mediante casos progresivos y estructurados, diseñados para estudiantes de medicina.
       </p>
 
       <div class="hero-actions" id="heroActions">
-        <a class="btn btn-primary" href="firebase-test.html?mode=login">Iniciar sesiÃ³n</a>
+        <a class="btn btn-primary" href="firebase-test.html?mode=login">Iniciar sesión</a>
         <a class="btn btn-ghost" href="firebase-test.html?mode=register">Crear cuenta gratis</a>
       </div>
       <div class="hero-actions" id="heroContinue" style="display:none">
-        <a class="btn btn-primary" href="biblioteca.html">Continuar a la biblioteca â†’</a>
+        <a class="btn btn-primary" href="biblioteca.html">Continuar a la biblioteca →</a>
       </div>
 
       <div class="hero-stats">
         <div class="hero-stat">
           <span class="hero-stat-val">10+</span>
-          <span class="hero-stat-label">Casos clÃ­nicos</span>
+          <span class="hero-stat-label">Casos clínicos</span>
         </div>
         <div class="hero-stat">
           <span class="hero-stat-val">5</span>
-          <span class="hero-stat-label">Sistemas mÃ©dicos</span>
+          <span class="hero-stat-label">Sistemas médicos</span>
         </div>
         <div class="hero-stat">
           <span class="hero-stat-val">7</span>
-          <span class="hero-stat-label">MÃ³dulos por caso</span>
+          <span class="hero-stat-label">Módulos por caso</span>
         </div>
       </div>
     </div>
@@ -412,7 +412,7 @@
         <!-- Content area -->
         <!-- ECG line -->
         <rect x="68" y="116" width="344" height="68" rx="12" fill="#f0f9ff"/>
-        <text x="84" y="132" font-family="Segoe UI,sans-serif" font-size="9" fill="#2563eb" font-weight="700" letter-spacing="1">ECG â€” MÃ“DULO 2</text>
+        <text x="84" y="132" font-family="Segoe UI,sans-serif" font-size="9" fill="#2563eb" font-weight="700" letter-spacing="1">ECG — MÓDULO 2</text>
         <polyline points="84,158 100,158 108,138 116,172 124,148 132,158 148,158 160,158 168,144 176,165 182,158 200,158 216,158 224,145 232,168 238,158 260,158 276,158 284,143 292,168 298,158 344,158" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 
         <!-- Vital signs row -->
@@ -429,15 +429,15 @@
         <rect x="300" y="200" width="112" height="58" rx="10" fill="#fdf4ff"/>
         <text x="316" y="218" font-family="Segoe UI,sans-serif" font-size="8" fill="#9333ea" font-weight="700">TEMP</text>
         <text x="314" y="238" font-family="Segoe UI,sans-serif" font-size="20" fill="#7e22ce" font-weight="800">38.2</text>
-        <text x="316" y="252" font-family="Segoe UI,sans-serif" font-size="8" fill="#d8b4fe">Â°C</text>
+        <text x="316" y="252" font-family="Segoe UI,sans-serif" font-size="8" fill="#d8b4fe">°C</text>
 
         <!-- Diagnosis section -->
         <rect x="68" y="274" width="344" height="82" rx="12" fill="#fafafa" stroke="#e2e8f0" stroke-width="1"/>
-        <text x="84" y="292" font-family="Segoe UI,sans-serif" font-size="9" fill="#64748b" font-weight="700" letter-spacing=".5">DIAGNÃ“STICO DIFERENCIAL</text>
+        <text x="84" y="292" font-family="Segoe UI,sans-serif" font-size="9" fill="#64748b" font-weight="700" letter-spacing=".5">DIAGNÓSTICO DIFERENCIAL</text>
 
         <!-- Dx options -->
         <rect x="84" y="300" width="180" height="14" rx="7" fill="#2563eb"/>
-        <text x="94" y="311" font-family="Segoe UI,sans-serif" font-size="8" fill="#fff" font-weight="600">NeumonÃ­a adquirida comunidad</text>
+        <text x="94" y="311" font-family="Segoe UI,sans-serif" font-size="8" fill="#fff" font-weight="600">Neumonía adquirida comunidad</text>
 
         <rect x="84" y="320" width="130" height="14" rx="7" fill="#e2e8f0"/>
         <text x="94" y="331" font-family="Segoe UI,sans-serif" font-size="8" fill="#64748b">Bronquitis aguda</text>
@@ -468,28 +468,28 @@
         <div class="feature-icon">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
         </div>
-        <div class="feature-title">AdquisiciÃ³n de datos</div>
-        <div class="feature-desc">Interrogatorio guiado con sÃ­ntomas reales y respuestas contextualizadas por caso.</div>
+        <div class="feature-title">Adquisición de datos</div>
+        <div class="feature-desc">Interrogatorio guiado con síntomas reales y respuestas contextualizadas por caso.</div>
       </div>
       <div class="feature">
         <div class="feature-icon">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
         </div>
-        <div class="feature-title">DiagnÃ³stico diferencial</div>
-        <div class="feature-desc">Construye hipÃ³tesis y jerarquiza diagnÃ³sticos con retroalimentaciÃ³n estructurada.</div>
+        <div class="feature-title">Diagnóstico diferencial</div>
+        <div class="feature-desc">Construye hipótesis y jerarquiza diagnósticos con retroalimentación estructurada.</div>
       </div>
       <div class="feature">
         <div class="feature-icon">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
         <div class="feature-title">Progreso guardado</div>
-        <div class="feature-desc">ContinÃºa cada caso donde lo dejaste. Tu razonamiento queda registrado por mÃ³dulo.</div>
+        <div class="feature-desc">Continúa cada caso donde lo dejaste. Tu razonamiento queda registrado por módulo.</div>
       </div>
     </div>
   </section>
 
   <footer class="footer">
-    DiseÃ±ado por <strong>Adriel Pereira</strong> Â· Estudiante de Medicina, Universidad del Zulia Â· H-CR v3
+    Diseñado por <strong>Adriel Pereira</strong> · Estudiante de Medicina, Universidad del Zulia · H-CR v3
   </footer>
 
   <script type="module">
@@ -525,4 +525,3 @@
   </script>
 </body>
 </html>
-
